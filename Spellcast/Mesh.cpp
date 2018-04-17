@@ -21,7 +21,7 @@ MeshPtr Mesh::Create() {
 bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	Importer importer;
 
-	const aiScene *scene = importer.ReadFile(a_filePath,
+	const aiScene* scene = importer.ReadFile(a_filePath,
 		a_flags
 		| aiProcess_CalcTangentSpace
 		| aiProcess_Triangulate
@@ -30,13 +30,19 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 		| aiProcess_JoinIdenticalVertices
 	);
 
-	if (scene) {
-		Init(scene);
-		return true;
+	if (!scene) {
+		cerr << "WARNING: Error parsing " << a_filePath << ": " << importer.GetErrorString() << endl;
+		return false;
 	}
 
-	cerr << "WARNING: Error parsing " << a_filePath << ": " << importer.GetErrorString() << endl;
-	return false;
+	Init(scene);
+	return true;
+}
+
+void Mesh::Render() const {
+	for (const MeshEntry& entry : m_entries) {
+		entry.Render();
+	}
 }
 
 void Mesh::Init(const aiScene* a_scene) {
@@ -136,4 +142,11 @@ bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec
 	glBindVertexArray(0);
 
 	return glGetError() == GL_NO_ERROR;
+}
+
+void Mesh::MeshEntry::Render() const {
+	glBindVertexArray(m_vaos[VAOs::Geometry]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, nullptr);
 }

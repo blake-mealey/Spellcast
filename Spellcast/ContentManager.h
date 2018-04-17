@@ -12,10 +12,12 @@ public:
 	
 	static MeshPtr& GetMesh(const std::string& a_filePath, bool a_overwrite = false);
 
-private:
-	static std::string GetContentPath(const std::string& a_filePath);
+	static bool ReadFile(const std::string& a_filePath, std::string& a_source);
+	
+	static std::string GetContentPath(const std::string& a_filePath, const std::string& a_dirPath = "");
 	static void NoFileWarning(const char* a_fileType, const char* a_filePath);
+private:
 
-	static std::unordered_map<std::string, nlohmann::json> m_jsonData;
-	static std::unordered_map<std::string, MeshPtr> m_meshes;
+	static std::unordered_map<std::string, nlohmann::json> s_jsonData;
+	static std::unordered_map<std::string, MeshPtr> s_meshes;
 };

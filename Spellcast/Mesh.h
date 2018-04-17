@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-class aiScene;
+struct aiScene;
 
 typedef unsigned int t_index;
 
@@ -21,8 +21,9 @@ public:
 
 	bool LoadFromFile(const std::string& a_filePath, unsigned a_flags = 0);
 
-	struct VAOs { enum { Geometry = 0, Count }; };
+	void Render() const;
 
+	struct VAOs { enum { Geometry = 0, Count }; };
 	struct VBOs { enum { Vertices = 0, Normals, Uvs, Count }; };
 
 private:
@@ -35,6 +36,8 @@ private:
 		~MeshEntry();
 
 		bool Init(const std::vector<t_index>& a_indices, const std::vector<glm::vec3>& a_vertices, const std::vector<glm::vec2>& a_uvs = {}, const std::vector<glm::vec3>& a_normals = {});
+
+		void Render() const;
 
 		GLuint m_indexBuffer;
 		GLuint m_vaos[VAOs::Count];

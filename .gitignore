@@ -51,7 +51,6 @@ artifacts/
 *_i.h
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -70,6 +69,9 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+
+[Dd]ebug/*.obj
+[Rr]elease/*.obj
 
 # Chutzpah Test files
 _Chutzpah*

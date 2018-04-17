@@ -7,8 +7,11 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 
 #include <iostream>
+#include "Mesh.h"
+#include "ContentManager.h"
 
 using namespace std;
+using namespace glm;
 
 #define INITIAL_SCREEN_WIDTH 1024
 #define INITIAL_SCREEN_HEIGHT 768
@@ -37,6 +40,9 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	}
 
 	// Create GLFW window
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
 	m_window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, a_windowTitle.c_str(), nullptr, nullptr);
 	if (!m_window) {
@@ -49,6 +55,7 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	int width, height;
 	glfwGetFramebufferSize(m_window, &width, &height);
 	glfwSwapInterval(1);
+	m_windowDims = vec2(width, height);
 
 	// TODO: GLFW input callbacks
 	//glfwSetMouseButtonCallback()
@@ -86,6 +93,9 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
 	ImGui::StyleColorsDark();
 
+	// Initialize shaders
+	m_lighting.Init();
+
 	return true;
 }
 
@@ -93,6 +103,13 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	glfwPollEvents();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
+
+	m_lighting.Enable();
+
+	const MeshPtr& mesh = ContentManager::GetMesh("Boulder.obj");
+	mesh->Render();
 
 	RenderDevTools(a_globalTime);
 

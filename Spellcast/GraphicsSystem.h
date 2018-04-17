@@ -3,6 +3,7 @@
 #include "System.h"
 
 #include <glm/glm.hpp>
+#include "LightingShader.h"
 
 struct GLFWwindow;
 
@@ -29,6 +30,8 @@ private:
 	size_t m_frameCount;
 	Time m_lastTime;
 	double m_framesPerSecond;
+
+	LightingShader m_lighting;
 
 	void RenderDevTools(const Time& a_globalTime);
 };
