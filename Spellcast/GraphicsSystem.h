@@ -18,8 +18,8 @@ public:
 	bool Initialize(const std::string& a_windowTitle);
 	void Update(const Time& a_deltaTime, const Time& a_globalTime) override;
 
-	bool WindowClosed();
-	Time GetGlobalTime();
+	bool WindowClosed() const;
+	static Time GetGlobalTime();
 
 private:
 	GLFWwindow* m_window;

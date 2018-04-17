@@ -8,7 +8,7 @@ using namespace nlohmann;
 
 unordered_map<string, json> ContentManager::m_jsonData;
 
-json& ContentManager::GetJsonData(const string a_filePath, const bool a_overwrite) {
+json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwrite) {
 	// Check if the data has already been loaded
 	if (!a_overwrite) {
 		const auto iter = m_jsonData.find(a_filePath);

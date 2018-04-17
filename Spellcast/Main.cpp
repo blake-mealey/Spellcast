@@ -8,10 +8,12 @@ int main() {
 	GraphicsSystem& graphics = GraphicsSystem::Instance();
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
+	ContentManager::GetJsonData("test.json");
+
 	Time globalTime;
 	while (!graphics.WindowClosed()) {
 		const Time lastTime = globalTime;
-		globalTime = graphics.GetGlobalTime();
+		globalTime = GraphicsSystem::GetGlobalTime();
 		const Time deltaTime = globalTime - lastTime;
 
 		graphics.Update(deltaTime, globalTime);

@@ -6,7 +6,7 @@
 
 class ContentManager {
 public:
-	static nlohmann::json& GetJsonData(std::string a_filePath, bool a_overwrite = false);
+	static nlohmann::json& GetJsonData(const const std::string& a_filePath, bool a_overwrite = false);
 
 private:
 	static std::string GetContentPath(const std::string& a_filePath);

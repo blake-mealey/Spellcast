@@ -18,7 +18,11 @@ GraphicsSystem& GraphicsSystem::Instance() {
 	return instance;
 }
 
-GraphicsSystem::GraphicsSystem() : m_window(nullptr), m_devToolsEnabled(true) { }
+GraphicsSystem::GraphicsSystem() :
+	m_window(nullptr),
+	m_devToolsEnabled(true),
+	m_frameCount(0),
+	m_framesPerSecond(0) { }
 
 GraphicsSystem::~GraphicsSystem() {
 	glfwDestroyWindow(m_window);
@@ -97,7 +101,7 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 
 
-bool GraphicsSystem::WindowClosed() {
+bool GraphicsSystem::WindowClosed() const {
 	return glfwWindowShouldClose(m_window);
 }
 
