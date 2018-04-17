@@ -1,12 +1,21 @@
-#include <iostream>
+#include "GraphicsSystem.h"
+
 #include <string>
 
 using namespace std;
 
 int main() {
-	cout << "Hello World" << endl;
+	GraphicsSystem& graphics = GraphicsSystem::Instance();
+	if (!graphics.Initialize("Spellcast")) exit(-1);
 
-	cin.get();
+	Time globalTime;
+	while (!graphics.WindowClosed()) {
+		const Time lastTime = globalTime;
+		globalTime = graphics.GetGlobalTime();
+		const Time deltaTime = globalTime - lastTime;
+
+		graphics.Update(deltaTime, globalTime);
+	}
 
 	return 0;
 }
