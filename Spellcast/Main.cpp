@@ -1,6 +1,6 @@
 #include "GraphicsSystem.h"
 
-#include <string>
+#include "ContentManager.h"
 
 using namespace std;
 

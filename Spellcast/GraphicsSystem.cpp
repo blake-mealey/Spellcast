@@ -28,7 +28,7 @@ GraphicsSystem::~GraphicsSystem() {
 bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	// Initialize GLFW
 	if (!glfwInit()) {
-		cerr << "Error initializing GLFW." << endl;
+		cerr << "ERROR: Could not initialize GLFW." << endl;
 		return false;
 	}
 
@@ -36,7 +36,7 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
 	m_window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, a_windowTitle.c_str(), nullptr, nullptr);
 	if (!m_window) {
-		cerr << "Error creating GLFW window." << endl;
+		cerr << "ERROR: Could not initialize GLFW window." << endl;
 		return false;
 	}
 
