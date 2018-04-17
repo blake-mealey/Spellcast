@@ -18,7 +18,7 @@ GraphicsSystem& GraphicsSystem::Instance() {
 	return instance;
 }
 
-GraphicsSystem::GraphicsSystem() : m_window(nullptr) { }
+GraphicsSystem::GraphicsSystem() : m_window(nullptr), m_devToolsEnabled(true) { }
 
 GraphicsSystem::~GraphicsSystem() {
 	glfwDestroyWindow(m_window);
@@ -90,8 +90,12 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	RenderDevTools(a_globalTime);
+
 	glfwSwapBuffers(m_window);
 }
+
+
 
 bool GraphicsSystem::WindowClosed() {
 	return glfwWindowShouldClose(m_window);
@@ -99,4 +103,27 @@ bool GraphicsSystem::WindowClosed() {
 
 Time GraphicsSystem::GetGlobalTime() {
 	return glfwGetTime();
+}
+
+void GraphicsSystem::RenderDevTools(const Time& a_globalTime) {
+	ImGui_ImplGlfwGL3_NewFrame();
+
+	if (m_devToolsEnabled) {
+		ImGui::Begin("Dev Tools", &m_devToolsEnabled);
+
+		m_frameCount++;
+		if (a_globalTime - m_lastTime >= 1.0) {
+			m_framesPerSecond = double(m_frameCount);
+			m_frameCount = 0;
+			m_lastTime = a_globalTime;
+		}
+
+		ImGui::LabelText("FPS", "%.0f", m_framesPerSecond);
+		ImGui::LabelText("ms/frame", "%.3f", 1000.0 / m_framesPerSecond);
+
+		ImGui::End();
+	}
+
+	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
+	ImGui::Render();
 }
