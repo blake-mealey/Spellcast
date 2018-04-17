@@ -15,7 +15,7 @@ public:
 	~GraphicsSystem() override;
 	static GraphicsSystem& Instance();
 
-	bool Initialize(const std::string& a_windowName);
+	bool Initialize(const std::string& a_windowTitle);
 	void Update(const Time& a_deltaTime, const Time& a_globalTime) override;
 
 	bool WindowClosed();
