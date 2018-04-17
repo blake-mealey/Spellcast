@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// #include <imgui/imgui.h>
-// #include <imgui/imgui_impl_glfw_gl3.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
 #include <iostream>
 
@@ -76,11 +76,11 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	glCullFace(GL_BACK);
 
 	// Initialize ImGui
-	// ImGui::CreateContext();
-	// ImGuiIO& io = ImGui::GetIO();
-	// ImGui_ImplGlfwGL3_Init(m_window, true);
-	// io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
-	// ImGui::StyleColorsDark();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplGlfwGL3_Init(m_window, true);
+	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
+	ImGui::StyleColorsDark();
 
 	return true;
 }
