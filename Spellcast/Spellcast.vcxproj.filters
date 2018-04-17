@@ -19,17 +19,17 @@
     <Filter Include="Source Files\Content">
       <UniqueIdentifier>{77870b53-bb3c-4981-849b-bb69c7007a75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Content">
-      <UniqueIdentifier>{4fd6b710-6c1f-4a9b-97e3-ca4e38748480}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Systems">
-      <UniqueIdentifier>{864f8fb3-c9b7-487a-91bc-ec008176e827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Utils">
-      <UniqueIdentifier>{7eb09d27-2687-44f7-a0f4-ae9bb54bc141}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{a5a3654c-8789-41b6-b825-a7abf0d4d3f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Content">
+      <UniqueIdentifier>{4fd6b710-6c1f-4a9b-97e3-ca4e38748480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{7eb09d27-2687-44f7-a0f4-ae9bb54bc141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems">
+      <UniqueIdentifier>{864f8fb3-c9b7-487a-91bc-ec008176e827}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,13 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System.h">
-      <Filter>Resource Files\Systems</Filter>
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsSystem.h">
-      <Filter>Resource Files\Systems</Filter>
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="Time.h">
-      <Filter>Resource Files\Utils</Filter>
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
