@@ -7,6 +7,7 @@ using namespace std;
 using namespace nlohmann;
 
 unordered_map<string, json> ContentManager::m_jsonData;
+unordered_map<string, MeshPtr> ContentManager::m_meshes;
 
 json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwrite) {
 	// Check if the data has already been loaded
@@ -33,6 +34,24 @@ json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwri
 	// Cache the result and return
 	m_jsonData[a_filePath] = data;
 	return m_jsonData[a_filePath];
+}
+
+MeshPtr& ContentManager::GetMesh(const std::string& a_filePath, bool a_overwrite) {
+	// Check if the data has already been loaded
+	if (!a_overwrite) {
+		const auto iter = m_meshes.find(a_filePath);
+		if (iter != m_meshes.end()) {
+			return iter->second;
+		}
+	}
+
+	// Try loading from the file
+	MeshPtr mesh = Mesh::Create();
+	mesh->LoadFromFile(GetContentPath(a_filePath));
+
+	// Cache the result and return
+	m_meshes[a_filePath] = mesh;
+	return m_meshes[a_filePath];
 }
 
 std::string ContentManager::GetContentPath(const std::string& a_filePath) {
