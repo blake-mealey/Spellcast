@@ -1,23 +1,102 @@
 #pragma once
 
-#include "Mesh.h"
-
 #include <json/json.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <unordered_map>
 
+class Mesh;
+typedef std::shared_ptr<Mesh> MeshPtr;
+
+class Texture;
+typedef std::shared_ptr<Texture> TexturePtr;
+
+class Material;
+typedef std::shared_ptr<Material> MaterialPtr;
+
+class ShaderProgram;
+typedef std::shared_ptr<ShaderProgram> ShaderProgramPtr;
+
 class ContentManager {
 public:
+    static const glm::vec4 COLOR_WHITE;
+    static const glm::vec4 COLOR_LIGHT_GREY;
+    static const glm::vec4 COLOR_BLACK;
+    static const glm::vec4 COLOR_LIGHT_RED;
+    static const glm::vec4 COLOR_RED;
+    static const glm::vec4 COLOR_LIGHT_GREEN;
+    static const glm::vec4 COLOR_GREEN;
+    static const glm::vec4 COLOR_DARK_BLUE;
+    static const glm::vec4 COLOR_LIGHT_BLUE;
+    static const glm::vec4 COLOR_BLUE;
+    static const glm::vec4 COLOR_YELLOW;
+    static const glm::vec4 COLOR_CYAN;
+
 	static nlohmann::json& GetJsonData(const std::string& a_filePath, bool a_overwrite = false);
 	
 	static MeshPtr& GetMesh(const std::string& a_filePath, bool a_overwrite = false);
+	static TexturePtr& GetTexture(const std::string& a_filePath, bool a_overwrite = false);
+	static MaterialPtr GetMaterial(const nlohmann::json& a_data, bool a_overwrite = false);
+	static ShaderProgramPtr& GetShaderProgram(const std::string& a_programName);
 
 	static bool ReadFile(const std::string& a_filePath, std::string& a_source);
 	
 	static std::string GetContentPath(const std::string& a_filePath, const std::string& a_dirPath = "");
 	static void NoFileWarning(const char* a_fileType, const char* a_filePath);
+
+	template <typename T>
+	static T FromJson(const nlohmann::json& a_data, const std::string& a_key, const T& a_default = T());
+
+	template <typename T>
+	static T FromJson(const nlohmann::json& a_data, const T& a_default = T());
+
+	template <typename V>
+	static V VecFromJson(const nlohmann::json& a_data, const std::string& a_key, const V& a_default = V());
+
+	template <typename V>
+	static V VecFromJson(const nlohmann::json& a_data, const V& a_default = V());
+
+	template <typename K>
+	static glm::vec4 ColorFromJson(const nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default = glm::vec4(1.f));
+
+	static glm::vec4 ColorFromJson(const nlohmann::json& a_data, const glm::vec4& a_default = glm::vec4(1.f));
 private:
 
 	static std::unordered_map<std::string, nlohmann::json> s_jsonData;
 	static std::unordered_map<std::string, MeshPtr> s_meshes;
+	static std::unordered_map<std::string, TexturePtr> s_textures;
+	static std::unordered_map<std::string, MaterialPtr> s_materials;
+	static std::unordered_map<std::string, ShaderProgramPtr> s_shaders;
 };
+
+template <typename T>
+T ContentManager::FromJson(const nlohmann::json& a_data, const std::string& a_key, const T& a_default) {
+	return FromJson(a_data[a_key], a_default);
+}
+
+template <typename T>
+T ContentManager::FromJson(const nlohmann::json& a_data, const T& a_default) {
+	if (a_data.is_null()) return a_default;
+	return a_data.get<T>();
+}
+
+template <typename V>
+V ContentManager::VecFromJson(const nlohmann::json& a_data, const std::string& a_key, const V& a_default) {
+	return VecFromJson(a_data[a_key], a_default);
+}
+
+template <typename V>
+V ContentManager::VecFromJson(const nlohmann::json& a_data, const V& a_default) {
+	if (!a_data.is_array() || a_data.size() != sizeof(V) / sizeof(float)) return a_default;
+
+	V vector;
+	float* vectorData = value_ptr(vector);
+	for (float f : a_data) vectorData++[0] = f;
+
+	return vector;
+}
+
+template <typename K>
+glm::vec4 ContentManager::ColorFromJson(const nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default) {
+	return ColorFromJson(a_data[a_key], a_default);
+}

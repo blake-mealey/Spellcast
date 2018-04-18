@@ -1,9 +1,8 @@
 #pragma once
 
 #include "System.h"
-
-#include <glm/glm.hpp>
 #include "LightingShader.h"
+#include "MeshRenderer.h"
 
 struct GLFWwindow;
 
@@ -23,6 +22,8 @@ public:
 	static Time GetGlobalTime();
 
 private:
+	MeshRenderer m_meshRenderer;
+
 	GLFWwindow* m_window;
 	glm::vec2 m_windowDims;
 

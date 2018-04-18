@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "MeshRenderer.h"
 
 #include <GL/glew.h>
 #include <assimp/Importer.hpp>
@@ -39,9 +40,9 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	return true;
 }
 
-void Mesh::Render() const {
+void Mesh::Render(const MeshRenderer* a_context) const {
 	for (const MeshEntry& entry : m_entries) {
-		entry.Render();
+		entry.Render(a_context);
 	}
 }
 
@@ -81,7 +82,8 @@ void Mesh::Init(const aiScene* a_scene) {
 
 
 
-Mesh::MeshEntry::MeshEntry(): m_indexBuffer(0), m_vaos{}, m_vbos{}, m_indexCount(0), m_vertexCount(0) { }
+Mesh::MeshEntry::MeshEntry(): m_indexBuffer(0), m_vaos{}, m_vbos{}, m_indexCount(0), m_vertexCount(0),
+                              m_materialIndex(0) { }
 
 Mesh::MeshEntry::~MeshEntry() {
 	if (m_indexBuffer) {
@@ -144,7 +146,11 @@ bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec
 	return glGetError() == GL_NO_ERROR;
 }
 
-void Mesh::MeshEntry::Render() const {
+void Mesh::MeshEntry::Render(const MeshRenderer* a_context) const {
+	// Use the current context's material
+	a_context->GetMaterial(m_materialIndex)->Use();
+	// TODO: Load the correct matrices to the shader as well
+
 	glBindVertexArray(m_vaos[VAOs::Geometry]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 

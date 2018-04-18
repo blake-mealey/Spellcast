@@ -1,13 +1,36 @@
 #include "LightingShader.h"
 #include "Uniforms.h"
+#include "Material.h"
+#include "Texture.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace glm;
+using namespace std;
 
 LightingShader::~LightingShader() {
 	// TODO: Safe delete?
 	glDeleteBuffers(SSBOs::Count, m_ssbos);
+}
+
+LightingShaderPtr LightingShader::Create() {
+	return make_shared<LightingShader>();
+}
+
+void LightingShader::SetMaterial(const Material* a_material) {
+	SetMaterialColor(a_material->GetColor());
+	SetMaterialSpecularColor(a_material->GetSpecularColor());
+	SetMaterialSpecularity(a_material->GetSpecularity());
+	SetMaterialEmission(a_material->GetEmission());
+	
+	SetDiffuseTextureEnabled(a_material->HasAlbedoMap());
+
+	SetUvScale(a_material->GetUvScale());
+	// SetUvOffset(a_material->GetUvOffset());
+
+	// SetBloomScale(a_material->GetBloomScale());
+
+	if (a_material->HasAlbedoMap()) a_material->GetAlbedoMap()->Bind(ALBEDO_TEXTURE_UNIT);
 }
 
 bool LightingShader::Init() {
@@ -70,16 +93,16 @@ bool LightingShader::Init() {
 	SetViewMatrix(view);
 	SetModelViewProjectionMatrix(projection * view * model);
 
-	SetDiffuseTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+	SetDiffuseTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
 	SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
 
 	SetDiffuseTextureEnabled(false);
 	SetShadowsEnabled(false);
 
-	SetMaterialDiffuseColor(vec4(195.f, 144.f, 212.f, 255.f) / 255.f);
+	SetMaterialColor(vec4(195.f, 144.f, 212.f, 255.f) / 255.f);
 	SetMaterialSpecularColor(vec4(51.f, 51.f, 51.f, 255.f) / 255.f);
 	SetMaterialSpecularity(1.f);
-	SetMaterialEmissiveness(0.f);
+	SetMaterialEmission(0.f);
 
 	SetAmbientColor(vec4(0.4f, 0.4f, 0.4f, 1.f));
 
@@ -89,7 +112,7 @@ bool LightingShader::Init() {
 
 	Disable();
 
-	LoadLights({DirectionLight(vec3(1.f), vec3(0.f, 0.f, 1.f))}, {}, {});
+	LoadLights({DirectionLight(vec3(1.f), vec3(0.f, -1.f, -2.f))}, {}, {});
 
 	return true;
 }
@@ -110,7 +133,7 @@ void LightingShader::SetDepthBiasModelViewProjectionMatrix(const mat4& a_value) 
 	LoadUniform(m_depthBiasModelViewProjectionMatrixLocation, a_value);
 }
 
-void LightingShader::SetMaterialDiffuseColor(const vec4& a_value) const {
+void LightingShader::SetMaterialColor(const vec4& a_value) const {
 	LoadUniform(m_materialDiffuseColorLocation, a_value);
 }
 
@@ -122,7 +145,7 @@ void LightingShader::SetMaterialSpecularity(const float& a_value) const {
 	LoadUniform(m_materialSpecularityLocation, a_value);
 }
 
-void LightingShader::SetMaterialEmissiveness(const float& a_value) const {
+void LightingShader::SetMaterialEmission(const float& a_value) const {
 	LoadUniform(m_materialEmissivenessLocation, a_value);
 }
 

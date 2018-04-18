@@ -15,6 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test.json" />
+    <None Include="Materials\Boulder.mat.json" />
+    <None Include="Boulder.comp.json" />
   </ItemGroup>
 </Project>

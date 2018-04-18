@@ -4,20 +4,26 @@
 
 #include <glm/glm.hpp>
 
+class LightingShader;
+typedef std::shared_ptr<LightingShader> LightingShaderPtr;
+
 class LightingShader : public ShaderProgram {
 public:
-	virtual ~LightingShader();
+	~LightingShader() override;
+	static LightingShaderPtr Create();
 	bool Init() override;
+
+	void SetMaterial(const Material* a_material) override;
 
 	void SetModelMatrix(const glm::mat4& a_value) const;
 	void SetViewMatrix(const glm::mat4& a_value) const;
 	void SetModelViewProjectionMatrix(const glm::mat4& a_value) const;
 	void SetDepthBiasModelViewProjectionMatrix(const glm::mat4& a_value) const;
 	
-	void SetMaterialDiffuseColor(const glm::vec4& a_value) const;
+	void SetMaterialColor(const glm::vec4& a_value) const;
 	void SetMaterialSpecularColor(const glm::vec4& a_value) const;
 	void SetMaterialSpecularity(const float& a_value) const;
-	void SetMaterialEmissiveness(const float& a_value) const;
+	void SetMaterialEmission(const float& a_value) const;
 	
 	void SetAmbientColor(const glm::vec4& a_value) const;
 	

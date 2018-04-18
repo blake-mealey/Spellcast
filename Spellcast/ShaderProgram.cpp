@@ -7,21 +7,25 @@
 using namespace std;
 using namespace glm;
 
-ShaderProgram::ShaderProgram(): m_shaderProgram(0), m_invalidUniform(false) { }
+ShaderProgram::ShaderProgram(): m_program(0), m_invalidUniform(false) { }
 
 ShaderProgram::~ShaderProgram() {
 	DeleteShaders();
 
-	if (m_shaderProgram) {
-		glDeleteProgram(m_shaderProgram);
-		m_shaderProgram = 0;
+	if (m_program) {
+		glDeleteProgram(m_program);
+		m_program = 0;
 	}
 }
 
-bool ShaderProgram::Init() {
-	m_shaderProgram = glCreateProgram();
+ShaderProgramPtr ShaderProgram::Create() {
+	return make_shared<ShaderProgram>();
+}
 
-	if (!m_shaderProgram) {
+bool ShaderProgram::Init() {
+	m_program = glCreateProgram();
+
+	if (!m_program) {
 		cerr << "WARNING: Could not create shader program." << endl;
 		return false;
 	}
@@ -31,11 +35,11 @@ bool ShaderProgram::Init() {
 
 void ShaderProgram::Enable() const {
 #ifdef _DEBUG
-	if (!m_shaderProgram) {
+	if (!m_program) {
 		cerr << "WARNING: Using uninitialized shader program." << endl;
 	}
 #endif
-	glUseProgram(m_shaderProgram);
+	glUseProgram(m_program);
 }
 
 void ShaderProgram::Disable() {
@@ -79,34 +83,34 @@ bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePat
 	}
 
 	// Attach the shader to our shader program
-	glAttachShader(m_shaderProgram, shader);
+	glAttachShader(m_program, shader);
 
 	return true;
 }
 
 bool ShaderProgram::Finalize() {
 	// Try linking the program
-	glLinkProgram(m_shaderProgram);
+	glLinkProgram(m_program);
 
 	// Check link status and print errors
     GLint status, length;
-    glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &status);
+    glGetProgramiv(m_program, GL_LINK_STATUS, &status);
     if (status == GL_FALSE) {
-        glGetProgramiv(m_shaderProgram, GL_INFO_LOG_LENGTH, &length);
+        glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &length);
         string info(length, ' ');
-        glGetProgramInfoLog(m_shaderProgram, info.length(), &length, &info[0]);
+        glGetProgramInfoLog(m_program, info.length(), &length, &info[0]);
         cerr << "WARNING: Could not link shader program:" << endl << info << endl;
     }
 
 	// Validate the program
-	glValidateProgram(m_shaderProgram);
+	glValidateProgram(m_program);
 
 	// Check validate status and print errors
-	glGetProgramiv(m_shaderProgram, GL_VALIDATE_STATUS, &status);
+	glGetProgramiv(m_program, GL_VALIDATE_STATUS, &status);
     if (status == GL_FALSE) {
-        glGetProgramiv(m_shaderProgram, GL_INFO_LOG_LENGTH, &length);
+        glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &length);
         string info(length, ' ');
-        glGetProgramInfoLog(m_shaderProgram, info.length(), &length, &info[0]);
+        glGetProgramInfoLog(m_program, info.length(), &length, &info[0]);
         cerr << "WARNING: Invalid shader program:" << endl << info << endl;
     }
 
@@ -117,7 +121,7 @@ bool ShaderProgram::Finalize() {
 }
 
 GLint ShaderProgram::GetUniformLocation(const string& a_uniformName) {
-	const GLuint location = glGetUniformLocation(m_shaderProgram, a_uniformName.c_str());
+	const GLuint location = glGetUniformLocation(m_program, a_uniformName.c_str());
 	if (location == INVALID_UNIFORM_LOCATION) {
 		m_invalidUniform = true;
 		cerr << "WARNING: Invalid uniform " << a_uniformName << endl;
@@ -127,7 +131,7 @@ GLint ShaderProgram::GetUniformLocation(const string& a_uniformName) {
 
 GLint ShaderProgram::GetProgramParam(GLint a_param) const {
 	GLint value;
-	glGetProgramiv(m_shaderProgram, a_param, &value);
+	glGetProgramiv(m_program, a_param, &value);
 	return value;
 }
 

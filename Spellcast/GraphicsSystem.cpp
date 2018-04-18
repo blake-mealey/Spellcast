@@ -94,7 +94,9 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	ImGui::StyleColorsDark();
 
 	// Initialize shaders
-	m_lighting.Init();
+	// m_lighting.Init();
+
+	m_meshRenderer.Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
 
 	return true;
 }
@@ -106,10 +108,12 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
 
-	m_lighting.Enable();
+	// m_lighting.Enable();
 
-	const MeshPtr& mesh = ContentManager::GetMesh("Boulder.obj");
-	mesh->Render();
+	// const MeshPtr& mesh = ContentManager::GetMesh("Boulder.obj");
+	// mesh->Render();
+
+	m_meshRenderer.Render();
 
 	RenderDevTools(a_globalTime);
 
