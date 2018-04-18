@@ -1,5 +1,4 @@
 #include "MeshRenderer.h"
-#include "ContentManager.h"
 #include "ShaderProgram.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,8 +8,12 @@ using namespace glm;
 
 MeshRenderer::MeshRenderer() : m_mesh(nullptr) {}
 
-component_type MeshRenderer::GetType() const {
+component_type MeshRenderer::GetType() {
 	return Component::GetType() | ComponentType::MESH_RENDERER;
+}
+
+component_index MeshRenderer::GetTypeIndex() {
+	return ComponentTypeIndex::MESH_RENDERER;
 }
 
 bool MeshRenderer::Init(const MeshRendererDesc& a_desc) {

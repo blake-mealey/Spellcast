@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include "GraphicsSystem.h"
+#include "EntityManager.h"
+#include "Entity.h"
 
 #include <glm/gtc/matrix_transform.inl>
 
@@ -7,8 +9,12 @@ using namespace glm;
 
 Camera::Camera() : m_nearClippingPlane(0.f), m_farClippingPlane(0.f), m_fieldOfView(0.f) {};
 
-component_type Camera::GetType() const {
+component_type Camera::GetType() {
 	return Component::GetType() | ComponentType::CAMERA;
+}
+
+component_index Camera::GetTypeIndex() {
+	return ComponentTypeIndex::CAMERA;
 }
 
 bool Camera::Init(const CameraDesc& a_desc) {
@@ -27,7 +33,10 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	m_viewportPixelScale = a_desc.m_viewportPixelScale;
 	m_viewportPixelPosition = a_desc.m_viewportPixelPosition;
 
-	m_meshRenderer.Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
+	m_entity = EntityManager::CreateAndGetEntity();
+	MeshRenderer* renderer = new MeshRenderer();
+	renderer->Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
+	m_entity->AddComponent(renderer);
 
 	return true;
 }
@@ -47,6 +56,7 @@ void Camera::Render(const GraphicsSystem& a_context) {
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
 	
 	// TODO: Render everything
-	m_meshRenderer.GetTransform().Rotate(Geometry::UP, 0.01f);
-	m_meshRenderer.Render(viewMatrix, projectionMatrix);
+	MeshRenderer* meshRenderer = m_entity->GetComponent<MeshRenderer>();
+	meshRenderer->GetTransform().Rotate(Geometry::UP, 0.01f);
+	meshRenderer->Render(viewMatrix, projectionMatrix);
 }

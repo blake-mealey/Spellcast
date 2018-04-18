@@ -11,6 +11,10 @@ bool Component::IsEnabled() const {
 	return m_enabled;
 }
 
-component_type Component::GetType() const {
+component_type Component::GetType() {
 	return ComponentType::BASE_COMPONENT;
+}
+
+component_index Component::GetTypeIndex() {
+	return ComponentTypeIndex::BASE_COMPONENT;
 }

@@ -5,6 +5,8 @@
 #include "Geometry.h"
 #include "MeshRenderer.h"
 
+class Entity;
+
 #define DEFAULT_NEAR_CLIPPING_PLANE 0.1f
 #define DEFAULT_FAR_CLIPPING_PLANE 1000.f
 #define DEFAULT_FIELD_OF_VIEW 60.f
@@ -52,14 +54,16 @@ struct CameraDesc {
 class Camera : public Component {
 public:
 	Camera();
-	component_type GetType() const override;
+	static component_type GetType();
+	static component_index GetTypeIndex();
 
 	bool Init(const CameraDesc& a_desc);
 
 	void Render(const GraphicsSystem& a_context);
 
 private:
-	MeshRenderer m_meshRenderer;
+	Entity* m_entity;
+	// MeshRenderer m_meshRenderer;
 
 	float m_nearClippingPlane;
 	float m_farClippingPlane;

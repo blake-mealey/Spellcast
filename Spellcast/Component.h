@@ -10,7 +10,8 @@ public:
 	virtual void SetEnabled(bool a_enabled);
 	bool IsEnabled() const;
 
-	virtual component_type GetType() const;
+	static component_type GetType();
+	static component_index GetTypeIndex();
 
 protected:
 	bool m_enabled;

@@ -33,7 +33,8 @@ struct MeshRendererDesc {
 class MeshRenderer : public Component, RenderContext {
 public:
 	MeshRenderer();
-	component_type GetType() const override;
+	static component_type GetType();
+	static component_index GetTypeIndex();
 
 	bool Init(const MeshRendererDesc& a_desc);
 
