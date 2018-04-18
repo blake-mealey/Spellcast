@@ -104,13 +104,16 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	// Initialize shaders
 	// m_lighting.Init();
 
-	m_meshRenderer.Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
+	// m_meshRenderer.Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
+	CameraDesc c;
+	c.m_globalPosition = vec3(0.f, 0.f, -5.f);
+	m_camera.Init(c);
 
 	return true;
 }
 
 void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
-	m_meshRenderer.GetTransform().Rotate(Geometry::UP, 0.01f);
+	// m_meshRenderer.GetTransform().Rotate(Geometry::UP, 0.01f);
 
 	glfwPollEvents();
 
@@ -123,7 +126,9 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	// const MeshPtr& mesh = ContentManager::GetMesh("Boulder.obj");
 	// mesh->Render();
 
-	m_meshRenderer.Render();
+	// m_meshRenderer.Render();
+
+	m_camera.Render(Instance());
 
 	RenderDevTools(a_globalTime);
 

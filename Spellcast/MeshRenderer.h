@@ -8,8 +8,10 @@
 #include <json/json.hpp>
 
 struct MeshRendererDesc {
-	explicit MeshRendererDesc(nlohmann::json& a_data) {
-		m_meshPath = ContentManager::FromJson<std::string>(a_data, "Mesh");
+	MeshRendererDesc() : m_mesh(nullptr), m_materials({}) {}
+
+	explicit MeshRendererDesc(nlohmann::json& a_data) : MeshRendererDesc() {
+		m_mesh = ContentManager::GetMesh(ContentManager::FromJson<std::string>(a_data, "Mesh"));
 		if (a_data["Materials"].is_array()) {
 			for (nlohmann::json& matData : a_data["Materials"]) {
 				m_materials.push_back(ContentManager::GetMaterial(matData));
@@ -21,7 +23,7 @@ struct MeshRendererDesc {
 		}
 	}
 
-	std::string m_meshPath;
+	MeshPtr m_mesh;
 	std::vector<MaterialPtr> m_materials;
 };
 
@@ -32,8 +34,8 @@ public:
 
 	bool Init(const MeshRendererDesc& a_desc);
 
-	void Render() const;
-	void InitRender(size_t a_materialIndex) const;
+	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
+	void InitRender(size_t a_materialIndex, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
 
 	Transform& GetTransform();
 

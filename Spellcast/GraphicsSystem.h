@@ -4,6 +4,7 @@
 #include "LightingShader.h"
 #include "MeshRenderer.h"
 #include <GLFW/glfw3.h>
+#include "Camera.h"
 
 struct GLFWwindow;
 
@@ -31,7 +32,8 @@ private:
 
 	void SetWindowDims(const glm::vec2& a_windowDims);
 
-	MeshRenderer m_meshRenderer;
+	// MeshRenderer m_meshRenderer;
+	Camera m_camera;
 
 	GLFWwindow* m_window;
 	glm::vec2 m_windowDims;
