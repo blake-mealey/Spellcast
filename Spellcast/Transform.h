@@ -11,7 +11,7 @@ public:
 		const glm::quat& a_rotation = glm::quat(),
 		Transform* a_parent = nullptr);
 
-	explicit Transform(const nlohmann::json& a_data, Transform* a_parent = nullptr);
+	explicit Transform(nlohmann::json& a_data, Transform* a_parent = nullptr);
 
 	Transform* GetParent() const;
 

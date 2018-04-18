@@ -13,7 +13,7 @@ MaterialPtr Material::Create() {
 	return make_shared<Material>();
 }
 
-bool Material::Init(const nlohmann::json& a_data) {
+bool Material::Init(nlohmann::json& a_data) {
 	m_shader = ContentManager::GetShaderProgram(ContentManager::FromJson<string>(a_data, "Shader", "Lighting"));
 	
 	m_albedoMap = ContentManager::GetTexture(ContentManager::FromJson<string>(a_data, "AlbedoMap"));

@@ -36,7 +36,7 @@ public:
 	
 	static MeshPtr& GetMesh(const std::string& a_filePath, bool a_overwrite = false);
 	static TexturePtr& GetTexture(const std::string& a_filePath, bool a_overwrite = false);
-	static MaterialPtr GetMaterial(const nlohmann::json& a_data, bool a_overwrite = false);
+	static MaterialPtr GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
 	static ShaderProgramPtr& GetShaderProgram(const std::string& a_programName);
 
 	static bool ReadFile(const std::string& a_filePath, std::string& a_source);
@@ -45,21 +45,21 @@ public:
 	static void NoFileWarning(const char* a_fileType, const char* a_filePath);
 
 	template <typename T>
-	static T FromJson(const nlohmann::json& a_data, const std::string& a_key, const T& a_default = T());
+	static T FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default = T());
 
 	template <typename T>
-	static T FromJson(const nlohmann::json& a_data, const T& a_default = T());
+	static T FromJson(nlohmann::json& a_data, const T& a_default = T());
 
 	template <typename V>
-	static V VecFromJson(const nlohmann::json& a_data, const std::string& a_key, const V& a_default = V());
+	static V VecFromJson(nlohmann::json& a_data, const std::string& a_key, const V& a_default = V());
 
 	template <typename V>
-	static V VecFromJson(const nlohmann::json& a_data, const V& a_default = V());
+	static V VecFromJson(nlohmann::json& a_data, const V& a_default = V());
 
 	template <typename K>
-	static glm::vec4 ColorFromJson(const nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default = glm::vec4(1.f));
+	static glm::vec4 ColorFromJson(nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default = glm::vec4(1.f));
 
-	static glm::vec4 ColorFromJson(const nlohmann::json& a_data, const glm::vec4& a_default = glm::vec4(1.f));
+	static glm::vec4 ColorFromJson(nlohmann::json& a_data, const glm::vec4& a_default = glm::vec4(1.f));
 private:
 
 	static std::unordered_map<std::string, nlohmann::json> s_jsonData;
@@ -70,23 +70,23 @@ private:
 };
 
 template <typename T>
-T ContentManager::FromJson(const nlohmann::json& a_data, const std::string& a_key, const T& a_default) {
+T ContentManager::FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default) {
 	return FromJson(a_data[a_key], a_default);
 }
 
 template <typename T>
-T ContentManager::FromJson(const nlohmann::json& a_data, const T& a_default) {
+T ContentManager::FromJson(nlohmann::json& a_data, const T& a_default) {
 	if (a_data.is_null()) return a_default;
 	return a_data.get<T>();
 }
 
 template <typename V>
-V ContentManager::VecFromJson(const nlohmann::json& a_data, const std::string& a_key, const V& a_default) {
+V ContentManager::VecFromJson(nlohmann::json& a_data, const std::string& a_key, const V& a_default) {
 	return VecFromJson(a_data[a_key], a_default);
 }
 
 template <typename V>
-V ContentManager::VecFromJson(const nlohmann::json& a_data, const V& a_default) {
+V ContentManager::VecFromJson(nlohmann::json& a_data, const V& a_default) {
 	if (!a_data.is_array() || a_data.size() != sizeof(V) / sizeof(float)) return a_default;
 
 	V vector;
@@ -97,6 +97,6 @@ V ContentManager::VecFromJson(const nlohmann::json& a_data, const V& a_default) 
 }
 
 template <typename K>
-glm::vec4 ContentManager::ColorFromJson(const nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default) {
+glm::vec4 ContentManager::ColorFromJson(nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default) {
 	return ColorFromJson(a_data[a_key], a_default);
 }

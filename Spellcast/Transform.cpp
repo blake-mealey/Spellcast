@@ -14,7 +14,7 @@ Transform::Transform(const vec3& a_position, const vec3& a_scale, const quat& a_
 	SetRotation(a_rotation);
 }
 
-Transform::Transform(const nlohmann::json& a_data, Transform* a_parent) : m_parent(a_parent) {
+Transform::Transform(nlohmann::json& a_data, Transform* a_parent) : m_parent(a_parent) {
 	SetPosition(ContentManager::VecFromJson(a_data, "Position", vec3(0.f)));
 	SetScale(ContentManager::VecFromJson(a_data, "Scale", vec3(1.f)));
 	SetRotation(degrees(ContentManager::VecFromJson(a_data, "Rotation", vec3(0.f))));

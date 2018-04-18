@@ -16,7 +16,7 @@ public:
 
 	static MaterialPtr Create();
 
-	bool Init(const nlohmann::json& a_data);
+	bool Init(nlohmann::json& a_data);
 	
 	// void Use() const;
 	const ShaderProgramPtr& GetShader() const;

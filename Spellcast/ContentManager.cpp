@@ -97,7 +97,7 @@ TexturePtr& ContentManager::GetTexture(const std::string& a_filePath, bool a_ove
 	return s_textures[a_filePath];
 }
 
-MaterialPtr ContentManager::GetMaterial(const json& a_data, bool a_overwrite) {
+MaterialPtr ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
 	json data;
 	const bool fromFile = a_data.is_string();
 	if (fromFile) {
@@ -171,7 +171,7 @@ void ContentManager::NoFileWarning(const char* a_fileType, const char* a_filePat
 	cerr << "WARNING: Could not open " << a_fileType << " file: " << a_filePath << endl;
 }
 
-vec4 ContentManager::ColorFromJson(const json& a_data, const vec4& a_default) {
+vec4 ContentManager::ColorFromJson(json& a_data, const vec4& a_default) {
 	vec4 color = a_default;
     if (a_data.is_array()) {
         if (a_data.size() == 3) {

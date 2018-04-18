@@ -8,15 +8,16 @@
 #include "Transform.h"
 
 struct MeshRendererDesc {
-	explicit MeshRendererDesc(const nlohmann::json& a_data) {
+	explicit MeshRendererDesc(nlohmann::json& a_data) {
 		m_meshPath = ContentManager::FromJson<std::string>(a_data, "Mesh");
 		if (a_data["Materials"].is_array()) {
-			for (const nlohmann::json& matData : a_data["Materials"]) {
+			for (nlohmann::json& matData : a_data["Materials"]) {
 				m_materials.push_back(ContentManager::GetMaterial(matData));
 			}
 		}
 		if (m_materials.empty()) {
-			m_materials.push_back(ContentManager::GetMaterial(nlohmann::json::object()));
+			nlohmann::json j = nlohmann::json::object();
+			m_materials.push_back(ContentManager::GetMaterial(j));
 		}
 	}
 
