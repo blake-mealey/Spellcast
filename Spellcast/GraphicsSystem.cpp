@@ -33,6 +33,10 @@ GraphicsSystem::~GraphicsSystem() {
 	glfwTerminate();
 }
 
+void GraphicsSystem::WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_height) {
+	Instance().SetWindowDims(vec2(a_width, a_height));
+}
+
 bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	// Initialize GLFW
 	if (!glfwInit()) {
@@ -60,6 +64,9 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 
 	// TODO: GLFW input callbacks
 	//glfwSetMouseButtonCallback()
+
+	// Window callbacks
+	glfwSetWindowSizeCallback(m_window, WindowSizeCallback);
 
 	// Center window on primary monitor
 	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -123,14 +130,16 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	glfwSwapBuffers(m_window);
 }
 
-
-
 bool GraphicsSystem::WindowClosed() const {
 	return glfwWindowShouldClose(m_window);
 }
 
 Time GraphicsSystem::GetGlobalTime() {
 	return glfwGetTime();
+}
+
+const vec2& GraphicsSystem::GetWindowDims() const {
+	return m_windowDims;
 }
 
 void GraphicsSystem::RenderDevTools(const Time& a_globalTime) {
@@ -154,4 +163,8 @@ void GraphicsSystem::RenderDevTools(const Time& a_globalTime) {
 
 	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
 	ImGui::Render();
+}
+
+void GraphicsSystem::SetWindowDims(const vec2& a_windowDims) {
+	m_windowDims = a_windowDims;
 }

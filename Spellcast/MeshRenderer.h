@@ -2,10 +2,10 @@
 
 #include "Component.h"
 #include "Mesh.h"
-
-#include <json/json.hpp>
 #include "ContentManager.h"
 #include "Transform.h"
+
+#include <json/json.hpp>
 
 struct MeshRendererDesc {
 	explicit MeshRendererDesc(nlohmann::json& a_data) {
@@ -28,11 +28,9 @@ struct MeshRendererDesc {
 class MeshRenderer : public Component {
 public:
 	MeshRenderer();
-	~MeshRenderer() override;
-	void SetEnabled(bool a_enabled) override;
 	component_type GetType() const override;
 
-	bool Init(MeshRendererDesc a_desc);
+	bool Init(const MeshRendererDesc& a_desc);
 
 	void Render() const;
 	void InitRender(size_t a_materialIndex) const;
