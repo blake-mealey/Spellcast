@@ -1,12 +1,10 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include <vector>
 #include <memory>
 #include "Material.h"
 
-class MeshRenderer;
+class RenderContext;
 struct aiScene;
 
 typedef unsigned int t_index;
@@ -23,7 +21,7 @@ public:
 
 	bool LoadFromFile(const std::string& a_filePath, unsigned a_flags = 0);
 
-	void Render(const MeshRenderer* a_context, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
+	void Render(const RenderContext* a_context) const;
 
 	struct VAOs { enum { Geometry = 0, Count }; };
 	struct VBOs { enum { Vertices = 0, Normals, Uvs, Count }; };
@@ -39,7 +37,7 @@ private:
 
 		bool Init(const std::vector<t_index>& a_indices, const std::vector<glm::vec3>& a_vertices, const std::vector<glm::vec2>& a_uvs = {}, const std::vector<glm::vec3>& a_normals = {});
 
-		void Render(const MeshRenderer* a_context, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
+		void Render(const RenderContext* a_context) const;
 
 		GLuint m_indexBuffer;
 		GLuint m_vaos[VAOs::Count];

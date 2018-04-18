@@ -15,23 +15,22 @@ component_type MeshRenderer::GetType() const {
 
 bool MeshRenderer::Init(const MeshRendererDesc& a_desc) {
 	m_mesh = a_desc.m_mesh;
+	m_transform = a_desc.m_transform;
 	m_materials = a_desc.m_materials;
 
 	return true;
 }
 
-void MeshRenderer::Render(const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
+void MeshRenderer::Render(const mat4& a_viewMatrix, const mat4& a_projectionMatrix) {
 	if (!m_enabled) return;
-	m_mesh->Render(this, a_viewMatrix, a_projectionMatrix);
+	RenderContext::Render(a_viewMatrix, a_projectionMatrix);
+	m_mesh->Render(this);
 }
 
-void MeshRenderer::InitRender(const size_t a_materialIndex, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
-	const MaterialPtr& material = m_materials[a_materialIndex];
-	const ShaderProgramPtr& shader = material->GetShader();
-	shader->Enable();
-
-	shader->SetMaterial(material);
-	shader->SetModelAndViewAndProjectionMatrices(m_transform.GetTransformationMatrix(), a_viewMatrix, a_projectionMatrix);
+void MeshRenderer::InitRenderPass(const size_t& a_materialIndex) const {
+	RenderContext::InitRenderPass(a_materialIndex);
+	GetShader(a_materialIndex)->SetModelAndViewAndProjectionMatrices(
+		m_transform.GetTransformationMatrix(), m_currentViewMatrix, m_currentProjectionMatrix);
 }
 
 Transform& MeshRenderer::GetTransform() {

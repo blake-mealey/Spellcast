@@ -1,5 +1,5 @@
 #include "Mesh.h"
-#include "MeshRenderer.h"
+#include "RenderContext.h"
 
 #include <GL/glew.h>
 #include <assimp/Importer.hpp>
@@ -40,9 +40,9 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	return true;
 }
 
-void Mesh::Render(const MeshRenderer* a_context, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
+void Mesh::Render(const RenderContext* a_context) const {
 	for (const MeshEntry& entry : m_entries) {
-		entry.Render(a_context, a_viewMatrix, a_projectionMatrix);
+		entry.Render(a_context);
 	}
 }
 
@@ -146,8 +146,8 @@ bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec
 	return glGetError() == GL_NO_ERROR;
 }
 
-void Mesh::MeshEntry::Render(const MeshRenderer* a_context, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
-	a_context->InitRender(m_materialIndex, a_viewMatrix, a_projectionMatrix);
+void Mesh::MeshEntry::Render(const RenderContext* a_context) const {
+	a_context->InitRenderPass(m_materialIndex);
 
 	glBindVertexArray(m_vaos[VAOs::Geometry]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
