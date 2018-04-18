@@ -34,10 +34,14 @@ bool Material::Init(const nlohmann::json& a_data) {
 	return true;
 }
 
-void Material::Use() const {
+const ShaderProgramPtr& Material::GetShader() const {
+	return m_shader;
+}
+
+/*void Material::Use() const {
 	m_shader->Enable();
 	m_shader->SetMaterial(this);
-}
+}*/
 
 bool Material::HasAlbedoMap() const {
 	return m_albedoMap != nullptr;

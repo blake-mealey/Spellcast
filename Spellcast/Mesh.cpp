@@ -147,9 +147,7 @@ bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec
 }
 
 void Mesh::MeshEntry::Render(const MeshRenderer* a_context) const {
-	// Use the current context's material
-	a_context->GetMaterial(m_materialIndex)->Use();
-	// TODO: Load the correct matrices to the shader as well
+	a_context->InitRender(m_materialIndex);
 
 	glBindVertexArray(m_vaos[VAOs::Geometry]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);

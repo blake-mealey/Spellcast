@@ -22,7 +22,8 @@ public:
 	void Enable() const;
 	static void Disable();
 	
-	virtual void SetMaterial(const Material* a_material) {};
+	virtual void SetMaterial(const MaterialPtr& a_material) {};
+	virtual void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) {};
 
 protected:
 	bool AddShader(GLenum a_shaderType, const std::string& a_filePath);

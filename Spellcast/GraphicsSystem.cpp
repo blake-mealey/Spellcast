@@ -9,6 +9,7 @@
 #include <iostream>
 #include "Mesh.h"
 #include "ContentManager.h"
+#include "Geometry.h"
 
 using namespace std;
 using namespace glm;
@@ -102,6 +103,8 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 }
 
 void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
+	m_meshRenderer.GetTransform().Rotate(Geometry::UP, 0.01f);
+
 	glfwPollEvents();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

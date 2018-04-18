@@ -5,6 +5,7 @@
 
 #include <json/json.hpp>
 #include "ContentManager.h"
+#include "Transform.h"
 
 struct MeshRendererDesc {
 	explicit MeshRendererDesc(const nlohmann::json& a_data) {
@@ -33,12 +34,12 @@ public:
 	bool Init(MeshRendererDesc a_desc);
 
 	void Render() const;
+	void InitRender(size_t a_materialIndex) const;
 
-	const MaterialPtr& GetMaterial(size_t a_index) const;
-	// TODO: get transform
+	Transform& GetTransform();
 
 private:
 	MeshPtr m_mesh;
 	std::vector<MaterialPtr> m_materials;
-	// TODO: transform
+	Transform m_transform;
 };

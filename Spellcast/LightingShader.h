@@ -13,7 +13,8 @@ public:
 	static LightingShaderPtr Create();
 	bool Init() override;
 
-	void SetMaterial(const Material* a_material) override;
+	void SetMaterial(const MaterialPtr& a_material) override;
+	void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) override;
 
 	void SetModelMatrix(const glm::mat4& a_value) const;
 	void SetViewMatrix(const glm::mat4& a_value) const;

@@ -18,7 +18,8 @@ public:
 
 	bool Init(const nlohmann::json& a_data);
 	
-	void Use() const;
+	// void Use() const;
+	const ShaderProgramPtr& GetShader() const;
 
 	bool HasAlbedoMap() const;
 	const TexturePtr& GetAlbedoMap() const;

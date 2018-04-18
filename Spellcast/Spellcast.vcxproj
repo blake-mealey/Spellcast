@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ContentManager.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicsSystem.cpp" />
     <ClCompile Include="LightingShader.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -163,10 +164,12 @@
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Time.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentType.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="LightingShader.h" />
     <ClInclude Include="ContentManager.h" />
     <ClInclude Include="GraphicsSystem.h" />
@@ -176,6 +179,7 @@
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Uniforms.h" />
     <ClInclude Include="Time.h" />
   </ItemGroup>
