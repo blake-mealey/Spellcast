@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include <iostream>
 #include "ContentManager.h"
+#include "MeshRenderer.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -19,13 +20,12 @@ entity_id EntityDesc::Create() {
 	Entity* entity = EntityManager::CreateAndGetEntity();
 
 	for (EntityDesc* desc : m_childrenDescs) {
-		const entity_id id = desc->Create();
-		EntityManager::GetEntity(id)->SetParent(entity->GetId());
+		const entity_id child = desc->Create();
+		EntityManager::GetEntity(child)->SetParent(entity->GetId());
 	}
 
 	for (ComponentDesc* desc : m_componentDescs) {
-		Component* component = desc->Create();
-		entity->AddComponent(component);
+		desc->Create(entity);
 	}
 
 	return entity->GetId();

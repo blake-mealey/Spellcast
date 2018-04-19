@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Component.h"
-#include "ContentManager.h"
-#include "MeshRenderer.h"
+
+#include <json/json.hpp>
+#include <glm/glm.hpp>
 
 class Entity;
 
@@ -12,10 +13,12 @@ class Entity;
 
 class GraphicsSystem;
 
+class Camera;
+
 struct CameraDesc : ComponentDesc {
 	CameraDesc();
 	explicit CameraDesc(nlohmann::json& a_data);
-	Component* Create() override;
+	void Create(Entity* a_entity) override;
 
 	float m_nearClippingPlane;
 	float m_farClippingPlane;
@@ -44,8 +47,6 @@ public:
 	void Render(const GraphicsSystem& a_context) const;
 
 private:
-	Entity* m_entity;
-
 	float m_nearClippingPlane;
 	float m_farClippingPlane;
 	

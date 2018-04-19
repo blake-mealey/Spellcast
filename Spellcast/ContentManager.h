@@ -40,11 +40,14 @@ public:
 	
 	static MeshPtr& GetMesh(const std::string& a_filePath, bool a_overwrite = false);
 	static TexturePtr& GetTexture(const std::string& a_filePath, bool a_overwrite = false);
+	static MaterialPtr GetMaterial(const std::string& a_filePath, bool a_overwrite = false);
 	static MaterialPtr GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
 	static ShaderProgramPtr& GetShaderProgram(const std::string& a_programName);
 
-	static std::vector<entity_id> LoadScene(const std::string& a_filePath, entity_id a_parent = INVALID_ENTITY);
+	// static std::vector<entity_id> LoadScene(const std::string& a_filePath, entity_id a_parent = INVALID_ENTITY);
+	static EntityDesc* GetEntityDesc(const std::string& a_filePath, bool a_overwrite = false);
 	static EntityDesc* GetEntityDesc(nlohmann::json& a_data, bool a_overwrite = false);
+	static ComponentDesc* GetComponentDesc(const std::string& a_filePath, bool a_overwrite = false);
 	static ComponentDesc* GetComponentDesc(nlohmann::json& a_data, bool a_overwrite = false);
 
 	static bool ReadFile(const std::string& a_filePath, std::string& a_source);

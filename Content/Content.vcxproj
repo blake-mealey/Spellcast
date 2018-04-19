@@ -19,7 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Boulder.comp.json" />
+    <None Include="Components\Boulder.comp.json" />
+    <None Include="Entities\Boulder.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Shaders\lighting.frag" />

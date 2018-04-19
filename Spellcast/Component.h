@@ -2,12 +2,13 @@
 
 #include "ComponentType.h"
 
+class Entity;
 class Component;
 
 class ComponentDesc {
 public:
 	virtual ~ComponentDesc() = default;
-	virtual Component* Create() = 0;
+	virtual void Create(Entity* a_entity) = 0;
 };
 
 class Component {

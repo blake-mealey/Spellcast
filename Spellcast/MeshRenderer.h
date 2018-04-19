@@ -7,10 +7,12 @@
 
 #include <json/json.hpp>
 
+class MeshRenderer;
+
 struct MeshRendererDesc : ComponentDesc {
 	MeshRendererDesc();
 	explicit MeshRendererDesc(nlohmann::json& a_data);
-	Component* Create() override;
+	void Create(Entity* a_entity) override;
 
 	MeshPtr m_mesh;
 	Transform m_transform;

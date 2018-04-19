@@ -101,6 +101,10 @@ TexturePtr& ContentManager::GetTexture(const std::string& a_filePath, bool a_ove
 	return s_textures[a_filePath];
 }
 
+MaterialPtr ContentManager::GetMaterial(const std::string& a_filePath, bool a_overwrite) {
+	return GetMaterial(json(a_filePath), a_overwrite);
+}
+
 MaterialPtr ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
 	json data;
 	const bool fromFile = a_data.is_string();
@@ -154,6 +158,12 @@ ShaderProgramPtr& ContentManager::GetShaderProgram(const string& a_programName) 
 	return s_shaders[a_programName];
 }
 
+EntityDesc* ContentManager::GetEntityDesc(const string& a_filePath, bool a_overwrite) {
+	string filePath = a_filePath;
+	json data = filePath;
+	return GetEntityDesc(data, a_overwrite);
+}
+
 EntityDesc* ContentManager::GetEntityDesc(json& a_data, bool a_overwrite) {
 	// If we are loading from a file, check if we have already loaded the data
 	const bool fromFile = a_data.is_string();
@@ -196,6 +206,10 @@ EntityDesc* ContentManager::GetEntityDesc(json& a_data, bool a_overwrite) {
 	return desc;
 }
 
+ComponentDesc* ContentManager::GetComponentDesc(const std::string& a_filePath, bool a_overwrite) {
+	return GetComponentDesc(json(a_filePath), a_overwrite);
+}
+
 ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) {
 	// If we are loading from a file, check if we have already loaded the data
 	const bool fromFile = a_data.is_string();
@@ -228,7 +242,12 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		}
 
 		// Get the component type index for the loaded data
-		const component_index index = ComponentType::GetIndex(a_data["Type"]);
+		json type = a_data["Type"];
+		if (!type.is_string()) {
+			cerr << "WARNING: Missing Type field in component data" << (fromFile ? " in " + filePath : "") << endl;
+			return nullptr;
+		}
+		const component_index index = ComponentType::GetIndex(type.get<string>());
 
 		// Construct the component description from the loaded data
 		switch (index) {

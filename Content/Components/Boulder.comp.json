@@ -1,4 +1,5 @@
 {
+  "Type": "MeshRenderer",
   "Mesh": "Boulder.obj",
   "Materials": ["Boulder.mat.json"]
 }

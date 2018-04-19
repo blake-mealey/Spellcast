@@ -9,6 +9,8 @@ int main() {
 	GraphicsSystem& graphics = GraphicsSystem::Instance();
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
+	ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
+
 	Time globalTime;
 	while (!graphics.WindowClosed()) {
 		const Time lastTime = globalTime;

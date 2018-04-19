@@ -24,10 +24,10 @@ MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 	}
 }
 
-Component* MeshRendererDesc::Create() {
+void MeshRendererDesc::Create(Entity* a_entity) {
 	auto* renderer = new MeshRenderer();
 	renderer->Init(*this);
-	return renderer;
+	a_entity->AddComponent(renderer);
 }
 
 

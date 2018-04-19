@@ -2,9 +2,9 @@
 #include "GraphicsSystem.h"
 #include "EntityManager.h"
 #include "Entity.h"
+#include "Geometry.h"
 
 #include <glm/gtc/matrix_transform.inl>
-#include "Geometry.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -32,10 +32,10 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 	m_viewportPixelPosition = ContentManager::VecFromJson(a_data, "ViewportPixelPosition", m_viewportPixelPosition);
 }
 
-Component* CameraDesc::Create() {
+void CameraDesc::Create(Entity* a_entity) {
 	auto* camera = new Camera();
 	camera->Init(*this);
-	return camera;
+	a_entity->AddComponent(camera);
 }
 
 
@@ -66,11 +66,6 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	
 	m_viewportPixelScale = a_desc.m_viewportPixelScale;
 	m_viewportPixelPosition = a_desc.m_viewportPixelPosition;
-
-	m_entity = EntityManager::CreateAndGetEntity();
-	MeshRenderer* renderer = new MeshRenderer();
-	renderer->Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
-	m_entity->AddComponent(renderer);
 
 	return true;
 }
