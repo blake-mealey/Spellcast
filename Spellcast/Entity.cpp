@@ -54,6 +54,10 @@ entity_id Entity::GetId() const {
 	return m_id;
 }
 
+Transform& Entity::GetTransform() {
+	return m_transform;
+}
+
 void Entity::SetParent(entity_id a_parent) {
 	// Check that the new parent is not the same as the old parent
 	if (m_parent == a_parent) return;
@@ -70,6 +74,9 @@ void Entity::SetParent(entity_id a_parent) {
 		Entity* oldParent = EntityManager::GetEntity(m_parent);
 		oldParent->m_children.erase(m_id);
 	}
+
+	// Update our transform's parent
+	m_transform.SetParent(&newParent->GetTransform());
 
 	// Add ourselves to the new parent, and update our parent's id
 	newParent->m_children.insert(m_id);

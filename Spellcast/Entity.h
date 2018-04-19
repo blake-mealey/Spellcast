@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "EntityManager.h"
+#include "Transform.h"
 
 #include <json/json.hpp>
 
@@ -24,6 +25,8 @@ public:
 	
 	entity_id GetId() const;
 	
+	Transform& GetTransform();
+	
 	void SetParent(entity_id a_parent);
 
 	template <class T>
@@ -39,6 +42,8 @@ private:
 	
 	bool m_active;
 	entity_id m_id;
+
+	Transform m_transform;
 
 	entity_id m_parent;
 	std::unordered_set<entity_id> m_children;

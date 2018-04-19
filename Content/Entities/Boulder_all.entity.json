@@ -11,5 +11,8 @@
         }
       ]
     }
+  ],
+  "Children": [
+    "Boulder.entity.json"
   ]
 }

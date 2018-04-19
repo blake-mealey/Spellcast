@@ -14,6 +14,7 @@ public:
 	explicit Transform(nlohmann::json& a_data, Transform* a_parent = nullptr);
 
 	Transform* GetParent() const;
+	void SetParent(Transform* a_transform);
 
 	const glm::vec3& GetLocalPosition() const;
 	const glm::vec3& GetLocalScale() const;

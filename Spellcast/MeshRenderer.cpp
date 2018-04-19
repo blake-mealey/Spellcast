@@ -27,6 +27,7 @@ MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 void MeshRendererDesc::Create(Entity* a_entity) {
 	auto* renderer = new MeshRenderer();
 	renderer->Init(*this);
+	renderer->GetTransform().SetParent(&a_entity->GetTransform());
 	a_entity->AddComponent(renderer);
 }
 

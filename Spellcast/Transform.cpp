@@ -24,6 +24,10 @@ Transform* Transform::GetParent() const {
 	return m_parent;
 }
 
+void Transform::SetParent(Transform* a_transform) {
+	m_parent = a_transform;
+}
+
 const vec3& Transform::GetLocalPosition() const {
 	return m_position;
 }
