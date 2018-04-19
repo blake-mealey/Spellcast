@@ -21,6 +21,7 @@
   <ItemGroup>
     <None Include="Components\Boulder.comp.json" />
     <None Include="Entities\Boulder.entity.json" />
+    <None Include="Entities\Boulder_all.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Shaders\lighting.frag" />

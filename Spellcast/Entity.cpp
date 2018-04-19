@@ -1,7 +1,6 @@
 #include "Entity.h"
 #include <iostream>
 #include "ContentManager.h"
-#include "MeshRenderer.h"
 
 using namespace std;
 using namespace nlohmann;
