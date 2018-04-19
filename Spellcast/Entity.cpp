@@ -9,4 +9,8 @@ Entity::~Entity() {
 		}
 		components.clear();
 	}
+	m_active = false;
+	m_parent = NO_PARENT;
 }
+
+Entity::Entity() : m_active(false), m_id(-1), m_parent(NO_PARENT), m_components({}) {}

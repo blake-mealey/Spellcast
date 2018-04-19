@@ -59,7 +59,7 @@ public:
 
 	bool Init(const CameraDesc& a_desc);
 
-	void Render(const GraphicsSystem& a_context);
+	void Render(const GraphicsSystem& a_context) const;
 
 private:
 	Entity* m_entity;

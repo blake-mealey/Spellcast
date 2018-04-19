@@ -41,7 +41,7 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	return true;
 }
 
-void Camera::Render(const GraphicsSystem& a_context) {
+void Camera::Render(const GraphicsSystem& a_context) const {
 	// Compute current viewport
 	const vec2& windowDims = a_context.GetWindowDims();
 	const vec2 viewportPosition = (windowDims * m_viewportUnitPosition) + m_viewportPixelPosition;
@@ -54,9 +54,12 @@ void Camera::Render(const GraphicsSystem& a_context) {
 	// Compute view and projection matrices
 	const mat4 viewMatrix = lookAt(m_globalPosition, m_targetGlobalPosition, m_upVector);
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
-	
-	// TODO: Render everything
-	MeshRenderer* meshRenderer = m_entity->GetComponent<MeshRenderer>();
-	meshRenderer->GetTransform().Rotate(Geometry::UP, 0.01f);
-	meshRenderer->Render(viewMatrix, projectionMatrix);
+
+	for (auto it = EntityManager::begin(); it != EntityManager::end(); ++it) {
+		Entity& entity = *it;
+		for (MeshRenderer* meshRenderer : entity.GetComponents<MeshRenderer>()) {
+			meshRenderer->GetTransform().Rotate(Geometry::UP, 0.01f);
+			meshRenderer->Render(viewMatrix, projectionMatrix);
+		}
+	}
 }
