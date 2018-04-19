@@ -2,7 +2,6 @@
 
 #include "Component.h"
 #include "ContentManager.h"
-#include "Geometry.h"
 #include "MeshRenderer.h"
 
 class Entity;
@@ -13,27 +12,10 @@ class Entity;
 
 class GraphicsSystem;
 
-struct CameraDesc {
-	CameraDesc() : m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE), m_farClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
-	               m_upVector(Geometry::UP), m_fieldOfView(glm::radians(DEFAULT_FIELD_OF_VIEW)), m_targetGlobalPosition(Geometry::FORWARD),
-				   m_viewportUnitScale(glm::vec2(1.f)) {}
-
-	explicit CameraDesc(nlohmann::json& a_data) : CameraDesc() {
-		m_nearClippingPlane = ContentManager::FromJson(a_data, "NearClippingPlane", m_nearClippingPlane);
-		m_farClippingPlane = ContentManager::FromJson(a_data, "FarClippingPlane", m_farClippingPlane);
-		
-		m_upVector = ContentManager::VecFromJson(a_data, "UpVector", m_upVector);
-		m_fieldOfView = glm::radians(ContentManager::FromJson(a_data, "FieldOfView", DEFAULT_FIELD_OF_VIEW));
-
-		m_globalPosition = ContentManager::VecFromJson(a_data, "Position", m_globalPosition);
-		m_targetGlobalPosition = ContentManager::VecFromJson(a_data, "Target", m_targetGlobalPosition);
-
-		m_viewportUnitScale = ContentManager::VecFromJson(a_data, "ViewportUnitScale", m_viewportUnitScale);
-		m_viewportUnitPosition = ContentManager::VecFromJson(a_data, "ViewportUnitPosition", m_viewportUnitPosition);
-		
-		m_viewportPixelScale = ContentManager::VecFromJson(a_data, "ViewportPixelScale", m_viewportPixelScale);
-		m_viewportPixelPosition = ContentManager::VecFromJson(a_data, "ViewportPixelPosition", m_viewportPixelPosition);
-	}
+struct CameraDesc : ComponentDesc {
+	CameraDesc();
+	explicit CameraDesc(nlohmann::json& a_data);
+	Component* Create() override;
 
 	float m_nearClippingPlane;
 	float m_farClippingPlane;
@@ -63,7 +45,6 @@ public:
 
 private:
 	Entity* m_entity;
-	// MeshRenderer m_meshRenderer;
 
 	float m_nearClippingPlane;
 	float m_farClippingPlane;

@@ -17,5 +17,8 @@
   <ItemGroup>
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Boulder.comp.json" />
+    <None Include="Shaders\lighting.frag" />
+    <None Include="Shaders\lighting.vert" />
+    <None Include="Shaders\includes\hsv.glsl" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 
 class Entity;
 
-#define NO_PARENT -1
+#define INVALID_ENTITY -1
 
 typedef long long entity_id;
 

@@ -7,6 +7,8 @@
 
 #include <fstream>
 #include <iostream>
+#include "MeshRenderer.h"
+#include "Camera.h"
 
 using namespace std;
 using namespace glm;
@@ -30,6 +32,8 @@ unordered_map<string, MeshPtr> ContentManager::s_meshes;
 unordered_map<string, TexturePtr> ContentManager::s_textures;
 unordered_map<string, MaterialPtr> ContentManager::s_materials;
 unordered_map<string, ShaderProgramPtr> ContentManager::s_shaders;
+unordered_map<string, ComponentDesc*> ContentManager::s_componentDescs;
+unordered_map<string, EntityDesc*> ContentManager::s_entityDescs;
 
 json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwrite) {
 	// Check if the data has already been loaded
@@ -150,6 +154,107 @@ ShaderProgramPtr& ContentManager::GetShaderProgram(const string& a_programName) 
 	return s_shaders[a_programName];
 }
 
+EntityDesc* ContentManager::GetEntityDesc(json& a_data, bool a_overwrite) {
+	// If we are loading from a file, check if we have already loaded the data
+	const bool fromFile = a_data.is_string();
+	EntityDesc* desc = nullptr;
+	string filePath;
+	if (fromFile) {
+		filePath = a_data.get<string>();
+		if (!a_overwrite) {
+			const auto it = s_entityDescs.find(filePath);
+			if (it != s_entityDescs.end()) {
+				desc = it->second;
+			}
+		}
+	}
+
+	// If the data is not already loaded, load it
+	if (!desc) {
+		// While we are given file path strings, load the next file
+		while (a_data.is_string()) {
+			a_data = GetJsonData(GetContentPath(a_data.get<string>(), "Entities/"), a_overwrite);
+		}
+
+		// While there is a super-entity, load and merge it
+		json super = a_data["Extends"];
+		while (!super.is_null()) {
+			json superData = GetJsonData(GetContentPath(super.get<string>(), "Entities/"), a_overwrite);
+			super = json(superData["Extends"]);
+			MergeJson(superData, a_data);
+			a_data = superData;
+		}
+
+		// Construct the description from the data
+		desc = new EntityDesc(a_data);
+
+		// Cache the description
+		if (fromFile) s_entityDescs[filePath] = desc;
+	}
+
+	// Return the entity description
+	return desc;
+}
+
+ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) {
+	// If we are loading from a file, check if we have already loaded the data
+	const bool fromFile = a_data.is_string();
+	ComponentDesc* desc = nullptr;
+	string filePath;
+	if (fromFile) {
+		filePath = a_data.get<string>();
+		if (!a_overwrite) {
+			const auto it = s_componentDescs.find(filePath);
+			if (it != s_componentDescs.end()) {
+				desc = it->second;
+			}
+		}
+	}
+
+	// If the data is not already loaded, load it
+	if (!desc) {
+		// While we are given file path strings, load the next file
+		while (a_data.is_string()) {
+			a_data = GetJsonData(GetContentPath(a_data.get<string>(), "Components/"), a_overwrite);
+		}
+
+		// While there is a super-component, load and merge it
+		json super = a_data["Extends"];
+		while (!super.is_null()) {
+			json superData = GetJsonData(GetContentPath(super.get<string>(), "Components/"), a_overwrite);
+			super = json(superData["Extends"]);
+			MergeJson(superData, a_data);
+			a_data = superData;
+		}
+
+		// Get the component type index for the loaded data
+		const component_index index = ComponentType::GetIndex(a_data["Type"]);
+
+		// Construct the component description from the loaded data
+		switch (index) {
+		case ComponentTypeIndex::MESH_RENDERER:
+			desc = new MeshRendererDesc(a_data);
+			break;
+		case ComponentTypeIndex::CAMERA:
+			desc = new CameraDesc(a_data);
+			break;
+		default: ;
+		}
+
+		// Cache the description
+		if (fromFile) s_componentDescs[filePath] = desc;
+
+		// If no description was loaded, print an error and return null
+		if (!desc) {
+			cerr << "WARNING: Unknown component type: " << a_data["Type"] << (fromFile ? " in " + filePath : "") << endl;
+			return nullptr;
+		}
+	}
+
+	// Return the component description
+	return desc;
+}
+
 bool ContentManager::ReadFile(const string& a_filePath, string& a_source) {
 	ifstream input(a_filePath.c_str());
 	if (input) {
@@ -161,6 +266,30 @@ bool ContentManager::ReadFile(const string& a_filePath, string& a_source) {
 	}
 	
 	return false;
+}
+
+void ContentManager::MergeJson(json& a_obj0, json& a_obj1, bool a_overwrite) {
+    if (a_obj0.is_object()) {
+        for (auto it = a_obj1.begin(); it != a_obj1.end(); ++it) {
+            if (a_obj0[it.key()].is_primitive()) {
+                if (a_overwrite || a_obj0[it.key()].is_null()) {
+                    a_obj0[it.key()] = it.value();
+                }
+            } else {
+                MergeJson(a_obj0[it.key()], it.value(), a_overwrite);
+            }
+        }
+    } else if (a_obj0.is_array()) {
+        if (a_obj0.size() >= 2 && a_obj0.size() <= 4 && a_obj0[0].is_number()) {
+            a_obj0 = a_obj1;
+        } else {
+            for (json &value : a_obj1) {
+                a_obj0.push_back(value);
+            }
+        }
+    } else {
+        a_obj0 = a_overwrite ? a_obj1 : a_obj0;
+    }
 }
 
 string ContentManager::GetContentPath(const string& a_filePath, const string& a_dirPath) {

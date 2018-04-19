@@ -3,13 +3,28 @@
 #include "Component.h"
 #include "EntityManager.h"
 
+#include <json/json.hpp>
+
 #include <vector>
 #include <array>
+#include <unordered_set>
+
+struct EntityDesc {
+	explicit EntityDesc(nlohmann::json& a_data);
+	entity_id Create();
+
+	std::vector<ComponentDesc*> m_componentDescs;
+	std::vector<EntityDesc*> m_childrenDescs;
+};
 
 class Entity {
 friend EntityManager;
 public:
 	~Entity();
+	
+	entity_id GetId() const;
+	
+	void SetParent(entity_id a_parent);
 
 	template <class T>
 	void AddComponent(T* a_component);
@@ -19,7 +34,6 @@ public:
 
 	template <class T>
 	std::vector<T*> GetComponents() const;
-
 private:
 	Entity();
 	
@@ -27,7 +41,7 @@ private:
 	entity_id m_id;
 
 	entity_id m_parent;
-	std::vector<entity_id> m_children;
+	std::unordered_set<entity_id> m_children;
 
 	std::array<std::vector<Component*>, ComponentTypeIndex::COUNT> m_components;
 };

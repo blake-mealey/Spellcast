@@ -1,9 +1,13 @@
 #pragma once
 
+#include "EntityManager.h"
+
 #include <json/json.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <unordered_map>
+#include "Component.h"
+#include "Entity.h"
 
 class Mesh;
 typedef std::shared_ptr<Mesh> MeshPtr;
@@ -39,7 +43,13 @@ public:
 	static MaterialPtr GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
 	static ShaderProgramPtr& GetShaderProgram(const std::string& a_programName);
 
+	static std::vector<entity_id> LoadScene(const std::string& a_filePath, entity_id a_parent = INVALID_ENTITY);
+	static EntityDesc* GetEntityDesc(nlohmann::json& a_data, bool a_overwrite = false);
+	static ComponentDesc* GetComponentDesc(nlohmann::json& a_data, bool a_overwrite = false);
+
 	static bool ReadFile(const std::string& a_filePath, std::string& a_source);
+
+	static void MergeJson(nlohmann::json& a_obj0, nlohmann::json& a_obj1, bool a_overwrite = true);
 	
 	static std::string GetContentPath(const std::string& a_filePath, const std::string& a_dirPath = "");
 	static void NoFileWarning(const char* a_fileType, const char* a_filePath);
@@ -67,6 +77,8 @@ private:
 	static std::unordered_map<std::string, TexturePtr> s_textures;
 	static std::unordered_map<std::string, MaterialPtr> s_materials;
 	static std::unordered_map<std::string, ShaderProgramPtr> s_shaders;
+	static std::unordered_map<std::string, ComponentDesc*> s_componentDescs;
+	static std::unordered_map<std::string, EntityDesc*> s_entityDescs;
 };
 
 template <typename T>

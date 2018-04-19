@@ -2,6 +2,14 @@
 
 #include "ComponentType.h"
 
+class Component;
+
+class ComponentDesc {
+public:
+	virtual ~ComponentDesc() = default;
+	virtual Component* Create() = 0;
+};
+
 class Component {
 public:
 	Component();

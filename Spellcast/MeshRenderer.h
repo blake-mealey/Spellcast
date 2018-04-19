@@ -1,29 +1,16 @@
 #pragma once
 
 #include "Component.h"
-#include "Mesh.h"
 #include "ContentManager.h"
 #include "Transform.h"
 #include "RenderContext.h"
 
 #include <json/json.hpp>
 
-struct MeshRendererDesc {
-	MeshRendererDesc() : m_mesh(nullptr), m_materials({}) {}
-
-	explicit MeshRendererDesc(nlohmann::json& a_data) : MeshRendererDesc() {
-		m_mesh = ContentManager::GetMesh(ContentManager::FromJson<std::string>(a_data, "Mesh"));
-		m_transform = Transform(a_data);
-		if (a_data["Materials"].is_array()) {
-			for (nlohmann::json& matData : a_data["Materials"]) {
-				m_materials.push_back(ContentManager::GetMaterial(matData));
-			}
-		}
-		if (m_materials.empty()) {
-			nlohmann::json j = nlohmann::json::object();
-			m_materials.push_back(ContentManager::GetMaterial(j));
-		}
-	}
+struct MeshRendererDesc : ComponentDesc {
+	MeshRendererDesc();
+	explicit MeshRendererDesc(nlohmann::json& a_data);
+	Component* Create() override;
 
 	MeshPtr m_mesh;
 	Transform m_transform;

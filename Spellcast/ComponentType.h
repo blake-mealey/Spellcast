@@ -2,6 +2,9 @@
 
 #include <string>
 
+#define INVALID_COMPONENT_INDEX -1
+#define INVALID_COMPONENT_TYPE -1
+
 typedef long long component_type;
 typedef int component_index;
 
@@ -30,6 +33,8 @@ struct ComponentType {
 
 	// Display names per component type
 	static const std::string DISPLAY_NAMES[ComponentTypeIndex::COUNT];
+	
+	static component_index GetIndex(const std::string& a_name);
 
 	template <class T>
 	static std::string GetDisplayName();

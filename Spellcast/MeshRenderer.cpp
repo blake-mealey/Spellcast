@@ -1,10 +1,37 @@
 #include "MeshRenderer.h"
 #include "ShaderProgram.h"
+#include "Mesh.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace std;
 using namespace glm;
+using namespace nlohmann;
+
+MeshRendererDesc::MeshRendererDesc() : m_mesh(nullptr), m_materials({}) {}
+
+MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
+	m_mesh = ContentManager::GetMesh(ContentManager::FromJson<std::string>(a_data, "Mesh"));
+	m_transform = Transform(a_data);
+	if (a_data["Materials"].is_array()) {
+		for (json& matData : a_data["Materials"]) {
+			m_materials.push_back(ContentManager::GetMaterial(matData));
+		}
+	}
+	if (m_materials.empty()) {
+		json j = json::object();
+		m_materials.push_back(ContentManager::GetMaterial(j));
+	}
+}
+
+Component* MeshRendererDesc::Create() {
+	auto* renderer = new MeshRenderer();
+	renderer->Init(*this);
+	return renderer;
+}
+
+
+
 
 MeshRenderer::MeshRenderer() : m_mesh(nullptr) {}
 
