@@ -29,6 +29,7 @@ public:
 	
 	void SetParent(entity_id a_parent);
 
+	// NOTE: Should _only_ be called from ComponentDesc::Create(Entity*) implementations
 	template <class T>
 	void AddComponent(T* a_component);
 
