@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "GraphicsSystem.h"
-#include "EntityManager.h"
+#include "World.h"
 #include "Entity.h"
 #include "Geometry.h"
 
@@ -85,7 +85,7 @@ void Camera::Render(const GraphicsSystem& a_context) const {
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
 
 	// Render meshes
-	for (auto it = EntityManager::begin(); it != EntityManager::end(); ++it) {
+	for (auto it = World::begin(); it != World::end(); ++it) {
 		Entity& entity = *it;
 		for (MeshRenderer* meshRenderer : entity.GetComponents<MeshRenderer>()) {
 			meshRenderer->Render(viewMatrix, projectionMatrix);

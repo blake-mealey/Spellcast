@@ -1,14 +1,17 @@
 #pragma once
 
 #include "SlotMap.h"
+#include "ComponentType.h"
 
+class Component;
 class Entity;
 
 #define INVALID_ENTITY -1
 
 typedef obj_id entity_id;
+typedef obj_id component_id;
 
-class EntityManager {
+class World {
 public:
 	static entity_id CreateEntity();
 	static Entity* CreateAndGetEntity();
@@ -23,4 +26,5 @@ public:
 
 private:
 	static SlotMap<Entity> s_entities;
+	static std::array<SlotMap<Component>, ComponentTypeIndex::COUNT> s_components;
 };

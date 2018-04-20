@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component.h"
-#include "EntityManager.h"
+#include "World.h"
 #include "Transform.h"
 
 #include <json/json.hpp>

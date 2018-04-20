@@ -9,7 +9,7 @@ int main() {
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
 	ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create();
-	EntityManager::GetEntity(ContentManager::GetEntityDesc("Boulder.entity.json")->Create())->GetComponent<MeshRenderer>()->GetTransform().Translate({2.f, 0.f, 0.f});
+	World::GetEntity(ContentManager::GetEntityDesc("Boulder.entity.json")->Create())->GetComponent<MeshRenderer>()->GetTransform().Translate({2.f, 0.f, 0.f});
 
 	Time globalTime;
 	while (!graphics.WindowClosed()) {

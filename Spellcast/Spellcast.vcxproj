@@ -156,7 +156,7 @@
     <ClCompile Include="ComponentType.cpp" />
     <ClCompile Include="ContentManager.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="World.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicsSystem.cpp" />
     <ClCompile Include="LightingShader.cpp" />
@@ -176,7 +176,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="World.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LightingShader.h" />
     <ClInclude Include="ContentManager.h" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityManager.h"
+#include "World.h"
 
 #include <json/json.hpp>
 #include <glm/gtc/type_ptr.hpp>

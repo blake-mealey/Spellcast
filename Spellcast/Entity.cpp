@@ -16,11 +16,11 @@ EntityDesc::EntityDesc(json& a_data) {
 }
 
 entity_id EntityDesc::Create() {
-	Entity* entity = EntityManager::CreateAndGetEntity();
+	Entity* entity = World::CreateAndGetEntity();
 
 	for (EntityDesc* desc : m_childrenDescs) {
 		const entity_id child = desc->Create();
-		EntityManager::GetEntity(child)->SetParent(entity->GetId());
+		World::GetEntity(child)->SetParent(entity->GetId());
 	}
 
 	for (ComponentDesc* desc : m_componentDescs) {
@@ -39,7 +39,7 @@ Entity::~Entity() {
 	
 	m_parent = INVALID_ENTITY;
 	for (entity_id id : m_children) {
-		EntityManager::DestroyEntity(id);
+		World::DestroyEntity(id);
 	}
 
 	for (vector<Component*>& components : m_components) {
@@ -63,7 +63,7 @@ void Entity::SetParent(entity_id a_parent) {
 	if (m_parent == a_parent) return;
 
 	// Check that the new parent exists
-	Entity* newParent = EntityManager::GetEntity(a_parent);
+	Entity* newParent = World::GetEntity(a_parent);
 	if (!newParent) {
 		cerr << "WARNING: Attempt to set parent to nullptr." << endl;
 		return;
@@ -71,7 +71,7 @@ void Entity::SetParent(entity_id a_parent) {
 
 	// If we have a parent, remove ourselves from it
 	if (m_parent != INVALID_ENTITY) {
-		Entity* oldParent = EntityManager::GetEntity(m_parent);
+		Entity* oldParent = World::GetEntity(m_parent);
 		oldParent->m_children.erase(m_id);
 	}
 
