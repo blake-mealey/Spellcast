@@ -10,7 +10,7 @@ using namespace glm;
 
 const regex ShaderProgram::S_NEW_LINE(R"(\/\/.*)");
 const regex ShaderProgram::S_DIRECTIVE(R"(^#pragma (.*))");
-const regex ShaderProgram::S_INCLUDE(R"(include ['"<](.*)['">])");
+const regex ShaderProgram::S_INCLUDE(R"(include (?:<(.*)>|'(.*)'|\"(.*)\"))");
 
 ShaderProgram::ShaderProgram(): m_program(0), m_invalidUniform(false) { }
 
@@ -186,13 +186,16 @@ bool ShaderProgram::PreprocessShaderSource(const string& a_filePath, string& a_s
 	smatch matches;
 	stringstream source;
 	while (regex_search(searchSource, matches, S_DIRECTIVE)) {
-		const string& argument = matches[1];
-		smatch argumentMatches;
+		const string& arg = matches[1];
+		smatch argMatches;
 
 		// Handle include directive
-		if (regex_match(argument, argumentMatches, S_INCLUDE)) {
+		if (regex_match(arg, argMatches, S_INCLUDE)) {
+			// Different capture group for '', "", <>. One group will contain path, other two will be empty string
+			const string includePath = argMatches[1].str() + argMatches[2].str() + argMatches[3].str();
 			string includeSource;
-			PreprocessShaderSource(argumentMatches[1], includeSource);
+			if (!PreprocessShaderSource(includePath, includeSource)) return false;
+			
 			// Flatten before including so we don't break line numbers
 			// TODO: Properly keep track of lines and report correct file name and line number in error to cerr
 			FlattenSource(includeSource);
@@ -217,6 +220,7 @@ bool ShaderProgram::PreprocessShaderSource(const string& a_filePath, string& a_s
 }
 
 void ShaderProgram::FlattenSource(std::string& a_source) {
+	// Remove comments
 	string searchSource = a_source;
 	smatch matches;
 	stringstream sourceStream;
@@ -226,6 +230,8 @@ void ShaderProgram::FlattenSource(std::string& a_source) {
 	}
 	sourceStream << searchSource << endl;
 	a_source = sourceStream.str();
+	
+	// Remove new lines
 	a_source.erase(std::remove(a_source.begin(), a_source.end(), '\n'), a_source.end());
 	a_source.erase(std::remove(a_source.begin(), a_source.end(), '\r'), a_source.end());
 }
