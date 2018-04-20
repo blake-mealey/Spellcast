@@ -1,5 +1,7 @@
 #version 430
 
+#pragma include "includes/hsv.glsl"
+
 struct PointLight {
 	vec3 color;
 	float power;
@@ -50,17 +52,6 @@ in vec4 shadowCoord;
 
 out vec4 fragmentColor;
 out vec4 glowColor;
-
-// From: http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-vec3 rgb2hsv(vec4 c) {
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
 
 vec4 getColorFromLight(vec4 diffuseColor, vec3 lightDirection_camera, vec4 lightColor) {
 	vec3 n = normalize(surfaceNormal_camera);
@@ -117,7 +108,7 @@ void main() {
 		}
 	}
 
-	vec3 hsv = rgb2hsv(fragmentColor);
+	vec3 hsv = hsv_from_rgb(fragmentColor);
 	glowColor = fragmentColor * (bloomScale + materialEmissiveness * 0.5) * hsv.z * hsv.z;
 	glowColor = vec4(glowColor.rgb, 1.f);
 }

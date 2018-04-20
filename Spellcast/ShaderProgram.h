@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <regex>
 
 class ShaderProgram;
 typedef std::shared_ptr<ShaderProgram> ShaderProgramPtr;
@@ -45,6 +46,14 @@ protected:
 	static void LoadUniform(const GLint& a_location, const glm::mat4& a_value);
 
 private:
+	static const std::regex S_NEW_LINE;
+	static const std::regex S_DIRECTIVE;
+	static const std::regex S_INCLUDE;
+	
+	bool PreprocessShaderSource(const std::string& a_filePath, std::string& a_source, std::string& a_resolvedFilePath) const;
+	bool PreprocessShaderSource(const std::string& a_filePath, std::string& a_source) const;
+	static void FlattenSource(std::string& a_source);
+
 	void DeleteShaders();
 
 	std::vector<GLuint> m_shaders;
