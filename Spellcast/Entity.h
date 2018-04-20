@@ -19,7 +19,7 @@ struct EntityDesc {
 };
 
 class Entity {
-friend EntityManager;
+friend SlotMap<Entity>;
 public:
 	~Entity();
 	

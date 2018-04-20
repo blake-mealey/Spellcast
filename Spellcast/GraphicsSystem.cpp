@@ -7,8 +7,6 @@
 #include <imgui/imgui_impl_glfw_gl3.h>
 
 #include <iostream>
-#include "Mesh.h"
-#include "ContentManager.h"
 #include "Geometry.h"
 
 using namespace std;
@@ -101,10 +99,6 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
 	ImGui::StyleColorsDark();
 
-	// Initialize shaders
-	// m_lighting.Init();
-
-	// m_meshRenderer.Init(MeshRendererDesc(ContentManager::GetJsonData(ContentManager::GetContentPath("Boulder.comp.json"))));
 	CameraDesc c;
 	c.m_globalPosition = vec3(0.f, 0.f, -5.f);
 	m_camera.Init(c);
@@ -113,20 +107,11 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 }
 
 void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
-	// m_meshRenderer.GetTransform().Rotate(Geometry::UP, 0.01f);
-
 	glfwPollEvents();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
-
-	// m_lighting.Enable();
-
-	// const MeshPtr& mesh = ContentManager::GetMesh("Boulder.obj");
-	// mesh->Render();
-
-	// m_meshRenderer.Render();
 
 	m_camera.Render(Instance());
 

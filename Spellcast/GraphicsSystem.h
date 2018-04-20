@@ -32,7 +32,6 @@ private:
 
 	void SetWindowDims(const glm::vec2& a_windowDims);
 
-	// MeshRenderer m_meshRenderer;
 	Camera m_camera;
 
 	GLFWwindow* m_window;
@@ -42,6 +41,4 @@ private:
 	size_t m_frameCount;
 	Time m_lastTime;
 	double m_framesPerSecond;
-
-	LightingShader m_lighting;
 };

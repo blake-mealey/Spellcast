@@ -186,6 +186,7 @@
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="SlotMap.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
