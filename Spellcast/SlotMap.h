@@ -6,6 +6,7 @@
 #define CHUNK_SIZE 3
 
 typedef long long obj_id;
+typedef int index;
 
 class SlotMapBase {
 public:
@@ -16,20 +17,31 @@ template <typename T>
 class SlotMap : public SlotMapBase {
 public:
 	obj_id CreateObject() {
+		// If no free indices in objTable, expand the table
 		if (m_freeList.empty()) {
+			// Create the new chunk
 			auto* chunk = new T[CHUNK_SIZE];
-			for (int i = CHUNK_SIZE - 1; i >= 0; --i) {
-				chunk[i].m_id = m_objTable.size() * CHUNK_SIZE + i;
-				m_freeList.push_back(m_objTable.size() * CHUNK_SIZE + i);
+			const index newChunkIndex = m_objTable.size() * CHUNK_SIZE;
+			for (index i = CHUNK_SIZE - 1; i >= 0; --i) {
+				const index newIndex = newChunkIndex + i;
+				chunk[i].m_id = newIndex;			// Initialize the ID of the new object to be its index (version 0)
+				m_freeList.push_back(newIndex);		// Add the new ID to the free list because it is unused
 			}
 			m_objTable.push_back(chunk);
 		}
 
-		const int free = m_freeList.back();
+		// Pop the next unused index
+		const index free = m_freeList.back();
 		m_freeList.pop_back();
-		T& obj = m_objTable[free / CHUNK_SIZE][free % CHUNK_SIZE];
-		obj.m_active = true;
-		return obj.m_id;
+
+
+
+		// Get the object at the index
+		T* obj = m_objTable[free / CHUNK_SIZE] + (free % CHUNK_SIZE);
+
+		// Set the object to be active (for iteration purposes), and return its ID
+		obj->m_active = true;
+		return obj->m_id;
 	}
 
 	T* CreateAndGetObject() {
@@ -37,7 +49,7 @@ public:
 	}
 
 	T* GetObject(const obj_id a_id) const {
-		const int lowOrder = a_id & 0xFFFFFFFF;
+		const index lowOrder = a_id & 0xFFFFFFFF;
 		T* obj = m_objTable[lowOrder / CHUNK_SIZE] + (lowOrder % CHUNK_SIZE);
 		return obj->m_id != a_id ? nullptr : obj;
 	}
@@ -95,5 +107,5 @@ private:
 	}
 
 	std::vector<T*> m_objTable;
-	std::vector<int> m_freeList;
+	std::vector<index> m_freeList;
 };
