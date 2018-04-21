@@ -7,8 +7,13 @@
 
 typedef long long obj_id;
 
+class SlotMapBase {
+public:
+	virtual ~SlotMapBase() = default;
+};
+
 template <typename T>
-class SlotMap {
+class SlotMap : public SlotMapBase {
 public:
 	obj_id CreateObject() {
 		if (m_freeList.empty()) {
@@ -31,17 +36,17 @@ public:
 		return GetObject(CreateObject());
 	}
 
-	T* GetObject(const obj_id a_id) {
+	T* GetObject(const obj_id a_id) const {
 		const int lowOrder = a_id & 0xFFFFFFFF;
 		T* obj = m_objTable[lowOrder / CHUNK_SIZE] + (lowOrder % CHUNK_SIZE);
 		return obj->m_id != a_id ? nullptr : obj;
 	}
 
-	bool IsObjectValid(const obj_id a_id) {
+	bool IsObjectValid(const obj_id a_id) const {
 		return GetObject(a_id) != nullptr;
 	}
 
-	void DestroyObject(obj_id a_id) {
+	void DestroyObject(const obj_id a_id) {
 		T* obj = GetObject(a_id);
 		if (!obj) return;
 		obj->m_id = (a_id & 0xFFFFFFFF) | (((a_id >> 32) + 1) << 32);

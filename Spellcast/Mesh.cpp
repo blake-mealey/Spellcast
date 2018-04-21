@@ -15,10 +15,6 @@ using namespace Assimp;
 Mesh::Mesh() = default;
 Mesh::~Mesh() = default;
 
-MeshPtr Mesh::Create() {
-	return make_shared<Mesh>();
-}
-
 bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	Importer importer;
 

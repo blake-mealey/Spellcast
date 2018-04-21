@@ -37,7 +37,9 @@ struct CameraDesc : ComponentDesc {
 };
 
 class Camera : public Component {
+friend SlotMap<Camera>;
 public:
+	~Camera() override = default;
 	Camera();
 	static component_type GetType();
 	static component_index GetTypeIndex();

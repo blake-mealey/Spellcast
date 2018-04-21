@@ -1,23 +1,18 @@
 #pragma once
 
-#include <vector>
-#include <memory>
 #include "Material.h"
+
+#include <vector>
 
 class RenderContext;
 struct aiScene;
 
 typedef unsigned int t_index;
 
-class Mesh;
-typedef std::shared_ptr<Mesh> MeshPtr;
-
 class Mesh {
 public:
 	Mesh();
 	~Mesh();
-
-	static MeshPtr Create();
 
 	bool LoadFromFile(const std::string& a_filePath, unsigned a_flags = 0);
 

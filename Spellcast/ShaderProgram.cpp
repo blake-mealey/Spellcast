@@ -23,10 +23,6 @@ ShaderProgram::~ShaderProgram() {
 	}
 }
 
-ShaderProgramPtr ShaderProgram::Create() {
-	return make_shared<ShaderProgram>();
-}
-
 bool ShaderProgram::Init() {
 	m_program = glCreateProgram();
 

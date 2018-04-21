@@ -1,7 +1,5 @@
 #pragma once
 
-#include "World.h"
-
 #include <json/json.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -10,16 +8,10 @@
 #include "Entity.h"
 
 class Mesh;
-typedef std::shared_ptr<Mesh> MeshPtr;
-
 class Texture;
-typedef std::shared_ptr<Texture> TexturePtr;
-
 class Material;
-typedef std::shared_ptr<Material> MaterialPtr;
-
+class Material;
 class ShaderProgram;
-typedef std::shared_ptr<ShaderProgram> ShaderProgramPtr;
 
 class ContentManager {
 public:
@@ -38,11 +30,11 @@ public:
 
 	static nlohmann::json& GetJsonData(const std::string& a_filePath, bool a_overwrite = false);
 	
-	static MeshPtr& GetMesh(const std::string& a_filePath, bool a_overwrite = false);
-	static TexturePtr& GetTexture(const std::string& a_filePath, bool a_overwrite = false);
-	static MaterialPtr GetMaterial(const std::string& a_filePath, bool a_overwrite = false);
-	static MaterialPtr GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
-	static ShaderProgramPtr& GetShaderProgram(const std::string& a_programName);
+	static Mesh* GetMesh(const std::string& a_filePath, bool a_overwrite = false);
+	static Texture* GetTexture(const std::string& a_filePath, bool a_overwrite = false);
+	static Material* GetMaterial(const std::string& a_filePath, bool a_overwrite = false);
+	static Material* GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
+	static ShaderProgram* GetShaderProgram(const std::string& a_programName);
 
 	// static std::vector<entity_id> LoadScene(const std::string& a_filePath, entity_id a_parent = INVALID_ENTITY);
 	static EntityDesc* GetEntityDesc(const std::string& a_filePath, bool a_overwrite = false);
@@ -76,10 +68,10 @@ public:
 private:
 
 	static std::unordered_map<std::string, nlohmann::json> s_jsonData;
-	static std::unordered_map<std::string, MeshPtr> s_meshes;
-	static std::unordered_map<std::string, TexturePtr> s_textures;
-	static std::unordered_map<std::string, MaterialPtr> s_materials;
-	static std::unordered_map<std::string, ShaderProgramPtr> s_shaders;
+	static std::unordered_map<std::string, Mesh*> s_meshes;
+	static std::unordered_map<std::string, Texture*> s_textures;
+	static std::unordered_map<std::string, Material*> s_materials;
+	static std::unordered_map<std::string, ShaderProgram*> s_shaders;
 	static std::unordered_map<std::string, ComponentDesc*> s_componentDescs;
 	static std::unordered_map<std::string, EntityDesc*> s_entityDescs;
 };
@@ -105,7 +97,7 @@ V ContentManager::VecFromJson(nlohmann::json& a_data, const V& a_default) {
 	if (!a_data.is_array() || a_data.size() != sizeof(V) / sizeof(float)) return a_default;
 
 	V vector;
-	float* vectorData = value_ptr(vector);
+	float* vectorData = glm::value_ptr(vector);
 	for (float f : a_data) vectorData++[0] = f;
 
 	return vector;

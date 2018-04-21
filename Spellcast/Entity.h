@@ -12,14 +12,16 @@
 
 struct EntityDesc {
 	explicit EntityDesc(nlohmann::json& a_data);
-	entity_id Create();
+	Entity* Create();
 
+	Transform m_transform;
 	std::vector<ComponentDesc*> m_componentDescs;
 	std::vector<EntityDesc*> m_childrenDescs;
 };
 
 class Entity {
 friend SlotMap<Entity>;
+friend EntityDesc;
 public:
 	~Entity();
 	
@@ -49,30 +51,25 @@ private:
 	entity_id m_parent;
 	std::unordered_set<entity_id> m_children;
 
-	std::array<std::vector<Component*>, ComponentTypeIndex::COUNT> m_components;
+	std::array<std::vector<component_id>, ComponentTypeIndex::COUNT> m_components;
 };
 
 template <class T>
 void Entity::AddComponent(T* a_component) {
-	m_components[ComponentTraits<T>::GetTypeIndex()].push_back(a_component);
+	m_components[ComponentTraits<T>::GetTypeIndex()].push_back(a_component->GetId());
 }
 
 template <class T>
 T* Entity::GetComponent() const {
-	const std::vector<Component*>& list = m_components[ComponentTraits<T>::GetTypeIndex()];
+	const std::vector<component_id>& list = m_components[ComponentTraits<T>::GetTypeIndex()];
 	if (list.empty()) return nullptr;
-	return static_cast<T*>(list[0]);
+	return World::GetComponent<T>(list[0]);
 }
 
 template <class T>
 std::vector<T*> Entity::GetComponents() const {
-	const std::vector<Component*>& components = m_components[ComponentTraits<T>::GetTypeIndex()];
-	std::vector<T*> casted;
-
-	if (components.empty()) return casted;
-
-	casted.resize(components.size());
-	for (size_t i = 0; i < components.size(); ++i) casted[i] = static_cast<T*>(components[i]);
-
-	return casted;
+	const std::vector<component_id>& ids = m_components[ComponentTraits<T>::GetTypeIndex()];
+	std::vector<T*> components;
+	for (component_id id : ids) components.push_back(World::GetComponent<T>(id));
+	return components;
 }

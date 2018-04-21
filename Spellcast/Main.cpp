@@ -8,8 +8,15 @@ int main() {
 	GraphicsSystem& graphics = GraphicsSystem::Instance();
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
-	ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create();
-	World::GetEntity(ContentManager::GetEntityDesc("Boulder.entity.json")->Create())->GetComponent<MeshRenderer>()->GetTransform().Translate({2.f, 0.f, 0.f});
+	Entity* b0 = ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
+	Entity* b1 = ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
+	Entity* b2 = ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
+
+	b2->GetTransform().Translate({0.f, 1.f, 0.f});
+
+	// ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create();
+	// World::GetEntity(ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create())->GetTransform().Translate({2.f, 1.f, 0.f});
+	// World::GetEntity(ContentManager::GetEntityDesc("Boulder.entity.json")->Create())->GetComponent<MeshRenderer>()->GetTransform().Translate({2.f, 1.f, 0.f});
 
 	Time globalTime;
 	while (!graphics.WindowClosed()) {

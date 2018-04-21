@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ComponentType.h"
+#include "World.h"
 
 class Entity;
 class Component;
@@ -12,9 +13,12 @@ public:
 };
 
 class Component {
+friend SlotMap<Component>;
 public:
 	Component();
 	virtual ~Component();
+
+	bool GetId() const;
 
 	virtual void SetEnabled(bool a_enabled);
 	bool IsEnabled() const;
@@ -24,4 +28,6 @@ public:
 
 protected:
 	bool m_enabled;
+	component_id m_id;
+	bool m_active;
 };

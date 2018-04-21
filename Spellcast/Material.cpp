@@ -1,17 +1,15 @@
 #include "Material.h"
 #include "ShaderProgram.h"
-#include "Uniforms.h"
 #include "Texture.h"
+#include "ContentManager.h"
 
 using namespace std;
 using namespace glm;
 
-Material::Material(): m_specularity(0), m_emission(0) {}
-Material::~Material() = default;
+Material::Material(): m_shader(nullptr), m_albedoMap(nullptr), m_specularMap(nullptr), m_specularity(0),
+                      m_emission(0), m_normalMap(nullptr), m_heightMap(nullptr) {}
 
-MaterialPtr Material::Create() {
-	return make_shared<Material>();
-}
+Material::~Material() = default;
 
 bool Material::Init(nlohmann::json& a_data) {
 	m_shader = ContentManager::GetShaderProgram(ContentManager::FromJson<string>(a_data, "Shader", "Lighting"));
@@ -34,7 +32,7 @@ bool Material::Init(nlohmann::json& a_data) {
 	return true;
 }
 
-const ShaderProgramPtr& Material::GetShader() const {
+const ShaderProgram* Material::GetShader() const {
 	return m_shader;
 }
 
@@ -47,7 +45,7 @@ bool Material::HasAlbedoMap() const {
 	return m_albedoMap != nullptr;
 }
 
-const TexturePtr& Material::GetAlbedoMap() const {
+const Texture* Material::GetAlbedoMap() const {
 	return m_albedoMap;
 }
 

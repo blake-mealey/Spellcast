@@ -6,6 +6,8 @@ using namespace std;
 using namespace nlohmann;
 
 EntityDesc::EntityDesc(json& a_data) {
+	m_transform = Transform(a_data);
+
 	for (json& child : a_data["Children"]) {
 		m_childrenDescs.push_back(ContentManager::GetEntityDesc(child));
 	}
@@ -15,19 +17,20 @@ EntityDesc::EntityDesc(json& a_data) {
 	}
 }
 
-entity_id EntityDesc::Create() {
+Entity* EntityDesc::Create() {
 	Entity* entity = World::CreateAndGetEntity();
 
+	entity->m_transform = Transform(m_transform);
+
 	for (EntityDesc* desc : m_childrenDescs) {
-		const entity_id child = desc->Create();
-		World::GetEntity(child)->SetParent(entity->GetId());
+		desc->Create()->SetParent(entity->GetId());
 	}
 
 	for (ComponentDesc* desc : m_componentDescs) {
 		desc->Create(entity);
 	}
 
-	return entity->GetId();
+	return entity;
 }
 
 
@@ -42,9 +45,10 @@ Entity::~Entity() {
 		World::DestroyEntity(id);
 	}
 
-	for (vector<Component*>& components : m_components) {
-		for (Component* component : components) {
-			delete component;
+	for (int typeIndex = 0; typeIndex < m_components.size(); ++typeIndex) {
+		vector<component_id>& components = m_components[typeIndex];
+		for (const component_id component : components) {
+			World::DestroyComponent(typeIndex, component);
 		}
 		components.clear();
 	}

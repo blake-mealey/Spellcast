@@ -7,6 +7,7 @@
 
 #include <json/json.hpp>
 
+class Mesh;
 class MeshRenderer;
 
 struct MeshRendererDesc : ComponentDesc {
@@ -14,18 +15,20 @@ struct MeshRendererDesc : ComponentDesc {
 	explicit MeshRendererDesc(nlohmann::json& a_data);
 	void Create(Entity* a_entity) override;
 
-	MeshPtr m_mesh;
+	Mesh* m_mesh;
 	Transform m_transform;
-	std::vector<MaterialPtr> m_materials;
+	std::vector<Material*> m_materials;
 };
 
 class MeshRenderer : public Component, RenderContext {
+friend SlotMap<MeshRenderer>;
 public:
+	~MeshRenderer() override = default;
 	MeshRenderer();
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const MeshRendererDesc& a_desc);
+	bool Init(const MeshRendererDesc* a_desc);
 
 	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) override;
 	void InitRenderPass(const size_t& a_materialIndex) const override;
@@ -33,6 +36,6 @@ public:
 	Transform& GetTransform();
 
 private:
-	MeshPtr m_mesh;
+	Mesh* m_mesh;
 	Transform m_transform;
 };

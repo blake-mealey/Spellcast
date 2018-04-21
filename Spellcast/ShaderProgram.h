@@ -1,30 +1,25 @@
 #pragma once
 
-#include "ContentManager.h"
-
+#include <glm/glm.hpp>
 #include <GL/glew.h>
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <regex>
 
-class ShaderProgram;
-typedef std::shared_ptr<ShaderProgram> ShaderProgramPtr;
+class Material;
 
 class ShaderProgram {
 public:
 	ShaderProgram();
 	virtual ~ShaderProgram();
 
-	static ShaderProgramPtr Create();
-
 	virtual bool Init();
 	void Enable() const;
 	static void Disable();
 	
-	virtual void SetMaterial(const MaterialPtr& a_material) {};
-	virtual void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) {};
+	virtual void SetMaterial(const Material* a_material) const {};
+	virtual void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const {};
 
 protected:
 	bool AddShader(GLenum a_shaderType, const std::string& a_filePath);

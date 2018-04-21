@@ -1,11 +1,11 @@
 #include "World.h"
 #include "Entity.h"
 
-#define CHUNK_SIZE 3
-
 using namespace std;
 
 SlotMap<Entity> World::s_entities;
+array<SlotMapBase*, ComponentTypeIndex::COUNT> World::s_components;
+array<bool, ComponentTypeIndex::COUNT> World::s_componentsInitialized;
 
 entity_id World::CreateEntity() {
 	return s_entities.CreateObject();
@@ -33,4 +33,8 @@ SlotMap<Entity>::iterator World::begin() {
 
 SlotMap<Entity>::iterator World::end() {
 	return s_entities.end();
+}
+
+void World::DestroyComponent(const component_index a_typeIndex, const component_id a_id) {
+	static_cast<SlotMap<Component>*>(s_components[a_typeIndex])->DestroyObject(a_id);
 }

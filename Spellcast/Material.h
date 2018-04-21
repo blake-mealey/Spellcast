@@ -1,28 +1,22 @@
 #pragma once
 
-#include "ContentManager.h"
+#include "ShaderProgram.h"
+#include "Texture.h"
 
 #include <json/json.hpp>
-
-#include <memory>
-
-class Material;
-typedef std::shared_ptr<Material> MaterialPtr;
 
 class Material {
 public:
 	Material();
 	~Material();
 
-	static MaterialPtr Create();
-
 	bool Init(nlohmann::json& a_data);
 	
 	// void Use() const;
-	const ShaderProgramPtr& GetShader() const;
+	const ShaderProgram* GetShader() const;
 
 	bool HasAlbedoMap() const;
-	const TexturePtr& GetAlbedoMap() const;
+	const Texture* GetAlbedoMap() const;
 	const glm::vec4& GetColor() const;
 
 	bool HasSpecularMap() const;
@@ -38,19 +32,19 @@ public:
 	const glm::vec2& GetUvOffset() const;
 
 private:
-	ShaderProgramPtr m_shader;
+	ShaderProgram* m_shader;
 	
-	TexturePtr m_albedoMap;
+	Texture* m_albedoMap;
 	glm::vec4 m_color;
 
-	TexturePtr m_specularMap;
+	Texture* m_specularMap;
 	glm::vec4 m_specularColor;
 	float m_specularity;
 
 	float m_emission;
 
-	TexturePtr m_normalMap;
-	TexturePtr m_heightMap;
+	Texture* m_normalMap;
+	Texture* m_heightMap;
 
 	glm::vec2 m_uvScale;
 	glm::vec2 m_uvOffset;

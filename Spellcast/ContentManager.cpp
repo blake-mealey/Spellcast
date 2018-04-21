@@ -28,10 +28,10 @@ const vec4 ContentManager::COLOR_YELLOW =			vec4(255.f, 233.f, 25.f, 255.f) / 25
 const vec4 ContentManager::COLOR_CYAN =				vec4(0.f, 1.f, 1.f, 1.f);
 
 unordered_map<string, json> ContentManager::s_jsonData;
-unordered_map<string, MeshPtr> ContentManager::s_meshes;
-unordered_map<string, TexturePtr> ContentManager::s_textures;
-unordered_map<string, MaterialPtr> ContentManager::s_materials;
-unordered_map<string, ShaderProgramPtr> ContentManager::s_shaders;
+unordered_map<string, Mesh*> ContentManager::s_meshes;
+unordered_map<string, Texture*> ContentManager::s_textures;
+unordered_map<string, Material*> ContentManager::s_materials;
+unordered_map<string, ShaderProgram*> ContentManager::s_shaders;
 unordered_map<string, ComponentDesc*> ContentManager::s_componentDescs;
 unordered_map<string, EntityDesc*> ContentManager::s_entityDescs;
 
@@ -61,7 +61,7 @@ json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwri
 	return s_jsonData[a_filePath];
 }
 
-MeshPtr& ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
+Mesh* ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
 	// Check if the data has already been loaded
 	if (!a_overwrite) {
 		const auto iter = s_meshes.find(a_filePath);
@@ -71,8 +71,9 @@ MeshPtr& ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
 	}
 
 	// Try loading from the file
-	MeshPtr mesh = Mesh::Create();
+	auto* mesh = new Mesh();
 	if (!mesh->LoadFromFile(GetContentPath(a_filePath, "Meshes/"))) {
+		delete mesh;
 		mesh = nullptr;
 	}
 
@@ -81,7 +82,7 @@ MeshPtr& ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
 	return s_meshes[a_filePath];
 }
 
-TexturePtr& ContentManager::GetTexture(const std::string& a_filePath, bool a_overwrite) {
+Texture* ContentManager::GetTexture(const std::string& a_filePath, bool a_overwrite) {
 	// Check if the data has already been loaded
 	if (!a_overwrite) {
 		const auto iter = s_textures.find(a_filePath);
@@ -91,8 +92,9 @@ TexturePtr& ContentManager::GetTexture(const std::string& a_filePath, bool a_ove
 	}
 
 	// Try loading from the file
-	TexturePtr texture = Texture::Create();
+	auto* texture = new Texture();
 	if (!texture->LoadFromFile(GetContentPath(a_filePath, "Textures/"))) {
+		delete texture;
 		texture = nullptr;
 	}
 
@@ -101,11 +103,13 @@ TexturePtr& ContentManager::GetTexture(const std::string& a_filePath, bool a_ove
 	return s_textures[a_filePath];
 }
 
-MaterialPtr ContentManager::GetMaterial(const std::string& a_filePath, bool a_overwrite) {
-	return GetMaterial(json(a_filePath), a_overwrite);
+Material* ContentManager::GetMaterial(const std::string& a_filePath, bool a_overwrite) {
+	string filePath = a_filePath;
+	json data = filePath;
+	return GetMaterial(data, a_overwrite);
 }
 
-MaterialPtr ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
+Material* ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
 	json data;
 	const bool fromFile = a_data.is_string();
 	if (fromFile) {
@@ -125,8 +129,9 @@ MaterialPtr ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
 	}
 
 	// Try loading from the file
-	MaterialPtr mat = Material::Create();
+	auto* mat = new Material();
 	if (!mat->Init(data)) {
+		delete mat;
 		mat = nullptr;
 	}
 
@@ -135,7 +140,7 @@ MaterialPtr ContentManager::GetMaterial(json& a_data, bool a_overwrite) {
 	return mat;
 }
 
-ShaderProgramPtr& ContentManager::GetShaderProgram(const string& a_programName) {
+ShaderProgram* ContentManager::GetShaderProgram(const string& a_programName) {
 	// Check if a shader with this name has already been initialized
 	const auto iter = s_shaders.find(a_programName);
 	if (iter != s_shaders.end()) {
@@ -143,13 +148,14 @@ ShaderProgramPtr& ContentManager::GetShaderProgram(const string& a_programName) 
 	}
 
 	// Try creating from name
-	ShaderProgramPtr shader = nullptr;
+	ShaderProgram* shader = nullptr;
 	if (a_programName == "Lighting") {
-		shader = LightingShader::Create();
+		shader = new LightingShader();
 	}
 
 	// Try initializing
 	if (shader && !shader->Init()) {
+		delete shader;
 		shader = nullptr;
 	}
 
@@ -207,7 +213,9 @@ EntityDesc* ContentManager::GetEntityDesc(json& a_data, bool a_overwrite) {
 }
 
 ComponentDesc* ContentManager::GetComponentDesc(const std::string& a_filePath, bool a_overwrite) {
-	return GetComponentDesc(json(a_filePath), a_overwrite);
+	string filePath = a_filePath;
+	json data = filePath;
+	return GetComponentDesc(data, a_overwrite);
 }
 
 ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) {
@@ -266,6 +274,7 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		// If no description was loaded, print an error and return null
 		if (!desc) {
 			cerr << "WARNING: Unknown component type: " << a_data["Type"] << (fromFile ? " in " + filePath : "") << endl;
+			delete desc;
 			return nullptr;
 		}
 	}

@@ -1,7 +1,15 @@
 #include "Component.h"
 
-Component::Component() : m_enabled(true) {}
-Component::~Component() = default;
+Component::Component() : m_enabled(true), m_id(INVALID_COMPONENT), m_active(false) {}
+
+Component::~Component() {
+	m_active = false;
+	m_enabled = true;
+}
+
+bool Component::GetId() const {
+	return m_id;
+}
 
 void Component::SetEnabled(bool a_enabled) {
 	m_enabled = a_enabled;

@@ -10,9 +10,9 @@ public:
 	virtual void InitRenderPass(const size_t& a_materialIndex) const;
 
 protected:
-	const ShaderProgramPtr& GetShader(const size_t& a_materialIndex) const;
+	const ShaderProgram* GetShader(const size_t& a_materialIndex) const;
 
-	std::vector<MaterialPtr> m_materials;
+	std::vector<Material*> m_materials;
 
 	glm::mat4 m_currentViewMatrix;
 	glm::mat4 m_currentProjectionMatrix;

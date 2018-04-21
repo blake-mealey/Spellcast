@@ -13,11 +13,7 @@ LightingShader::~LightingShader() {
 	glDeleteBuffers(SSBOs::Count, m_ssbos);
 }
 
-LightingShaderPtr LightingShader::Create() {
-	return make_shared<LightingShader>();
-}
-
-void LightingShader::SetMaterial(const MaterialPtr& a_material) {
+void LightingShader::SetMaterial(const Material* a_material) const {
 	SetMaterialColor(a_material->GetColor());
 	SetMaterialSpecularColor(a_material->GetSpecularColor());
 	SetMaterialSpecularity(a_material->GetSpecularity());
@@ -33,7 +29,7 @@ void LightingShader::SetMaterial(const MaterialPtr& a_material) {
 	if (a_material->HasAlbedoMap()) a_material->GetAlbedoMap()->Bind(ALBEDO_TEXTURE_UNIT);
 }
 
-void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMatrix, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) {
+void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMatrix, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
 	SetModelMatrix(a_modelMatrix);
 	SetViewMatrix(a_viewMatrix);
 	SetModelViewProjectionMatrix(a_projectionMatrix * a_viewMatrix * a_modelMatrix);

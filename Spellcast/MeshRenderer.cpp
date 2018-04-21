@@ -25,8 +25,8 @@ MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 }
 
 void MeshRendererDesc::Create(Entity* a_entity) {
-	auto* renderer = new MeshRenderer();
-	renderer->Init(*this);
+	auto* renderer = World::CreateAndGetComponent<MeshRenderer>();
+	renderer->Init(this);
 	renderer->GetTransform().SetParent(&a_entity->GetTransform());
 	a_entity->AddComponent(renderer);
 }
@@ -44,10 +44,10 @@ component_index MeshRenderer::GetTypeIndex() {
 	return ComponentTypeIndex::MESH_RENDERER;
 }
 
-bool MeshRenderer::Init(const MeshRendererDesc& a_desc) {
-	m_mesh = a_desc.m_mesh;
-	m_transform = a_desc.m_transform;
-	m_materials = a_desc.m_materials;
+bool MeshRenderer::Init(const MeshRendererDesc* a_desc) {
+	m_mesh = a_desc->m_mesh;
+	m_transform = a_desc->m_transform;
+	m_materials = std::vector<Material*>(a_desc->m_materials);
 
 	return true;
 }

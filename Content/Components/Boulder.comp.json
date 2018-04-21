@@ -3,5 +3,5 @@
   "Mesh": "Boulder.obj",
   "Materials": ["Boulder.mat.json"],
   "Scale": [0.5, 0.5, 0.5],
-  "Position": [-1, 0, 0]
+  "Position": [0, 0, 0]
 }

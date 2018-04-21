@@ -16,10 +16,6 @@ Texture::~Texture() {
 	}
 }
 
-TexturePtr Texture::Create() {
-	return make_shared<Texture>();
-}
-
 bool Texture::LoadFromFile(const std::string& a_filePath) {
 	int components;
 	const auto data = stbi_load(a_filePath.c_str(), &m_width, &m_height, &components, 0);

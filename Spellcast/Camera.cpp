@@ -12,7 +12,7 @@ using namespace nlohmann;
 CameraDesc::CameraDesc(): m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
                           m_farClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
                           m_upVector(Geometry::UP), m_fieldOfView(radians(DEFAULT_FIELD_OF_VIEW)),
-                          m_targetGlobalPosition(Geometry::FORWARD),
+                          m_globalPosition(-Geometry::FORWARD),
                           m_viewportUnitScale(vec2(1.f)) {}
 
 CameraDesc::CameraDesc(json& a_data): CameraDesc() {
@@ -33,7 +33,8 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 }
 
 void CameraDesc::Create(Entity* a_entity) {
-	auto* camera = new Camera();
+	// auto* camera = new Camera();
+	auto* camera = World::CreateAndGetComponent<Camera>();
 	camera->Init(*this);
 	a_entity->AddComponent(camera);
 }
