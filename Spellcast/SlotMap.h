@@ -7,6 +7,7 @@
 
 typedef long long obj_id;
 typedef int index;
+typedef int version;
 
 class SlotMapBase {
 public:
@@ -37,7 +38,7 @@ public:
 
 
 		// Get the object at the index
-		T* obj = m_objTable[free / CHUNK_SIZE] + (free % CHUNK_SIZE);
+		T* obj = GetObjectFromIndex(free);
 
 		// Set the object to be active (for iteration purposes), and return its ID
 		obj->m_active = true;
@@ -49,8 +50,7 @@ public:
 	}
 
 	T* GetObject(const obj_id a_id) const {
-		const index lowOrder = a_id & 0xFFFFFFFF;
-		T* obj = m_objTable[lowOrder / CHUNK_SIZE] + (lowOrder % CHUNK_SIZE);
+		T* obj = GetObjectFromIndex(GetIndex(a_id));
 		return obj->m_id != a_id ? nullptr : obj;
 	}
 
@@ -61,7 +61,7 @@ public:
 	void DestroyObject(const obj_id a_id) {
 		T* obj = GetObject(a_id);
 		if (!obj) return;
-		obj->m_id = (a_id & 0xFFFFFFFF) | (((a_id >> 32) + 1) << 32);
+		IncrementVersion(obj->m_id);
 		obj->~T();
 		m_freeList.push_back(a_id & 0xFFFFFFFF);
 	}
@@ -102,6 +102,26 @@ public:
 	iterator end() { return iterator(end_ptr(), end_ptr()); }
 
 private:
+	index GetIndex(const obj_id a_id) const {
+		return a_id & 0xFFFFFFFF;
+	}
+	
+	version GetVersion(const obj_id a_id) const {
+		return a_id >> 32;
+	}
+
+	obj_id GetId(const index a_index, const version a_version) const {
+		return a_index | (a_version << 32);
+	}
+
+	void IncrementVersion(obj_id& a_id) const {
+		a_id = GetId(GetIndex(a_id), GetVersion(a_id) + 1);
+	}
+
+	T* GetObjectFromIndex(const index a_index) const {
+		return m_objTable[a_index / CHUNK_SIZE] + (a_index % CHUNK_SIZE);
+	}
+
 	T* end_ptr() {
 		return m_objTable[0] + m_objTable.size()*CHUNK_SIZE;
 	}

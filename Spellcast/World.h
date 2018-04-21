@@ -8,8 +8,8 @@
 class Component;
 class Entity;
 
-#define INVALID_ENTITY -1
-#define INVALID_COMPONENT -1
+#define INVALID_ENTITY INVALID_OBJECT
+#define INVALID_COMPONENT INVALID_OBJECT
 
 typedef obj_id entity_id;
 typedef obj_id component_id;
