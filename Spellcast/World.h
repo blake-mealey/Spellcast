@@ -50,7 +50,6 @@ private:
 
 	static SlotMap<Entity> s_entities;
 	static std::array<SlotMapBase*, ComponentTypeIndex::COUNT> s_components;
-	static std::array<bool, ComponentTypeIndex::COUNT> s_componentsInitialized;
 };
 
 template <class T>
@@ -81,13 +80,10 @@ void World::DestroyComponent(const component_id a_id) {
 template <class T>
 SlotMap<T>* World::GetSlotMap() {
 	const component_index typeIndex = ComponentTraits<T>::GetTypeIndex();
-	SlotMap<T>* slotMap = nullptr;
-	if (s_componentsInitialized[typeIndex]) {
-		slotMap = static_cast<SlotMap<T>*>(s_components[typeIndex]);
-	} else {
+	SlotMap<T>* slotMap = static_cast<SlotMap<T>*>(s_components[typeIndex]);
+	if (!slotMap) {
 		slotMap = new SlotMap<T>();
 		s_components[typeIndex] = slotMap;
-		s_componentsInitialized[typeIndex] = true;
 	}
 	return slotMap;
 }

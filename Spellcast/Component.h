@@ -18,7 +18,7 @@ public:
 	Component();
 	virtual ~Component();
 
-	bool GetId() const;
+	component_id GetId() const;
 
 	virtual void SetEnabled(bool a_enabled);
 	bool IsEnabled() const;

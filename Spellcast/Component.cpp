@@ -7,7 +7,7 @@ Component::~Component() {
 	m_enabled = true;
 }
 
-bool Component::GetId() const {
+component_type Component::GetId() const {
 	return m_id;
 }
 

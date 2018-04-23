@@ -20,7 +20,7 @@ EntityDesc::EntityDesc(json& a_data) {
 Entity* EntityDesc::Create() {
 	Entity* entity = World::CreateAndGetEntity();
 
-	entity->m_transform = Transform(m_transform);
+	entity->m_transform = m_transform;
 
 	for (EntityDesc* desc : m_childrenDescs) {
 		desc->Create()->SetParent(entity->GetId());

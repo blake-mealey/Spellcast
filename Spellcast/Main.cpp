@@ -12,7 +12,9 @@ int main() {
 	Entity* b1 = ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
 	Entity* b2 = ContentManager::GetEntityDesc("Boulder.entity.json")->Create();
 
-	b2->GetTransform().Translate({0.f, 1.f, 0.f});
+	b0->GetTransform().Translate({0.f, -1.f, 0.f});
+	b1->GetTransform().Translate({0.f, 1.f, 0.f});
+	b2->GetTransform().Scale(0.5f);
 
 	// ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create();
 	// World::GetEntity(ContentManager::GetEntityDesc("Boulder_all.entity.json")->Create())->GetTransform().Translate({2.f, 1.f, 0.f});

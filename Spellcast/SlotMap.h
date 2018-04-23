@@ -3,7 +3,7 @@
 #include <vector>
 
 #define INVALID_OBJECT -1
-#define CHUNK_SIZE 3
+#define CHUNK_SIZE 256
 
 typedef long long obj_id;
 typedef int index;
@@ -34,8 +34,6 @@ public:
 		// Pop the next unused index
 		const index free = m_freeList.back();
 		m_freeList.pop_back();
-
-
 
 		// Get the object at the index
 		T* obj = GetObjectFromIndex(free);
@@ -74,7 +72,11 @@ public:
 		typedef T* pointer;
 		typedef std::forward_iterator_tag iterator_category;
 		typedef int difference_type;
-		explicit iterator(pointer a_ptr, pointer a_end) : m_ptr(a_ptr), m_end(a_end) {}
+		explicit iterator(const SlotMap<T>& a_slotMap, index a_primaryIndex, index a_secondaryIndex) :
+			m_primaryIndex(a_primaryIndex), m_secondaryIndex(a_secondaryIndex), m_slotMap(a_slotMap) {
+			update_ptr();
+		}
+
 		self_type operator++(int) {			// postfix
 			const self_type i = *this;
 			iterate();
@@ -89,41 +91,51 @@ public:
 		bool operator==(const self_type& a_rhs) const { return m_ptr == a_rhs.m_ptr; }
 		bool operator!=(const self_type& a_rhs) const { return m_ptr != a_rhs.m_ptr; }
 	private:
+		void update_ptr() {
+			m_ptr = m_slotMap.m_objTable[m_primaryIndex] + m_secondaryIndex;
+		}
+
 		void iterate() {
 			do {
-				++m_ptr;
-			} while (!m_ptr->m_active && m_ptr != m_end);
+				if (++m_secondaryIndex == CHUNK_SIZE) {
+					m_secondaryIndex = 0;
+					++m_primaryIndex;
+				}
+				// if (++m_secondaryIndex % CHUNK_SIZE == 0) ++m_primaryIndex;		// Why doesn't this work?
+				update_ptr();
+			} while (m_primaryIndex < m_slotMap.m_objTable.size() && !m_ptr->m_active);
 		}
+
 		pointer m_ptr;
-		pointer m_end;
+
+		index m_primaryIndex;
+		index m_secondaryIndex;
+		const SlotMap<T>& m_slotMap;
 	};
 
-	iterator begin() { return iterator(m_objTable[0], end_ptr()); }
-	iterator end() { return iterator(end_ptr(), end_ptr()); }
+	iterator begin() { return iterator(*this, 0, 0); }
+	iterator end() { return iterator(*this, m_objTable.size(), 0); }
 
 private:
-	index GetIndex(const obj_id a_id) const {
+	friend iterator;
+	static index GetIndex(const obj_id a_id) {
 		return a_id & 0xFFFFFFFF;
 	}
-	
-	version GetVersion(const obj_id a_id) const {
+
+	static version GetVersion(const obj_id a_id) {
 		return a_id >> 32;
 	}
 
-	obj_id GetId(const index a_index, const version a_version) const {
+	static obj_id GetId(const index a_index, const version a_version) {
 		return a_index | (a_version << 32);
 	}
 
-	void IncrementVersion(obj_id& a_id) const {
+	static void IncrementVersion(obj_id& a_id) {
 		a_id = GetId(GetIndex(a_id), GetVersion(a_id) + 1);
 	}
 
 	T* GetObjectFromIndex(const index a_index) const {
 		return m_objTable[a_index / CHUNK_SIZE] + (a_index % CHUNK_SIZE);
-	}
-
-	T* end_ptr() {
-		return m_objTable[0] + m_objTable.size()*CHUNK_SIZE;
 	}
 
 	std::vector<T*> m_objTable;
