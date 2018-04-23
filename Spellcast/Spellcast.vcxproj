@@ -176,6 +176,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="SlotMap_New.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LightingShader.h" />

@@ -63,7 +63,7 @@ public:
 		if (!obj) return;
 		IncrementVersion(obj->m_id);
 		obj->~T();
-		m_freeList.push_back(a_id & 0xFFFFFFFF);
+		m_freeList.push_back(GetIndex(a_id));
 	}
 
 	class iterator {
@@ -102,19 +102,19 @@ public:
 	iterator end() { return iterator(end_ptr(), end_ptr()); }
 
 private:
-	index GetIndex(const obj_id a_id) const {
+	static index GetIndex(const obj_id a_id) {
 		return a_id & 0xFFFFFFFF;
 	}
-	
-	version GetVersion(const obj_id a_id) const {
+
+	static version GetVersion(const obj_id a_id) {
 		return a_id >> 32;
 	}
 
-	obj_id GetId(const index a_index, const version a_version) const {
+	static obj_id GetId(const index a_index, const version a_version) {
 		return a_index | (a_version << 32);
 	}
 
-	void IncrementVersion(obj_id& a_id) const {
+	static void IncrementVersion(obj_id& a_id) {
 		a_id = GetId(GetIndex(a_id), GetVersion(a_id) + 1);
 	}
 
