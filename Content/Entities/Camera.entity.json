@@ -1,0 +1,8 @@
+{
+  "Components": [
+    {
+      "Type": "Camera",
+      "Position": [ 0, 0, -5 ]
+    }
+  ]
+}

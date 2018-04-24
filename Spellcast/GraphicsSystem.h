@@ -1,9 +1,8 @@
 #pragma once
 
 #include "System.h"
-#include "Camera.h"
 
-#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #define INITIAL_SCREEN_WIDTH 1024
 #define INITIAL_SCREEN_HEIGHT 768
@@ -33,8 +32,6 @@ private:
 	void RenderDevTools(const Time& a_globalTime);
 
 	void SetWindowDims(const glm::vec2& a_windowDims);
-
-	Camera m_camera;
 
 	GLFWwindow* m_window;
 	glm::vec2 m_windowDims;

@@ -1,6 +1,7 @@
 #include "GraphicsSystem.h"
 #include "Geometry.h"
 #include "Logger.h"
+#include "Camera.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -107,10 +108,6 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
 	ImGui::StyleColorsDark();
 
-	CameraDesc c;
-	c.m_globalPosition = vec3(0.f, 0.f, -5.f);
-	if (!m_camera.Init(c)) Logger::Console()->warn("Camera not initialized.");
-
 	return true;
 }
 
@@ -119,7 +116,10 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_camera.Render(Instance());
+	// Render cameras
+	for (auto it = World::BeginComponents<Camera>(); it != World::EndComponents<Camera>(); ++it) {
+		it->Render(Instance());
+	}
 
 	RenderDevTools(a_globalTime);
 

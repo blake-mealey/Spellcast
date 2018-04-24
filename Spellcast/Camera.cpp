@@ -37,7 +37,6 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 }
 
 void CameraDesc::Create(Entity* a_entity) {
-	// auto* camera = new Camera();
 	auto* camera = World::CreateAndGetComponent<Camera>();
 	camera->Init(*this);
 	a_entity->AddComponent(camera);
