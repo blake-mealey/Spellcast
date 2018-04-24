@@ -28,5 +28,6 @@
     <None Include="Shaders\copy.frag" />
     <None Include="Shaders\copy.vert" />
     <None Include="Entities\Camera.entity.json" />
+    <None Include="Shaders\blur.frag" />
   </ItemGroup>
 </Project>

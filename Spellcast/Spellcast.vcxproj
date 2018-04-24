@@ -162,6 +162,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="SkyboxRenderer.cpp" />
     <ClCompile Include="SkyboxShader.cpp" />
+    <ClCompile Include="BlurShader.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicsSystem.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlurShader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentType.h" />

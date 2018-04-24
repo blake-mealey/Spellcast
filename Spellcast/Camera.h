@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Component.h"
+#include "CopyShader.h"
+#include "BlurShader.h"
+#include "Texture.h"
 
 #include <json/json.hpp>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
-#include "CopyShader.h"
-#include "Texture.h"
 
 class Entity;
 
@@ -53,10 +54,14 @@ public:
 
 	void Render(const GraphicsSystem& a_context);
 
+	void SetViewportUnitScale(const glm::vec2& a_scale);
+	void SetViewportUnitPosition(const glm::vec2& a_position);
+
 private:
 	CopyShader m_copyShader;
+	BlurShader m_blurShader;
 
-	bool GenerateBuffersAndTextures();
+	bool GenerateBuffers();
 	bool InitVaoAndVbo();
 	bool InitGlowBuffer();
 	bool InitScreenBuffer();
@@ -71,8 +76,8 @@ private:
 	Texture m_screenTexture;
 	Texture m_glowTexture;
 
-	GLuint m_blurTextures[BLUR_LEVEL_COUNT];
-	GLuint m_blurTempTextures[BLUR_LEVEL_COUNT];
+	Texture m_blurTextures[BLUR_LEVEL_COUNT];
+	Texture m_blurTempTextures[BLUR_LEVEL_COUNT];
 
 	float m_nearClippingPlane;
 	float m_farClippingPlane;

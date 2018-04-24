@@ -25,6 +25,7 @@
     <None Include="Entities\Camera.entity.json" />
     <None Include="Entities\Skybox.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
+    <None Include="Shaders\blur.frag" />
     <None Include="Shaders\copy.frag" />
     <None Include="Shaders\copy.vert" />
     <None Include="Shaders\includes\hsv.glsl" />

@@ -48,8 +48,6 @@ Camera::~Camera() {
 	if (m_screenBuffer) glDeleteFramebuffers(1, &m_screenBuffer);
 	if (m_screenVao) glDeleteVertexArrays(1, &m_screenVao);
 	if (m_screenVbo) glDeleteBuffers(1, &m_screenVbo);
-	if (m_blurTextures[0]) glDeleteTextures(BLUR_LEVEL_COUNT, m_blurTextures);
-	if (m_blurTempTextures[0]) glDeleteTextures(BLUR_LEVEL_COUNT, m_blurTempTextures);
 }
 
 Camera::Camera() : m_depthStencilBuffer(0), m_screenBuffer(0), m_glowBuffer(0), m_screenVao(0), m_screenVbo(0),
@@ -68,13 +66,14 @@ component_index Camera::GetTypeIndex() {
 
 bool Camera::Init(const CameraDesc& a_desc) {
 	// Initialize buffers and textures
-	if (!GenerateBuffersAndTextures()) return false;
+	if (!GenerateBuffers()) return false;
 	if (!InitVaoAndVbo()) return false;
 	if (!InitGlowBuffer()) return false;
 	if (!InitScreenBuffer()) return false;
 
-	// Initialize copy shader
+	// Initialize shaders
 	if (!m_copyShader.Init()) return false;
+	if (!m_blurShader.Init()) return false;
 
 	// Copy data from description
 	m_nearClippingPlane = a_desc.m_nearClippingPlane;
@@ -95,16 +94,12 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	return true;
 }
 
-bool Camera::GenerateBuffersAndTextures() {
+bool Camera::GenerateBuffers() {
 	// Generate buffers
 	glGenFramebuffers(2, &m_screenBuffer);
 	glGenRenderbuffers(1, &m_depthStencilBuffer);
 	glGenVertexArrays(1, &m_screenVao);
 	glGenBuffers(1, &m_screenVbo);
-
-	// Generate textures
-	glGenTextures(BLUR_LEVEL_COUNT, m_blurTextures);
-	glGenTextures(BLUR_LEVEL_COUNT, m_blurTempTextures);
 
 	return glGetError() == GL_NO_ERROR;
 }
@@ -141,19 +136,8 @@ bool Camera::InitGlowBuffer() {
 	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
 		// const float factor = 1.f / pow(2, i);
 
-		glBindTexture(GL_TEXTURE_2D, m_blurTextures[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glBindTexture(GL_TEXTURE_2D, m_blurTempTextures[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		m_blurTextures[i].Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+		m_blurTempTextures[i].Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -214,11 +198,8 @@ void Camera::Render(const GraphicsSystem& a_context) {
 		for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
 			const float factor = 1.f / pow(2, i);
 
-			glBindTexture(GL_TEXTURE_2D, m_blurTextures[i]);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width * factor, height * factor, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-			glBindTexture(GL_TEXTURE_2D, m_blurTempTextures[i]);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width * factor, height * factor, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+			m_blurTextures->UpdateDimensions(width, height);
+			m_blurTempTextures->UpdateDimensions(width, height);
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -253,9 +234,52 @@ void Camera::Render(const GraphicsSystem& a_context) {
 		it->GetTransform().Rotate(Geometry::UP, 0.01f);
 	}
 
+	// Post-processing effects
+	glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
+	glBindVertexArray(m_screenVao);
+
+	m_copyShader.Enable();
+	m_glowTexture.Bind(ALBEDO_TEXTURE_UNIT);
+
+	// Copy the glow buffer to each of the level buffers
+	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
+		const float factor = 1.f / pow(2, i);
+		glViewport(0, 0, m_viewportScale.x * factor, m_viewportScale.y * factor);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_blurTextures[i].GetId(), 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
+	m_blurShader.Enable();
+
+	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
+		// Get the relevant buffers
+		const Texture& buffer = m_blurTextures[i];
+		const Texture& blurBuffer = m_blurTempTextures[i];
+
+		// Set the viewport
+		const float factor = 1.f / pow(2, i);
+		glViewport(0, 0, m_viewportScale.x * factor, m_viewportScale.y * factor);
+
+		// Calculate the blur offsets
+		const float xOffset = 1.2f / (m_viewportScale.x * factor);
+		const float yOffset = 1.2f / (m_viewportScale.y * factor);
+
+		// Blur on the x-axis
+		buffer.Bind(ALBEDO_TEXTURE_UNIT);
+		m_blurShader.SetOffset(vec2(xOffset, 0.f));
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurBuffer.GetId(), 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		// Blur on the y-axis
+		blurBuffer.Bind(ALBEDO_TEXTURE_UNIT);
+		m_blurShader.SetOffset(vec2(0.f, yOffset));
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.GetId(), 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
 	// Copy the screen buffer to the window
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	glBindVertexArray(m_screenVao);
 
 	m_copyShader.Enable();
@@ -263,4 +287,25 @@ void Camera::Render(const GraphicsSystem& a_context) {
 
 	glViewport(m_viewportPosition.x, m_viewportPosition.y, m_viewportScale.x, m_viewportScale.y);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+
+
+	glDepthMask(GL_FALSE);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
+		m_blurTextures[i].Bind(ALBEDO_TEXTURE_UNIT);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+}
+
+void Camera::SetViewportUnitScale(const vec2& a_scale) {
+	m_viewportUnitScale = a_scale;
+}
+
+void Camera::SetViewportUnitPosition(const vec2& a_position) {
+	m_viewportUnitPosition = a_position;
 }
