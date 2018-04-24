@@ -165,6 +165,10 @@
     <ClCompile Include="Include\PennerEasing\Quart.cpp" />
     <ClCompile Include="Include\PennerEasing\Quint.cpp" />
     <ClCompile Include="Include\PennerEasing\Sine.cpp" />
+    <ClCompile Include="Include\spdlog\fmt\bundled\format.cc" />
+    <ClCompile Include="Include\spdlog\fmt\bundled\ostream.cc" />
+    <ClCompile Include="Include\spdlog\fmt\bundled\posix.cc" />
+    <ClCompile Include="Include\spdlog\fmt\bundled\printf.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\imgui\imconfig.h" />
@@ -185,6 +189,44 @@
     <ClInclude Include="Include\PennerEasing\Quart.h" />
     <ClInclude Include="Include\PennerEasing\Quint.h" />
     <ClInclude Include="Include\PennerEasing\Sine.h" />
+    <ClInclude Include="Include\spdlog\async_logger.h" />
+    <ClInclude Include="Include\spdlog\common.h" />
+    <ClInclude Include="Include\spdlog\contrib\sinks\step_file_sink.h" />
+    <ClInclude Include="Include\spdlog\details\async_logger_impl.h" />
+    <ClInclude Include="Include\spdlog\details\async_log_helper.h" />
+    <ClInclude Include="Include\spdlog\details\file_helper.h" />
+    <ClInclude Include="Include\spdlog\details\logger_impl.h" />
+    <ClInclude Include="Include\spdlog\details\log_msg.h" />
+    <ClInclude Include="Include\spdlog\details\mpmc_bounded_q.h" />
+    <ClInclude Include="Include\spdlog\details\null_mutex.h" />
+    <ClInclude Include="Include\spdlog\details\os.h" />
+    <ClInclude Include="Include\spdlog\details\pattern_formatter_impl.h" />
+    <ClInclude Include="Include\spdlog\details\registry.h" />
+    <ClInclude Include="Include\spdlog\details\spdlog_impl.h" />
+    <ClInclude Include="Include\spdlog\fmt\bundled\format.h" />
+    <ClInclude Include="Include\spdlog\fmt\bundled\ostream.h" />
+    <ClInclude Include="Include\spdlog\fmt\bundled\posix.h" />
+    <ClInclude Include="Include\spdlog\fmt\bundled\printf.h" />
+    <ClInclude Include="Include\spdlog\fmt\bundled\time.h" />
+    <ClInclude Include="Include\spdlog\fmt\fmt.h" />
+    <ClInclude Include="Include\spdlog\fmt\ostr.h" />
+    <ClInclude Include="Include\spdlog\formatter.h" />
+    <ClInclude Include="Include\spdlog\logger.h" />
+    <ClInclude Include="Include\spdlog\sinks\android_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\ansicolor_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\base_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\dist_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\file_sinks.h" />
+    <ClInclude Include="Include\spdlog\sinks\msvc_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\null_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\ostream_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\stdout_sinks.h" />
+    <ClInclude Include="Include\spdlog\sinks\syslog_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\wincolor_sink.h" />
+    <ClInclude Include="Include\spdlog\sinks\windebug_sink.h" />
+    <ClInclude Include="Include\spdlog\spdlog.h" />
+    <ClInclude Include="Include\spdlog\tweakme.h" />
     <ClInclude Include="Include\stb\stb_image.h" />
     <ClInclude Include="Include\stb\stb_image_write.h" />
   </ItemGroup>

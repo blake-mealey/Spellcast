@@ -22,10 +22,13 @@
     <None Include="Components\Boulder.comp.json" />
     <None Include="Entities\Boulder.entity.json" />
     <None Include="Entities\Boulder_all.entity.json" />
+    <None Include="Entities\Skybox.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Shaders\lighting.frag" />
     <None Include="Shaders\lighting.vert" />
+    <None Include="Shaders\skybox.frag" />
+    <None Include="Shaders\skybox.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

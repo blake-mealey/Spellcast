@@ -13,28 +13,6 @@ LightingShader::~LightingShader() {
 	glDeleteBuffers(SSBOs::Count, m_ssbos);
 }
 
-void LightingShader::SetMaterial(const Material* a_material) const {
-	SetMaterialColor(a_material->GetColor());
-	SetMaterialSpecularColor(a_material->GetSpecularColor());
-	SetMaterialSpecularity(a_material->GetSpecularity());
-	SetMaterialEmission(a_material->GetEmission());
-	
-	SetDiffuseTextureEnabled(a_material->HasAlbedoMap());
-
-	SetUvScale(a_material->GetUvScale());
-	// SetUvOffset(a_material->GetUvOffset());
-
-	// SetBloomScale(a_material->GetBloomScale());
-
-	if (a_material->HasAlbedoMap()) a_material->GetAlbedoMap()->Bind(ALBEDO_TEXTURE_UNIT);
-}
-
-void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMatrix, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
-	SetModelMatrix(a_modelMatrix);
-	SetViewMatrix(a_viewMatrix);
-	SetModelViewProjectionMatrix(a_projectionMatrix * a_viewMatrix * a_modelMatrix);
-}
-
 bool LightingShader::Init() {
 	if (!ShaderProgram::Init()) return false;
 
@@ -59,27 +37,27 @@ bool LightingShader::Init() {
 	// Store uniform locations
 	// ------------------------------------------------------------------------------------------
 
-	m_modelMatrixLocation = GetUniformLocation("modelMatrix");
-	m_viewMatrixLocation = GetUniformLocation("viewMatrix");
-	m_modelViewProjectionMatrixLocation = GetUniformLocation("modelViewProjectionMatrix");
-	m_depthBiasModelViewProjectionMatrixLocation = GetUniformLocation("depthBiasModelViewProjectionMatrix");
+	m_modelMatrixLoc = GetUniformLocation("modelMatrix");
+	m_viewMatrixLoc = GetUniformLocation("viewMatrix");
+	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
+	m_depthBiasModelViewProjectionMatrixLoc = GetUniformLocation("depthBiasModelViewProjectionMatrix");
 
-	m_materialDiffuseColorLocation = GetUniformLocation("materialDiffuseColor");
-	m_materialSpecularColorLocation = GetUniformLocation("materialSpecularColor");
-	m_materialSpecularityLocation = GetUniformLocation("materialSpecularity");
-	m_materialEmissivenessLocation = GetUniformLocation("materialEmissiveness");
+	m_materialDiffuseColorLoc = GetUniformLocation("materialDiffuseColor");
+	m_materialSpecularColorLoc = GetUniformLocation("materialSpecularColor");
+	m_materialSpecularityLoc = GetUniformLocation("materialSpecularity");
+	m_materialEmissivenessLoc = GetUniformLocation("materialEmissiveness");
 	
-	m_ambientColorLocation = GetUniformLocation("ambientColor");
+	m_ambientColorLoc = GetUniformLocation("ambientColor");
 	
-	m_shadowMapLocation = GetUniformLocation("shadowMap");
-	m_shadowsEnabledLocation = GetUniformLocation("shadowsEnabled");
+	m_shadowMapLoc = GetUniformLocation("shadowMap");
+	m_shadowsEnabledLoc = GetUniformLocation("shadowsEnabled");
 	
-	m_diffuseTextureLocation = GetUniformLocation("diffuseTexture");
-	m_diffuseTextureEnabledLocation = GetUniformLocation("diffuseTextureEnabled");
+	m_diffuseTextureLoc = GetUniformLocation("diffuseTexture");
+	m_diffuseTextureEnabledLoc = GetUniformLocation("diffuseTextureEnabled");
 	
-	m_uvScaleLocation = GetUniformLocation("uvScale");
+	m_uvScaleLoc = GetUniformLocation("uvScale");
 	
-	m_bloomScaleLocation = GetUniformLocation("bloomScale");
+	m_bloomScaleLoc = GetUniformLocation("bloomScale");
 
 	// ------------------------------------------------------------------------------------------
 	// Load uniform defaults
@@ -119,64 +97,86 @@ bool LightingShader::Init() {
 	return true;
 }
 
+void LightingShader::SetMaterial(const Material* a_material) const {
+	SetMaterialColor(a_material->GetColor());
+	SetMaterialSpecularColor(a_material->GetSpecularColor());
+	SetMaterialSpecularity(a_material->GetSpecularity());
+	SetMaterialEmission(a_material->GetEmission());
+	
+	SetDiffuseTextureEnabled(a_material->HasAlbedoMap());
+
+	SetUvScale(a_material->GetUvScale());
+	// SetUvOffset(a_material->GetUvOffset());
+
+	// SetBloomScale(a_material->GetBloomScale());
+
+	if (a_material->HasAlbedoMap()) a_material->GetAlbedoMap()->Bind(ALBEDO_TEXTURE_UNIT);
+}
+
+void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMatrix, const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
+	SetModelMatrix(a_modelMatrix);
+	SetViewMatrix(a_viewMatrix);
+	SetModelViewProjectionMatrix(a_projectionMatrix * a_viewMatrix * a_modelMatrix);
+}
+
 void LightingShader::SetModelMatrix(const mat4& a_value) const {
-	LoadUniform(m_modelMatrixLocation, a_value);
+	LoadUniform(m_modelMatrixLoc, a_value);
 }
 
 void LightingShader::SetViewMatrix(const mat4& a_value) const {
-	LoadUniform(m_viewMatrixLocation, a_value);
+	LoadUniform(m_viewMatrixLoc, a_value);
 }
 
 void LightingShader::SetModelViewProjectionMatrix(const mat4& a_value) const {
-	LoadUniform(m_modelViewProjectionMatrixLocation, a_value);
+	LoadUniform(m_modelViewProjectionMatrixLoc, a_value);
 }
 
 void LightingShader::SetDepthBiasModelViewProjectionMatrix(const mat4& a_value) const {
-	LoadUniform(m_depthBiasModelViewProjectionMatrixLocation, a_value);
+	LoadUniform(m_depthBiasModelViewProjectionMatrixLoc, a_value);
 }
 
 void LightingShader::SetMaterialColor(const vec4& a_value) const {
-	LoadUniform(m_materialDiffuseColorLocation, a_value);
+	LoadUniform(m_materialDiffuseColorLoc, a_value);
 }
 
 void LightingShader::SetMaterialSpecularColor(const vec4& a_value) const {
-	LoadUniform(m_materialSpecularColorLocation, a_value);
+	LoadUniform(m_materialSpecularColorLoc, a_value);
 }
 
-void LightingShader::SetMaterialSpecularity(const float& a_value) const {
-	LoadUniform(m_materialSpecularityLocation, a_value);
+void LightingShader::SetMaterialSpecularity(const float a_value) const {
+	LoadUniform(m_materialSpecularityLoc, a_value);
 }
 
-void LightingShader::SetMaterialEmission(const float& a_value) const {
-	LoadUniform(m_materialEmissivenessLocation, a_value);
+void LightingShader::SetMaterialEmission(const float a_value) const {
+	LoadUniform(m_materialEmissivenessLoc, a_value);
 }
 
 void LightingShader::SetAmbientColor(const vec4& a_value) const {
-	LoadUniform(m_ambientColorLocation, a_value);
+	LoadUniform(m_ambientColorLoc, a_value);
 }
 
-void LightingShader::SetShadowMapTextureUnit(const GLuint& a_value) const {
-	LoadUniform(m_shadowMapLocation, a_value);
+void LightingShader::SetShadowMapTextureUnit(const GLuint a_value) const {
+	LoadUniform(m_shadowMapLoc, a_value);
 }
 
-void LightingShader::SetShadowsEnabled(const bool& a_value) const {
-	LoadUniform(m_shadowsEnabledLocation, a_value);
+void LightingShader::SetShadowsEnabled(const bool a_value) const {
+	LoadUniform(m_shadowsEnabledLoc, a_value);
 }
 
-void LightingShader::SetDiffuseTextureUnit(const GLuint& a_value) const {
-	LoadUniform(m_diffuseTextureLocation, a_value);
+void LightingShader::SetDiffuseTextureUnit(const GLuint a_value) const {
+	LoadUniform(m_diffuseTextureLoc, a_value);
 }
 
-void LightingShader::SetDiffuseTextureEnabled(const bool& a_value) const {
-	LoadUniform(m_diffuseTextureEnabledLocation, a_value);
+void LightingShader::SetDiffuseTextureEnabled(const bool a_value) const {
+	LoadUniform(m_diffuseTextureEnabledLoc, a_value);
 }
 
 void LightingShader::SetUvScale(const vec2& a_value) const {
-	LoadUniform(m_uvScaleLocation, a_value);
+	LoadUniform(m_uvScaleLoc, a_value);
 }
 
-void LightingShader::SetBloomScale(const float& a_value) const {
-	LoadUniform(m_bloomScaleLocation, a_value);
+void LightingShader::SetBloomScale(const float a_value) const {
+	LoadUniform(m_bloomScaleLoc, a_value);
 }
 
 void LightingShader::LoadLights(const std::vector<DirectionLight>& a_directionLights,

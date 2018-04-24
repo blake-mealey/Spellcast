@@ -24,8 +24,8 @@ public:
 	
 	static void DestroyEntity(entity_id a_id);
 
-	static SlotMap<Entity>::iterator begin();
-	static SlotMap<Entity>::iterator end();
+	static SlotMap<Entity>::iterator BeginEntities();
+	static SlotMap<Entity>::iterator EndEntities();
 
 
 
@@ -44,6 +44,12 @@ public:
 	template <class T>
 	static void DestroyComponent(component_id a_id);
 	static void DestroyComponent(component_index a_typeIndex, component_id a_id);
+
+	template <class T>
+	static typename SlotMap<T>::iterator BeginComponents();
+
+	template <class T>
+	static typename SlotMap<T>::iterator EndComponents();
 private:
 	template <class T>
 	static SlotMap<T>* GetSlotMap();
@@ -75,6 +81,16 @@ bool World::IsComponentValid(const component_id a_id) {
 template <class T>
 void World::DestroyComponent(const component_id a_id) {
 	DestroyComponent(ComponentTraits<T>::GetTypeIndex(), a_id);
+}
+
+template <class T>
+typename SlotMap<T>::iterator World::BeginComponents() {
+	return GetSlotMap<T>()->begin();
+}
+
+template <class T>
+typename SlotMap<T>::iterator World::EndComponents() {
+	return GetSlotMap<T>()->end();
 }
 
 template <class T>

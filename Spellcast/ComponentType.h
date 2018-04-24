@@ -14,23 +14,21 @@ struct ComponentTraits {
 	static component_index GetTypeIndex() { return T::GetTypeIndex(); }
 };
 
+// NOTE:	To add a component type, add an enum item to the struct at any index and
+//			then add a string to the array in ComponentType.cpp at the same index
+
 // Unique, no-gap indices per component type
 struct ComponentTypeIndex {
 	enum {
 		BASE_COMPONENT = 0,
 		MESH_RENDERER,
+		SKYBOX_RENDERER,
 		CAMERA,
 		COUNT
 	};
 };
 
 struct ComponentType {
-	// Unique bit flag per component type
-	// TODO: Is this even needed? It is directly derived from index
-	static constexpr component_type BASE_COMPONENT =					1 << ComponentTypeIndex::BASE_COMPONENT;
-	static constexpr component_type MESH_RENDERER =						1 << ComponentTypeIndex::MESH_RENDERER;
-	static constexpr component_type CAMERA =							1 << ComponentTypeIndex::CAMERA;
-
 	// Display names per component type
 	static const std::string DISPLAY_NAMES[ComponentTypeIndex::COUNT];
 	

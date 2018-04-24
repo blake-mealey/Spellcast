@@ -20,7 +20,7 @@ bool Component::IsEnabled() const {
 }
 
 component_type Component::GetType() {
-	return ComponentType::BASE_COMPONENT;
+	return 1 << GetTypeIndex();
 }
 
 component_index Component::GetTypeIndex() {

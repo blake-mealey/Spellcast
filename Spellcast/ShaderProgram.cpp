@@ -1,8 +1,9 @@
 #include "ShaderProgram.h"
 #include "ContentManager.h"
 #include "Uniforms.h"
+#include "Logger.h"
 
-#include <iostream>
+#include <sstream>
 #include <regex>
 
 using namespace std;
@@ -27,7 +28,7 @@ bool ShaderProgram::Init() {
 	m_program = glCreateProgram();
 
 	if (!m_program) {
-		cerr << "WARNING: Could not create shader program." << endl;
+		Logger::Console()->warn("Could not create shader program.");
 		return false;
 	}
 
@@ -37,7 +38,7 @@ bool ShaderProgram::Init() {
 void ShaderProgram::Enable() const {
 #ifdef _DEBUG
 	if (!m_program) {
-		cerr << "WARNING: Using uninitialized shader program." << endl;
+		Logger::Console()->warn("Using uninitialized shader program.");
 	}
 #endif
 	glUseProgram(m_program);
@@ -57,7 +58,7 @@ bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePat
 	// Try to create a shader object
 	const GLuint shader = glCreateShader(a_shaderType);
 	if (!shader) {
-		cerr << "WARNING: Could not create shader of type " << a_shaderType << endl;
+		Logger::Console()->warn("Could not create shader of type {}", a_shaderType);
 		return false;
 	}
 
@@ -77,7 +78,9 @@ bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePat
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 		string info(length, ' ');
 		glGetShaderInfoLog(shader, info.length(), &length, &info[0]);
-		cerr << "WARNING: Could not compile shader " << resolvedFilePath << ":" << endl << endl << source << endl << info << endl;
+		Logger::Console()->warn("Could not compile shader {}:", resolvedFilePath, info);
+		Logger::Console()->warn(info);
+		Logger::File()->warn("Could not compile shader {}:\n\n{}\n{}", resolvedFilePath, source, info);
 		return false;
 	}
 
@@ -98,7 +101,7 @@ bool ShaderProgram::Finalize() {
         glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &length);
         string info(length, ' ');
         glGetProgramInfoLog(m_program, info.length(), &length, &info[0]);
-        cerr << "WARNING: Could not link shader program:" << endl << info << endl;
+		Logger::Console()->warn("Could not link shader program:\n{}", info);
     }
 
 	// Validate the program
@@ -110,7 +113,7 @@ bool ShaderProgram::Finalize() {
         glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &length);
         string info(length, ' ');
         glGetProgramInfoLog(m_program, info.length(), &length, &info[0]);
-        cerr << "WARNING: Invalid shader program:" << endl << info << endl;
+		Logger::Console()->warn("Invalid shader program:\n{}", info);
     }
 
 	// Delete shaders because we no longer need them
@@ -119,11 +122,11 @@ bool ShaderProgram::Finalize() {
 	return glGetError() == GL_NO_ERROR;
 }
 
-GLint ShaderProgram::GetUniformLocation(const string& a_uniformName) {
-	const GLuint location = glGetUniformLocation(m_program, a_uniformName.c_str());
+uniform_loc ShaderProgram::GetUniformLocation(const string& a_uniformName) {
+	const uniform_loc location = glGetUniformLocation(m_program, a_uniformName.c_str());
 	if (location == INVALID_UNIFORM_LOCATION) {
 		m_invalidUniform = true;
-		cerr << "WARNING: Invalid uniform " << a_uniformName << endl;
+		Logger::Console()->warn("Invalid uniform \"{}\"", a_uniformName);
 	}
 	return location;
 }
@@ -134,35 +137,35 @@ GLint ShaderProgram::GetProgramParam(GLint a_param) const {
 	return value;
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const bool& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const bool& a_value) {
 	glUniform1ui(a_location, a_value);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const GLuint& a_value) {
-	glUniform1ui(a_location, a_value);
-}
-
-void ShaderProgram::LoadUniform(const GLint& a_location, const int& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const GLuint& a_value) {
 	glUniform1i(a_location, a_value);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const float& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const int& a_value) {
+	glUniform1i(a_location, a_value);
+}
+
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const float& a_value) {
 	glUniform1f(a_location, a_value);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const vec2& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const vec2& a_value) {
 	glUniform2f(a_location, a_value.x, a_value.y);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const vec3& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const vec3& a_value) {
 	glUniform3f(a_location, a_value.x, a_value.y, a_value.z);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const vec4& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const vec4& a_value) {
 	glUniform4f(a_location, a_value.x, a_value.y, a_value.z, a_value.w);
 }
 
-void ShaderProgram::LoadUniform(const GLint& a_location, const mat4& a_value) {
+void ShaderProgram::LoadUniform(const uniform_loc& a_location, const mat4& a_value) {
 	glUniformMatrix4fv(a_location, 1, false, &a_value[0][0]);
 }
 
@@ -193,7 +196,7 @@ bool ShaderProgram::PreprocessShaderSource(const string& a_filePath, string& a_s
 			if (!PreprocessShaderSource(includePath, includeSource)) return false;
 			
 			// Flatten before including so we don't break line numbers
-			// TODO: Properly keep track of lines and report correct file name and line number in error to cerr
+			// TODO: Properly keep track of lines and report correct file name and line number in logger
 			FlattenSource(includeSource);
 			source << matches.prefix() << includeSource;
 		}

@@ -4,11 +4,13 @@
 #include "Texture.h"
 #include "Material.h"
 #include "ShaderProgram.h"
-
-#include <fstream>
-#include <iostream>
 #include "MeshRenderer.h"
 #include "Camera.h"
+#include "CubeMap.h"
+#include "SkyboxRenderer.h"
+#include "Logger.h"
+
+#include <fstream>
 
 using namespace std;
 using namespace glm;
@@ -30,12 +32,13 @@ const vec4 ContentManager::COLOR_CYAN =				vec4(0.f, 1.f, 1.f, 1.f);
 unordered_map<string, json> ContentManager::s_jsonData;
 unordered_map<string, Mesh*> ContentManager::s_meshes;
 unordered_map<string, Texture*> ContentManager::s_textures;
+unordered_map<string, CubeMap*> ContentManager::s_cubeMaps;
 unordered_map<string, Material*> ContentManager::s_materials;
 unordered_map<string, ShaderProgram*> ContentManager::s_shaders;
 unordered_map<string, ComponentDesc*> ContentManager::s_componentDescs;
 unordered_map<string, EntityDesc*> ContentManager::s_entityDescs;
 
-json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwrite) {
+json ContentManager::GetJsonData(const string& a_filePath, const bool a_overwrite) {
 	// Check if the data has already been loaded
 	if (!a_overwrite) {
 		const auto iter = s_jsonData.find(a_filePath);
@@ -58,7 +61,7 @@ json& ContentManager::GetJsonData(const string& a_filePath, const bool a_overwri
 
 	// Cache the result and return
 	s_jsonData[a_filePath] = data;
-	return s_jsonData[a_filePath];
+	return data;
 }
 
 Mesh* ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
@@ -79,7 +82,7 @@ Mesh* ContentManager::GetMesh(const string& a_filePath, bool a_overwrite) {
 
 	// Cache the result and return
 	s_meshes[a_filePath] = mesh;
-	return s_meshes[a_filePath];
+	return mesh;
 }
 
 Texture* ContentManager::GetTexture(const std::string& a_filePath, bool a_overwrite) {
@@ -100,7 +103,28 @@ Texture* ContentManager::GetTexture(const std::string& a_filePath, bool a_overwr
 
 	// Cache the result and return
 	s_textures[a_filePath] = texture;
-	return s_textures[a_filePath];
+	return texture;
+}
+
+CubeMap* ContentManager::GetCubeMap(const std::string& a_filePath, bool a_overwrite) {
+	// Check if the data has already been loaded
+	if (!a_overwrite) {
+		const auto iter = s_cubeMaps.find(a_filePath);
+		if (iter != s_cubeMaps.end()) {
+			return iter->second;
+		}
+	}
+
+	// Try loading from the file
+	auto* cubeMap = new CubeMap();
+	if (!cubeMap->LoadFromFile(GetContentPath(a_filePath, "Textures/"))) {
+		delete cubeMap;
+		cubeMap = nullptr;
+	}
+
+	// Cache the result and return
+	s_cubeMaps[a_filePath] = cubeMap;
+	return cubeMap;
 }
 
 Material* ContentManager::GetMaterial(const std::string& a_filePath, bool a_overwrite) {
@@ -161,7 +185,7 @@ ShaderProgram* ContentManager::GetShaderProgram(const string& a_programName) {
 
 	// Cache the result and return
 	s_shaders[a_programName] = shader;
-	return s_shaders[a_programName];
+	return shader;
 }
 
 EntityDesc* ContentManager::GetEntityDesc(const string& a_filePath, bool a_overwrite) {
@@ -252,7 +276,7 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		// Get the component type index for the loaded data
 		json type = a_data["Type"];
 		if (!type.is_string()) {
-			cerr << "WARNING: Missing Type field in component data" << (fromFile ? " in " + filePath : "") << endl;
+			Logger::Console()->warn("Missing Type field in component data{}", fromFile ? " in " + filePath : "");
 			return nullptr;
 		}
 		const component_index index = ComponentType::GetIndex(type.get<string>());
@@ -261,6 +285,9 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		switch (index) {
 		case ComponentTypeIndex::MESH_RENDERER:
 			desc = new MeshRendererDesc(a_data);
+			break;
+		case ComponentTypeIndex::SKYBOX_RENDERER:
+			desc = new SkyboxRendererDesc(a_data);
 			break;
 		case ComponentTypeIndex::CAMERA:
 			desc = new CameraDesc(a_data);
@@ -273,7 +300,12 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 
 		// If no description was loaded, print an error and return null
 		if (!desc) {
-			cerr << "WARNING: Unknown component type: " << a_data["Type"] << (fromFile ? " in " + filePath : "") << endl;
+			if (a_data["Type"].is_null()) {
+				Logger::Console()->warn("Component type not specified{}.", fromFile ? " in " + filePath : "");
+			} else {
+				Logger::Console()->warn("Unknown component type: {}{}", a_data["Type"].get<string>(),
+					fromFile ? " in " + filePath : "");
+			}
 			delete desc;
 			return nullptr;
 		}
@@ -325,7 +357,7 @@ string ContentManager::GetContentPath(const string& a_filePath, const string& a_
 }
 
 void ContentManager::NoFileWarning(const char* a_fileType, const char* a_filePath) {
-	cerr << "WARNING: Could not open " << a_fileType << " file: " << a_filePath << endl;
+	Logger::Console()->warn("Could not open {} file: {}", a_fileType, a_filePath);
 }
 
 vec4 ContentManager::ColorFromJson(json& a_data, const vec4& a_default) {

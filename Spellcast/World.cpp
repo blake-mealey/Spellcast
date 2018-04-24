@@ -26,11 +26,11 @@ void World::DestroyEntity(const entity_id a_id) {
 	s_entities.DestroyObject(a_id);
 }
 
-SlotMap<Entity>::iterator World::begin() {
+SlotMap<Entity>::iterator World::BeginEntities() {
 	return s_entities.begin();
 }
 
-SlotMap<Entity>::iterator World::end() {
+SlotMap<Entity>::iterator World::EndEntities() {
 	return s_entities.end();
 }
 

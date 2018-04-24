@@ -1,4 +1,6 @@
 #include "GraphicsSystem.h"
+#include "Geometry.h"
+#include "Logger.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -6,11 +8,10 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 
-#include <iostream>
-#include "Geometry.h"
-
 using namespace std;
 using namespace glm;
+
+#define OPENGL_DEBUG 0
 
 #define INITIAL_SCREEN_WIDTH 1024
 #define INITIAL_SCREEN_HEIGHT 768
@@ -38,18 +39,21 @@ void GraphicsSystem::WindowSizeCallback(GLFWwindow* a_window, int a_width, int a
 bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	// Initialize GLFW
 	if (!glfwInit()) {
-		cerr << "ERROR: Could not initialize GLFW." << endl;
+		Logger::Console()->error("Could not initialize GLFW.");
 		return false;
 	}
 
 	// Create GLFW window
+#if OPENGL_DEBUG
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
 	m_window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, a_windowTitle.c_str(), nullptr, nullptr);
 	if (!m_window) {
-		cerr << "ERROR: Could not initialize GLFW window." << endl;
+		Logger::Console()->error("Could not initialize GLFW window.");
 		return false;
 	}
 
@@ -91,6 +95,13 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	// Enable back-face culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	// Enable debug outputs
+#if OPENGL_DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(Logger::GlErrorCallback, nullptr);
+#endif
 
 	// Initialize ImGui
 	ImGui::CreateContext();

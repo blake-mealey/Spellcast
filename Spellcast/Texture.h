@@ -10,7 +10,7 @@ public:
 	~Texture();
 
 	bool LoadFromFile(const std::string& a_filePath);
-	void Bind(GLuint a_textureUnit) const;
+	void Bind(GLenum a_textureUnit) const;
 private:
 	GLuint m_texture;
 	int m_width;

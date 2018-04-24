@@ -2,8 +2,6 @@
 
 #include "Material.h"
 
-#include <glm/glm.hpp>
-
 class RenderContext {
 public:
 	virtual void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix);

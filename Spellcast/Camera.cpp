@@ -5,6 +5,7 @@
 #include "Geometry.h"
 
 #include <glm/gtc/matrix_transform.inl>
+#include "SkyboxRenderer.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -45,7 +46,7 @@ void CameraDesc::Create(Entity* a_entity) {
 Camera::Camera() : m_nearClippingPlane(0.f), m_farClippingPlane(0.f), m_fieldOfView(0.f) {};
 
 component_type Camera::GetType() {
-	return Component::GetType() | ComponentType::CAMERA;
+	return Component::GetType() | (1 << GetTypeIndex());
 }
 
 component_index Camera::GetTypeIndex() {
@@ -86,11 +87,19 @@ void Camera::Render(const GraphicsSystem& a_context) const {
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
 
 	// Render meshes
-	for (auto it = World::begin(); it != World::end(); ++it) {
-		Entity& entity = *it;
-		for (MeshRenderer* meshRenderer : entity.GetComponents<MeshRenderer>()) {
-			meshRenderer->Render(viewMatrix, projectionMatrix);
-		}
-		entity.GetTransform().Rotate(Geometry::UP, 0.01f);
+	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {
+		it->Render(viewMatrix, projectionMatrix);
+	}
+
+	// Render skyboxes
+	glDisable(GL_CULL_FACE);
+	for (auto it = World::BeginComponents<SkyboxRenderer>(); it != World::EndComponents<SkyboxRenderer>(); ++it) {
+		it->Render(viewMatrix, projectionMatrix);
+	}
+	glEnable(GL_CULL_FACE);
+
+	// Rotate entities... for reasons
+	for (auto it = World::BeginEntities(); it != World::EndEntities(); ++it) {
+		it->GetTransform().Rotate(Geometry::UP, 0.01f);
 	}
 }

@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include <iostream>
 #include "ContentManager.h"
+#include "Logger.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -69,7 +70,9 @@ void Entity::SetParent(entity_id a_parent) {
 	// Check that the new parent exists
 	Entity* newParent = World::GetEntity(a_parent);
 	if (!newParent) {
-		cerr << "WARNING: Attempt to set parent to nullptr." << endl;
+#ifdef _DEBUG
+		Logger::Console()->warn("Attempt to set parent to nullptr.");
+#endif
 		return;
 	}
 

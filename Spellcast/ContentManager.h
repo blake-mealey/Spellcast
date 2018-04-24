@@ -1,14 +1,16 @@
 #pragma once
 
+#include "Component.h"
+#include "Entity.h"
+
 #include <json/json.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <unordered_map>
-#include "Component.h"
-#include "Entity.h"
 
 class Mesh;
 class Texture;
+class CubeMap;
 class Material;
 class Material;
 class ShaderProgram;
@@ -28,10 +30,11 @@ public:
     static const glm::vec4 COLOR_YELLOW;
     static const glm::vec4 COLOR_CYAN;
 
-	static nlohmann::json& GetJsonData(const std::string& a_filePath, bool a_overwrite = false);
+	static nlohmann::json GetJsonData(const std::string& a_filePath, bool a_overwrite = false);
 	
 	static Mesh* GetMesh(const std::string& a_filePath, bool a_overwrite = false);
 	static Texture* GetTexture(const std::string& a_filePath, bool a_overwrite = false);
+	static CubeMap* GetCubeMap(const std::string& a_filePath, bool a_overwrite = false);
 	static Material* GetMaterial(const std::string& a_filePath, bool a_overwrite = false);
 	static Material* GetMaterial(nlohmann::json& a_data, bool a_overwrite = false);
 	static ShaderProgram* GetShaderProgram(const std::string& a_programName);
@@ -70,6 +73,7 @@ private:
 	static std::unordered_map<std::string, nlohmann::json> s_jsonData;
 	static std::unordered_map<std::string, Mesh*> s_meshes;
 	static std::unordered_map<std::string, Texture*> s_textures;
+	static std::unordered_map<std::string, CubeMap*> s_cubeMaps;
 	static std::unordered_map<std::string, Material*> s_materials;
 	static std::unordered_map<std::string, ShaderProgram*> s_shaders;
 	static std::unordered_map<std::string, ComponentDesc*> s_componentDescs;

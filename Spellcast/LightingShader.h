@@ -2,8 +2,6 @@
 
 #include "ShaderProgram.h"
 
-#include <glm/glm.hpp>
-
 class LightingShader : public ShaderProgram {
 public:
 	~LightingShader() override;
@@ -19,20 +17,20 @@ public:
 	
 	void SetMaterialColor(const glm::vec4& a_value) const;
 	void SetMaterialSpecularColor(const glm::vec4& a_value) const;
-	void SetMaterialSpecularity(const float& a_value) const;
-	void SetMaterialEmission(const float& a_value) const;
+	void SetMaterialSpecularity(float a_value) const;
+	void SetMaterialEmission(float a_value) const;
 	
 	void SetAmbientColor(const glm::vec4& a_value) const;
 	
-	void SetShadowMapTextureUnit(const GLuint& a_value) const;
-	void SetShadowsEnabled(const bool& a_value) const;
+	void SetShadowMapTextureUnit(GLuint a_value) const;
+	void SetShadowsEnabled(bool a_value) const;
 	
-	void SetDiffuseTextureUnit(const GLuint& a_value) const;
-	void SetDiffuseTextureEnabled(const bool& a_value) const;
+	void SetDiffuseTextureUnit(GLuint a_value) const;
+	void SetDiffuseTextureEnabled(bool a_value) const;
 	
 	void SetUvScale(const glm::vec2& a_value) const;
 	
-	void SetBloomScale(const float& a_value) const;
+	void SetBloomScale(float a_value) const;
 
 	struct DirectionLight {
 		DirectionLight(glm::vec3 a_color, glm::vec3 a_direction) :
@@ -80,27 +78,27 @@ public:
 		const std::vector<SpotLight>& a_spotLights, const std::vector<PointLight>& a_pointLights) const;
 private:
 
-	GLuint m_modelMatrixLocation = 0;
-	GLuint m_viewMatrixLocation = 0;
-	GLuint m_modelViewProjectionMatrixLocation = 0;
-	GLuint m_depthBiasModelViewProjectionMatrixLocation = 0;
+	uniform_loc m_modelMatrixLoc = 0;
+	uniform_loc m_viewMatrixLoc = 0;
+	uniform_loc m_modelViewProjectionMatrixLoc = 0;
+	uniform_loc m_depthBiasModelViewProjectionMatrixLoc = 0;
 
-	GLuint m_materialDiffuseColorLocation = 0;
-	GLuint m_materialSpecularColorLocation = 0;
-	GLuint m_materialSpecularityLocation = 0;
-	GLuint m_materialEmissivenessLocation = 0;
+	uniform_loc m_materialDiffuseColorLoc = 0;
+	uniform_loc m_materialSpecularColorLoc = 0;
+	uniform_loc m_materialSpecularityLoc = 0;
+	uniform_loc m_materialEmissivenessLoc = 0;
 	
-	GLuint m_ambientColorLocation = 0;
+	uniform_loc m_ambientColorLoc = 0;
 	
-	GLuint m_shadowMapLocation = 0;
-	GLuint m_shadowsEnabledLocation = 0;
+	uniform_loc m_shadowMapLoc = 0;
+	uniform_loc m_shadowsEnabledLoc = 0;
 	
-	GLuint m_diffuseTextureLocation = 0;
-	GLuint m_diffuseTextureEnabledLocation = 0;
+	uniform_loc m_diffuseTextureLoc = 0;
+	uniform_loc m_diffuseTextureEnabledLoc = 0;
 	
-	GLuint m_uvScaleLocation = 0;
+	uniform_loc m_uvScaleLoc = 0;
 	
-	GLuint m_bloomScaleLocation = 0;
+	uniform_loc m_bloomScaleLoc = 0;
 
 	GLuint m_ssbos[SSBOs::Count] = {};
 };

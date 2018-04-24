@@ -9,6 +9,8 @@
 
 class Material;
 
+typedef GLint uniform_loc;
+
 class ShaderProgram {
 public:
 	ShaderProgram();
@@ -18,27 +20,27 @@ public:
 	void Enable() const;
 	static void Disable();
 	
-	virtual void SetMaterial(const Material* a_material) const {};
-	virtual void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const {};
+	virtual void SetMaterial(const Material* a_material) const {}
+	virtual void SetModelAndViewAndProjectionMatrices(const glm::mat4& a_modelMatrix, const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const {}
 
 protected:
 	bool AddShader(GLenum a_shaderType, const std::string& a_filePath);
 	bool Finalize();
 
-	GLint GetUniformLocation(const std::string& a_uniformName);
+	uniform_loc GetUniformLocation(const std::string& a_uniformName);
 	GLint GetProgramParam(GLint a_param) const;
 	
 	GLuint m_program;
 	bool m_invalidUniform;
 
-	static void LoadUniform(const GLint& a_location, const bool& a_value);
-	static void LoadUniform(const GLint& a_location, const GLuint& a_value);
-	static void LoadUniform(const GLint& a_location, const int& a_value);
-	static void LoadUniform(const GLint& a_location, const float& a_value);
-	static void LoadUniform(const GLint& a_location, const glm::vec2& a_value);
-	static void LoadUniform(const GLint& a_location, const glm::vec3& a_value);
-	static void LoadUniform(const GLint& a_location, const glm::vec4& a_value);
-	static void LoadUniform(const GLint& a_location, const glm::mat4& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const bool& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const GLuint& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const int& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const float& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const glm::vec2& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const glm::vec3& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const glm::vec4& a_value);
+	static void LoadUniform(const uniform_loc& a_location, const glm::mat4& a_value);
 
 private:
 	static const std::regex S_NEW_LINE;

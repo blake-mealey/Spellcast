@@ -12,7 +12,6 @@ public:
 
 	bool Init(nlohmann::json& a_data);
 	
-	// void Use() const;
 	const ShaderProgram* GetShader() const;
 
 	bool HasAlbedoMap() const;

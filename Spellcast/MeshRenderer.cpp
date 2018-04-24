@@ -37,7 +37,7 @@ void MeshRendererDesc::Create(Entity* a_entity) {
 MeshRenderer::MeshRenderer() : m_mesh(nullptr) {}
 
 component_type MeshRenderer::GetType() {
-	return Component::GetType() | ComponentType::MESH_RENDERER;
+	return Component::GetType() | (1 << GetTypeIndex());
 }
 
 component_index MeshRenderer::GetTypeIndex() {

@@ -1,12 +1,11 @@
 #include "Mesh.h"
 #include "RenderContext.h"
+#include "Logger.h"
 
 #include <GL/glew.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include <iostream>
 
 using namespace std;
 using namespace glm;
@@ -28,7 +27,7 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	);
 
 	if (!scene) {
-		cerr << "WARNING: Error parsing " << a_filePath << ": " << importer.GetErrorString() << endl;
+		Logger::Console()->warn("Error parsing {}: {}", a_filePath, importer.GetErrorString());
 		return false;
 	}
 
@@ -39,6 +38,12 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 void Mesh::Render(const RenderContext* a_context) const {
 	for (const MeshEntry& entry : m_entries) {
 		entry.Render(a_context);
+	}
+}
+
+void Mesh::RenderBasic() const {
+	for (const MeshEntry& entry : m_entries) {
+		entry.RenderBasic();
 	}
 }
 
@@ -149,4 +154,15 @@ void Mesh::MeshEntry::Render(const RenderContext* a_context) const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+void Mesh::MeshEntry::RenderBasic() const {
+	glBindVertexArray(m_vaos[VAOs::Geometry]);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, nullptr);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 }
