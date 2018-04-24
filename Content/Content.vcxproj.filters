@@ -25,5 +25,7 @@
     <None Include="Entities\Skybox.entity.json" />
     <None Include="Shaders\skybox.frag" />
     <None Include="Shaders\skybox.vert" />
+    <None Include="Shaders\copy.frag" />
+    <None Include="Shaders\copy.vert" />
   </ItemGroup>
 </Project>

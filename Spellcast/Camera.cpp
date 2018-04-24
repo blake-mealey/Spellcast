@@ -3,9 +3,12 @@
 #include "World.h"
 #include "Entity.h"
 #include "Geometry.h"
+#include "SkyboxRenderer.h"
+#include "MeshRenderer.h"
+#include "Logger.h"
+#include "Uniforms.h"
 
 #include <glm/gtc/matrix_transform.inl>
-#include "SkyboxRenderer.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -41,9 +44,20 @@ void CameraDesc::Create(Entity* a_entity) {
 }
 
 
+Camera::~Camera() {
+	if (m_depthStencilBuffer) glDeleteRenderbuffers(2, &m_depthStencilBuffer);
+	if (m_screenBuffer) glDeleteFramebuffers(1, &m_screenBuffer);
+	if (m_screenVao) glDeleteVertexArrays(1, &m_screenVao);
+	if (m_screenVbo) glDeleteBuffers(1, &m_screenVbo);
+	if (m_blurTextures[0]) glDeleteTextures(BLUR_LEVEL_COUNT, m_blurTextures);
+	if (m_blurTempTextures[0]) glDeleteTextures(BLUR_LEVEL_COUNT, m_blurTempTextures);
+}
 
-
-Camera::Camera() : m_nearClippingPlane(0.f), m_farClippingPlane(0.f), m_fieldOfView(0.f) {};
+Camera::Camera() : m_depthStencilBuffer(0), m_screenBuffer(0), m_glowBuffer(0), m_screenVao(0), m_screenVbo(0),
+                   m_blurTextures{}, m_blurTempTextures{},
+                   m_nearClippingPlane(0.f),
+                   m_farClippingPlane(0.f),
+                   m_fieldOfView(0.f) {};
 
 component_type Camera::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -54,6 +68,16 @@ component_index Camera::GetTypeIndex() {
 }
 
 bool Camera::Init(const CameraDesc& a_desc) {
+	// Initialize buffers and textures
+	if (!GenerateBuffersAndTextures()) return false;
+	if (!InitVaoAndVbo()) return false;
+	if (!InitGlowBuffer()) return false;
+	if (!InitScreenBuffer()) return false;
+
+	// Initialize copy shader
+	if (!m_copyShader.Init()) return false;
+
+	// Copy data from description
 	m_nearClippingPlane = a_desc.m_nearClippingPlane;
 	m_farClippingPlane = a_desc.m_farClippingPlane;
 	
@@ -72,19 +96,146 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	return true;
 }
 
-void Camera::Render(const GraphicsSystem& a_context) const {
+bool Camera::GenerateBuffersAndTextures() {
+	// Generate buffers
+	glGenFramebuffers(2, &m_screenBuffer);
+	glGenRenderbuffers(1, &m_depthStencilBuffer);
+	glGenVertexArrays(1, &m_screenVao);
+	glGenBuffers(1, &m_screenVbo);
+
+	// Generate textures
+	glGenTextures(BLUR_LEVEL_COUNT, m_blurTextures);
+	glGenTextures(BLUR_LEVEL_COUNT, m_blurTempTextures);
+
+	return glGetError() == GL_NO_ERROR;
+}
+
+bool Camera::InitVaoAndVbo() {
+	// Initialize VAO
+	glBindVertexArray(m_screenVao);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_screenVbo);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, static_cast<void*>(nullptr));
+	glBindVertexArray(0);
+
+	// Initialize VBO
+	const vec2 verts[4] = {
+		vec2(-1, -1),
+		vec2( 1, -1),
+		vec2(-1,  1),
+		vec2( 1,  1)
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec2) * 4, verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	return glGetError() == GL_NO_ERROR;
+}
+
+bool Camera::InitGlowBuffer() {
+	// Initialize glow buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
+
+	GLenum glowBuffers[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, glowBuffers);
+
+	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
+		// const float factor = 1.f / pow(2, i);
+
+		glBindTexture(GL_TEXTURE_2D, m_blurTextures[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glBindTexture(GL_TEXTURE_2D, m_blurTempTextures[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return glGetError() == GL_NO_ERROR;
+}
+
+bool Camera::InitScreenBuffer() {
+	// Initialize screen buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_screenBuffer);
+
+	GLenum screenBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, screenBuffers);
+
+	// Normal color buffer
+	m_screenTexture.Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_screenTexture.GetId(), 0);
+
+	// Glow color buffer
+	m_glowTexture.Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_glowTexture.GetId(), 0);
+
+	// Depth buffer
+	glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1, 1);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilBuffer);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		Logger::Console()->warn("Screen framebuffer incomplete.");
+		return false;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return glGetError() == GL_NO_ERROR;
+}
+
+void Camera::Render(const GraphicsSystem& a_context) {
 	// Compute current viewport
 	const vec2& windowDims = a_context.GetWindowDims();
-	const vec2 viewportPosition = (windowDims * m_viewportUnitPosition) + m_viewportPixelPosition;
-	const vec2 viewportScale = (windowDims * m_viewportUnitScale) + m_viewportPixelScale;
-	glViewport(viewportPosition.x, viewportPosition.y, viewportScale.x, viewportScale.y);
+	const vec2 lastViewportPosition = m_viewportPosition;
+	const vec2 lastViewportScale = m_viewportScale;
+	m_viewportPosition = (windowDims * m_viewportUnitPosition) + m_viewportPixelPosition;
+	m_viewportScale = (windowDims * m_viewportUnitScale) + m_viewportPixelScale;
+	glViewport(0, 0, m_viewportScale.x, m_viewportScale.y);
+
+	// Update texture sizes
+	if (m_viewportScale != lastViewportScale) {
+		const int width = m_viewportScale.x, height = m_viewportScale.y;
+
+		m_screenTexture.UpdateDimensions(width, height);
+		m_glowTexture.UpdateDimensions(width, height);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+
+		for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
+			const float factor = 1.f / pow(2, i);
+
+			glBindTexture(GL_TEXTURE_2D, m_blurTextures[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width * factor, height * factor, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+			glBindTexture(GL_TEXTURE_2D, m_blurTempTextures[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width * factor, height * factor, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		}
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
 
 	// Compute current aspect ratio
-	const float aspectRatio = viewportScale.x / viewportScale.y;
+	const float aspectRatio = m_viewportScale.x / m_viewportScale.y;
 
 	// Compute view and projection matrices
 	const mat4 viewMatrix = lookAt(m_globalPosition, m_targetGlobalPosition, m_upVector);
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
+
+	// Render to the screen buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_screenBuffer);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render meshes
 	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {
@@ -102,4 +253,15 @@ void Camera::Render(const GraphicsSystem& a_context) const {
 	for (auto it = World::BeginEntities(); it != World::EndEntities(); ++it) {
 		it->GetTransform().Rotate(Geometry::UP, 0.01f);
 	}
+
+	// Copy the screen buffer to the window
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glBindVertexArray(m_screenVao);
+
+	m_copyShader.Enable();
+	m_screenTexture.Bind(ALBEDO_TEXTURE_UNIT);
+
+	glViewport(m_viewportPosition.x, m_viewportPosition.y, m_viewportScale.x, m_viewportScale.y);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

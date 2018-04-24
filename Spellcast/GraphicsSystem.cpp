@@ -11,10 +11,7 @@
 using namespace std;
 using namespace glm;
 
-#define OPENGL_DEBUG 0
-
-#define INITIAL_SCREEN_WIDTH 1024
-#define INITIAL_SCREEN_HEIGHT 768
+#define OPENGL_DEBUG 1
 
 GraphicsSystem& GraphicsSystem::Instance() {
 	static GraphicsSystem instance;
@@ -96,7 +93,7 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	// Enable debug outputs
+	// Enable debug outputs if requested
 #if OPENGL_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -112,7 +109,7 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 
 	CameraDesc c;
 	c.m_globalPosition = vec3(0.f, 0.f, -5.f);
-	m_camera.Init(c);
+	if (!m_camera.Init(c)) Logger::Console()->warn("Camera not initialized.");
 
 	return true;
 }
@@ -121,8 +118,6 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	glfwPollEvents();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glViewport(0, 0, m_windowDims.x, m_windowDims.y);
 
 	m_camera.Render(Instance());
 

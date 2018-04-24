@@ -1,10 +1,12 @@
 #pragma once
 
 #include "System.h"
-#include "LightingShader.h"
-#include "MeshRenderer.h"
-#include <GLFW/glfw3.h>
 #include "Camera.h"
+
+#include <GLFW/glfw3.h>
+
+#define INITIAL_SCREEN_WIDTH 1024
+#define INITIAL_SCREEN_HEIGHT 768
 
 struct GLFWwindow;
 
