@@ -23,7 +23,9 @@
     <None Include="Entities\Boulder.entity.json" />
     <None Include="Entities\Boulder_all.entity.json" />
     <None Include="Entities\Camera.entity.json" />
+    <None Include="Entities\Floor.entity.json" />
     <None Include="Entities\Skybox.entity.json" />
+    <None Include="Entities\Sun.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\blur.frag" />
     <None Include="Shaders\copy.frag" />
@@ -31,6 +33,8 @@
     <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Shaders\lighting.frag" />
     <None Include="Shaders\lighting.vert" />
+    <None Include="Shaders\shadow.frag" />
+    <None Include="Shaders\shadow.vert" />
     <None Include="Shaders\skybox.frag" />
     <None Include="Shaders\skybox.vert" />
   </ItemGroup>

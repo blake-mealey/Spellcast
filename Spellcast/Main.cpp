@@ -1,24 +1,25 @@
-#include "GraphicsSystem.h"
+#include "Graphics.h"
 #include "Camera.h"
 #include "ContentManager.h"
 
 #include <glm/glm.hpp>
+#include "Simulation.h"
 
 using namespace glm;
 using namespace std;
 
 int main() {
-	GraphicsSystem& graphics = GraphicsSystem::Instance();
+	Graphics& graphics = Graphics::Instance();
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
-	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
-	
-	Entity* c0 = ContentManager::GetEntityDesc("Camera.entity.json")->Create();
-	c0->GetComponent<Camera>()->SetViewportUnitScale(vec2(0.5f, 1.f));
-	Entity* c1 = ContentManager::GetEntityDesc("Camera.entity.json")->Create();
-	c1->GetComponent<Camera>()->SetViewportUnitScale(vec2(0.5f, 1.f));
-	c1->GetComponent<Camera>()->SetViewportUnitPosition(vec2(0.5f, 0.f));
+	Simulation& simulation = Simulation::Instance();
+	if (!simulation.Initialize()) exit(-1);
 
+	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();	
+	ContentManager::GetEntityDesc("Sun.entity.json")->Create();	
+	ContentManager::GetEntityDesc("Camera.entity.json")->Create();
+	
+	ContentManager::GetEntityDesc("Floor.entity.json")->Create();
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate({0.f, -1.f, 0.f});
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate({0.f, 1.f, 0.f});
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Scale(0.5f);
@@ -26,9 +27,10 @@ int main() {
 	Time globalTime;
 	while (!graphics.WindowClosed()) {
 		const Time lastTime = globalTime;
-		globalTime = GraphicsSystem::GetGlobalTime();
+		globalTime = Graphics::GetGlobalTime();
 		const Time deltaTime = globalTime - lastTime;
-
+		
+		simulation.Update(deltaTime, globalTime);
 		graphics.Update(deltaTime, globalTime);
 	}
 

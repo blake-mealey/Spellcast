@@ -24,6 +24,9 @@ struct ComponentTypeIndex {
 		MESH_RENDERER,
 		SKYBOX_RENDERER,
 		CAMERA,
+		DIRECTION_LIGHT,
+		SPOT_LIGHT,
+		POINT_LIGHT,
 		COUNT
 	};
 };

@@ -1,7 +1,10 @@
-#include "GraphicsSystem.h"
+#include "Graphics.h"
 #include "Geometry.h"
 #include "Logger.h"
 #include "Camera.h"
+#include "LightingShader.h"
+#include "DirectionLight.h"
+#include "ContentManager.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -14,27 +17,27 @@ using namespace glm;
 
 #define OPENGL_DEBUG 1
 
-GraphicsSystem& GraphicsSystem::Instance() {
-	static GraphicsSystem instance;
+Graphics& Graphics::Instance() {
+	static Graphics instance;
 	return instance;
 }
 
-GraphicsSystem::GraphicsSystem() :
-	m_window(nullptr),
-	m_devToolsEnabled(true),
-	m_frameCount(0),
-	m_framesPerSecond(0) { }
+Graphics::Graphics() : m_lightingShader(nullptr),
+                       m_window(nullptr),
+                       m_devToolsEnabled(true),
+                       m_frameCount(0),
+                       m_framesPerSecond(0) { }
 
-GraphicsSystem::~GraphicsSystem() {
+Graphics::~Graphics() {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }
 
-void GraphicsSystem::WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_height) {
+void Graphics::WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_height) {
 	Instance().SetWindowDims(vec2(a_width, a_height));
 }
 
-bool GraphicsSystem::Initialize(const string& a_windowTitle) {
+bool Graphics::Initialize(const string& a_windowTitle) {
 	// Initialize GLFW
 	if (!glfwInit()) {
 		Logger::Console()->error("Could not initialize GLFW.");
@@ -108,13 +111,24 @@ bool GraphicsSystem::Initialize(const string& a_windowTitle) {
 	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
 	ImGui::StyleColorsDark();
 
+	// Get the lighting shader
+	m_lightingShader = static_cast<LightingShader*>(ContentManager::GetShaderProgram("Lighting"));
+
 	return true;
 }
 
-void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
+void Graphics::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	glfwPollEvents();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render shadow maps
+	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
+		it->RenderShadowMap();
+	}
+
+	// Load the current lights into the lighting shader
+	m_lightingShader->LoadLights();
 
 	// Render cameras
 	for (auto it = World::BeginComponents<Camera>(); it != World::EndComponents<Camera>(); ++it) {
@@ -126,19 +140,19 @@ void GraphicsSystem::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	glfwSwapBuffers(m_window);
 }
 
-bool GraphicsSystem::WindowClosed() const {
+bool Graphics::WindowClosed() const {
 	return glfwWindowShouldClose(m_window);
 }
 
-Time GraphicsSystem::GetGlobalTime() {
+Time Graphics::GetGlobalTime() {
 	return glfwGetTime();
 }
 
-const vec2& GraphicsSystem::GetWindowDims() const {
+const vec2& Graphics::GetWindowDims() const {
 	return m_windowDims;
 }
 
-void GraphicsSystem::RenderDevTools(const Time& a_globalTime) {
+void Graphics::RenderDevTools(const Time& a_globalTime) {
 	ImGui_ImplGlfwGL3_NewFrame();
 
 	if (m_devToolsEnabled) {
@@ -161,6 +175,6 @@ void GraphicsSystem::RenderDevTools(const Time& a_globalTime) {
 	ImGui::Render();
 }
 
-void GraphicsSystem::SetWindowDims(const vec2& a_windowDims) {
+void Graphics::SetWindowDims(const vec2& a_windowDims) {
 	m_windowDims = a_windowDims;
 }

@@ -29,5 +29,9 @@
     <None Include="Shaders\copy.vert" />
     <None Include="Entities\Camera.entity.json" />
     <None Include="Shaders\blur.frag" />
+    <None Include="Entities\Sun.entity.json" />
+    <None Include="Entities\Floor.entity.json" />
+    <None Include="Shaders\shadow.frag" />
+    <None Include="Shaders\shadow.vert" />
   </ItemGroup>
 </Project>

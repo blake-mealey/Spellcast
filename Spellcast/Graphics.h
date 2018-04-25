@@ -7,16 +7,17 @@
 #define INITIAL_SCREEN_WIDTH 1024
 #define INITIAL_SCREEN_HEIGHT 768
 
+class LightingShader;
 struct GLFWwindow;
 
-class GraphicsSystem : public System {
-	GraphicsSystem();
+class Graphics : public System {
+	Graphics();
 public:
-	GraphicsSystem(const GraphicsSystem&) = delete;
-	GraphicsSystem& operator= (const GraphicsSystem&) = delete;
+	Graphics(const Graphics&) = delete;
+	Graphics& operator= (const Graphics&) = delete;
 
-	~GraphicsSystem() override;
-	static GraphicsSystem& Instance();
+	~Graphics() override;
+	static Graphics& Instance();
 
 	static void WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_height);
 
@@ -32,6 +33,8 @@ private:
 	void RenderDevTools(const Time& a_globalTime);
 
 	void SetWindowDims(const glm::vec2& a_windowDims);
+
+	LightingShader* m_lightingShader;
 
 	GLFWwindow* m_window;
 	glm::vec2 m_windowDims;

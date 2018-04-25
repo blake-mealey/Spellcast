@@ -10,7 +10,7 @@ void Logger::GlErrorCallback(GLenum a_source, GLenum a_type, GLuint a_id, GLenum
                              const GLchar* a_message, const void* a_userParam) {
 
 	const auto severity = GetSeverity(a_severity);
-	if (severity == level::err) return;
+	// if (severity == level::err) return;
 	Console()->log(severity, a_message);
 }
 

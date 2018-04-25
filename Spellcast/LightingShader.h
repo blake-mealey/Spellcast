@@ -32,16 +32,16 @@ public:
 	
 	void SetBloomScale(float a_value) const;
 
-	struct DirectionLight {
-		DirectionLight(glm::vec3 a_color, glm::vec3 a_direction) :
+	struct DirectionLightData {
+		DirectionLightData(glm::vec3 a_color, glm::vec3 a_direction) :
 			m_color(a_color), m_direction(a_direction) {}
 
 		glm::vec3 m_color;				float __padding0[1];
 		glm::vec3 m_direction;			float __padding1[1];
 	};
 
-	struct SpotLight {
-		SpotLight(glm::vec3 a_color, float a_power, glm::vec3 a_position, float a_angle, glm::vec3 a_direction) :
+	struct SpotLightData {
+		SpotLightData(glm::vec3 a_color, float a_power, glm::vec3 a_position, float a_angle, glm::vec3 a_direction) :
 			m_color(a_color), m_power(a_power), m_position(a_position), m_angle(a_angle), m_direction(a_direction) {}
 
 		glm::vec3 m_color;
@@ -51,8 +51,8 @@ public:
 		glm::vec3 m_direction;			float __padding0[1];
 	};
 
-	struct PointLight {
-		PointLight(glm::vec3 a_color, float a_power, glm::vec3 a_position) :
+	struct PointLightData {
+		PointLightData(glm::vec3 a_color, float a_power, glm::vec3 a_position) :
 			m_color(a_color), m_power(a_power), m_position(a_position) {}
 
 		glm::vec3 m_color;
@@ -74,9 +74,14 @@ public:
 
 	// TODO: void LoadLights(vector<LightComponent>)
 
-	void LoadLights(const std::vector<DirectionLight>& a_directionLights,
-		const std::vector<SpotLight>& a_spotLights, const std::vector<PointLight>& a_pointLights) const;
+	void LoadLights(const std::vector<DirectionLightData>& a_directionLights,
+		const std::vector<SpotLightData>& a_spotLights, const std::vector<PointLightData>& a_pointLights) const;
+
+	void LoadLights();
 private:
+	const static glm::mat4 BIAS_MATRIX;
+
+	glm::mat4 m_depthViewProjectionMatrix;
 
 	uniform_loc m_modelMatrixLoc = 0;
 	uniform_loc m_viewMatrixLoc = 0;

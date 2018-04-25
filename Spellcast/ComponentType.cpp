@@ -4,7 +4,10 @@ const std::string ComponentType::DISPLAY_NAMES[ComponentTypeIndex::COUNT] = {
 	"BaseComponent",
 	"MeshRenderer",
 	"SkyboxRenderer",
-	"Camera"
+	"Camera",
+	"DirectionLight",
+	"SpotLight",
+	"PointLight"
 };
 
 component_index ComponentType::GetIndex(const std::string& a_name) {

@@ -8,7 +8,8 @@ using namespace std;
 using namespace glm;
 using namespace nlohmann;
 
-MeshRendererDesc::MeshRendererDesc() : m_mesh(nullptr), m_materials({}) {}
+MeshRendererDesc::MeshRendererDesc() : m_mesh(nullptr), m_materials({}), m_castsShadows(false),
+                                       m_receivesShadows(false) {}
 
 MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 	m_mesh = ContentManager::GetMesh(ContentManager::FromJson<std::string>(a_data, "Mesh"));
@@ -22,6 +23,9 @@ MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 		json j = json::object();
 		m_materials.push_back(ContentManager::GetMaterial(j));
 	}
+
+	m_castsShadows = ContentManager::FromJson(a_data, "CastsShadows", true);
+	m_receivesShadows = ContentManager::FromJson(a_data, "ReceivesShadows", true);
 }
 
 void MeshRendererDesc::Create(Entity* a_entity) {
@@ -34,7 +38,7 @@ void MeshRendererDesc::Create(Entity* a_entity) {
 
 
 
-MeshRenderer::MeshRenderer() : m_mesh(nullptr) {}
+MeshRenderer::MeshRenderer() : m_mesh(nullptr), m_castsShadows(false), m_receivesShadows(false) {}
 
 component_type MeshRenderer::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -49,21 +53,40 @@ bool MeshRenderer::Init(const MeshRendererDesc* a_desc) {
 	m_transform = a_desc->m_transform;
 	m_materials = std::vector<Material*>(a_desc->m_materials);
 
+	m_castsShadows = a_desc->m_castsShadows;
+	m_receivesShadows = a_desc->m_receivesShadows;
+
 	return true;
 }
 
-void MeshRenderer::Render(const mat4& a_viewMatrix, const mat4& a_projectionMatrix) {
+void MeshRenderer::Render(const mat4& a_viewMatrix, const mat4& a_projectionMatrix) const {
 	if (!m_enabled) return;
-	RenderContext::Render(a_viewMatrix, a_projectionMatrix);
-	m_mesh->Render(this);
+	// mat4 viewProjectionMatrix = a_projectionMatrix * a_viewMatrix;
+	for (const Mesh::Entry& entry : m_mesh->GetEntries()) {
+		const Material* material = m_materials[entry.m_materialIndex];
+		const ShaderProgram* shader = material->GetShader();
+		shader->Enable();
+		shader->SetMaterial(material);
+		shader->SetModelAndViewAndProjectionMatrices(m_transform.GetTransformationMatrix(),
+			a_viewMatrix, a_projectionMatrix);
+
+		entry.Render();
+	}
 }
 
-void MeshRenderer::InitRenderPass(const size_t& a_materialIndex) const {
-	RenderContext::InitRenderPass(a_materialIndex);
-	GetShader(a_materialIndex)->SetModelAndViewAndProjectionMatrices(
-		m_transform.GetTransformationMatrix(), m_currentViewMatrix, m_currentProjectionMatrix);
+void MeshRenderer::RenderBasic() const {
+	if (!m_enabled) return;
+	m_mesh->RenderBasic();
 }
 
 Transform& MeshRenderer::GetTransform() {
 	return m_transform;
+}
+
+const Transform& MeshRenderer::GetTransform() const {
+	return m_transform;
+}
+
+bool MeshRenderer::DoesCastShadows() const {
+	return m_castsShadows;
 }

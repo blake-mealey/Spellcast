@@ -9,6 +9,7 @@
 #include "CubeMap.h"
 #include "SkyboxRenderer.h"
 #include "Logger.h"
+#include "DirectionLight.h"
 
 #include <fstream>
 
@@ -291,6 +292,9 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 			break;
 		case ComponentTypeIndex::CAMERA:
 			desc = new CameraDesc(a_data);
+			break;
+		case ComponentTypeIndex::DIRECTION_LIGHT:
+			desc = new DirectionLightDesc(a_data);
 			break;
 		default: ;
 		}

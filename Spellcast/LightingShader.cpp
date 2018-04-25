@@ -2,11 +2,20 @@
 #include "Uniforms.h"
 #include "Material.h"
 #include "Texture.h"
+#include "World.h"
+#include "DirectionLight.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace glm;
 using namespace std;
+
+const mat4 LightingShader::BIAS_MATRIX = mat4(
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 0.5, 0.0,
+	0.5, 0.5, 0.5, 1.0
+);
 
 LightingShader::~LightingShader() {
 	// TODO: Safe delete?
@@ -92,8 +101,6 @@ bool LightingShader::Init() {
 
 	Disable();
 
-	LoadLights({DirectionLight(vec3(1.f), vec3(0.f, -1.f, -2.f))}, {}, {});
-
 	return true;
 }
 
@@ -117,6 +124,7 @@ void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMat
 	SetModelMatrix(a_modelMatrix);
 	SetViewMatrix(a_viewMatrix);
 	SetModelViewProjectionMatrix(a_projectionMatrix * a_viewMatrix * a_modelMatrix);
+	SetDepthBiasModelViewProjectionMatrix(BIAS_MATRIX * m_depthViewProjectionMatrix * a_modelMatrix);
 }
 
 void LightingShader::SetModelMatrix(const mat4& a_value) const {
@@ -179,17 +187,44 @@ void LightingShader::SetBloomScale(const float a_value) const {
 	LoadUniform(m_bloomScaleLoc, a_value);
 }
 
-void LightingShader::LoadLights(const std::vector<DirectionLight>& a_directionLights,
-	const std::vector<SpotLight>& a_spotLights, const std::vector<PointLight>& a_pointLights) const {
+void LightingShader::LoadLights(const vector<DirectionLightData>& a_directionLights,
+	const vector<SpotLightData>& a_spotLights, const vector<PointLightData>& a_pointLights) const {
 	
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbos[SSBOs::DirectionLights]);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, a_directionLights.size() * sizeof(DirectionLight), a_directionLights.data(), GL_DYNAMIC_COPY);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, a_directionLights.size() * sizeof(DirectionLightData), a_directionLights.data(), GL_DYNAMIC_COPY);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbos[SSBOs::SpotLights]);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, a_spotLights.size() * sizeof(SpotLight), a_spotLights.data(), GL_DYNAMIC_COPY);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, a_spotLights.size() * sizeof(SpotLightData), a_spotLights.data(), GL_DYNAMIC_COPY);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbos[SSBOs::PointLights]);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, a_pointLights.size() * sizeof(PointLight), a_pointLights.data(), GL_DYNAMIC_COPY);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, a_pointLights.size() * sizeof(PointLightData), a_pointLights.data(), GL_DYNAMIC_COPY);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void LightingShader::LoadLights() {
+	vector<DirectionLightData> directionLights;
+	vector<SpotLightData> spotLights;
+	vector<PointLightData> pointLights;
+
+	Enable();
+	
+	SetShadowsEnabled(false);
+
+	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
+		const DirectionLight& light = *it;
+		if (!light.IsEnabled()) continue;
+		
+		directionLights.emplace_back(light.GetColor(), light.GetDirection());
+
+		if (light.CastsShadows()) {
+			light.GetShadowMap().Bind(SHADOW_TEXTURE_UNIT);
+			SetShadowsEnabled(true);
+			m_depthViewProjectionMatrix = light.GetDepthViewProjectionMatrix();
+		}
+	}
+
+	LoadLights(directionLights, spotLights, pointLights);
+
+	Disable();
 }

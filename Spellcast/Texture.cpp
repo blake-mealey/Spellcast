@@ -30,6 +30,15 @@ bool Texture::LoadFromFile(const std::string& a_filePath) {
 
 bool Texture::Init(const GLint a_format, const int a_width, const int a_height, const void* a_pixels,
                    const GLint a_wrapMode) {
+	
+	return Init(a_format, a_format, GL_UNSIGNED_BYTE, a_width, a_height, a_pixels, a_wrapMode);
+}
+
+bool Texture::Init(const GLint a_internalFormat, const GLint a_format, const GLenum a_type, const int a_width,
+				   const int a_height,
+                   const void* a_pixels,
+                   const GLint a_wrapMode) {
+
 	// Error check
 	if (a_format < 0 || a_width < 0 || a_height < 0) {
 		Logger::Console()->warn("Invalid format or dimensions of image.");
@@ -46,7 +55,7 @@ bool Texture::Init(const GLint a_format, const int a_width, const int a_height, 
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	// Set format, dimensions, and data of texture
-	glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, a_pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, a_internalFormat, m_width, m_height, 0, m_format, a_type, a_pixels);
 
 	// Initialize texture
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, a_wrapMode);
@@ -56,6 +65,12 @@ bool Texture::Init(const GLint a_format, const int a_width, const int a_height, 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return glGetError() == GL_NO_ERROR;
+}
+
+void Texture::SetParameter(const GLenum a_parameter, const GLint a_value) const {
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glTexParameteri(GL_TEXTURE_2D, a_parameter, a_value);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool Texture::UpdateDimensions(const int a_width, const int a_height) {
@@ -85,3 +100,4 @@ void Texture::Bind(const GLenum a_textureUnit) const {
 GLuint Texture::GetId() const {
 	return m_texture;
 }
+

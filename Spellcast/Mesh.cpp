@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "RenderContext.h"
 #include "Logger.h"
 
 #include <GL/glew.h>
@@ -35,16 +34,14 @@ bool Mesh::LoadFromFile(const std::string& a_filePath, const unsigned a_flags) {
 	return true;
 }
 
-void Mesh::Render(const RenderContext* a_context) const {
-	for (const MeshEntry& entry : m_entries) {
-		entry.Render(a_context);
+void Mesh::RenderBasic() const {
+	for (const Entry& entry : m_entries) {
+		entry.RenderBasic();
 	}
 }
 
-void Mesh::RenderBasic() const {
-	for (const MeshEntry& entry : m_entries) {
-		entry.RenderBasic();
-	}
+const vector<Mesh::Entry>& Mesh::GetEntries() const {
+	return m_entries;
 }
 
 void Mesh::Init(const aiScene* a_scene) {
@@ -83,10 +80,10 @@ void Mesh::Init(const aiScene* a_scene) {
 
 
 
-Mesh::MeshEntry::MeshEntry(): m_indexBuffer(0), m_vaos{}, m_vbos{}, m_indexCount(0), m_vertexCount(0),
+Mesh::Entry::Entry(): m_indexBuffer(0), m_vaos{}, m_vbos{}, m_indexCount(0), m_vertexCount(0),
                               m_materialIndex(0) { }
 
-Mesh::MeshEntry::~MeshEntry() {
+Mesh::Entry::~Entry() {
 	if (m_indexBuffer) {
 		glDeleteBuffers(1, &m_indexBuffer);
 		glDeleteBuffers(VBOs::Count, m_vbos);
@@ -94,7 +91,7 @@ Mesh::MeshEntry::~MeshEntry() {
 	}
 }
 
-bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec3>& vertices,
+bool Mesh::Entry::Init(const vector<t_index>& indices, const vector<glm::vec3>& vertices,
 	const vector<vec2>& uvs, const vector<vec3>& normals) {
 
 	// Initialize counts
@@ -147,16 +144,14 @@ bool Mesh::MeshEntry::Init(const vector<t_index>& indices, const vector<glm::vec
 	return glGetError() == GL_NO_ERROR;
 }
 
-void Mesh::MeshEntry::Render(const RenderContext* a_context) const {
-	a_context->InitRenderPass(m_materialIndex);
-
+void Mesh::Entry::Render() const {
 	glBindVertexArray(m_vaos[VAOs::Geometry]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void Mesh::MeshEntry::RenderBasic() const {
+void Mesh::Entry::RenderBasic() const {
 	glBindVertexArray(m_vaos[VAOs::Geometry]);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);

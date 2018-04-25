@@ -3,7 +3,6 @@
 #include "Component.h"
 #include "ContentManager.h"
 #include "Transform.h"
-#include "RenderContext.h"
 
 #include <json/json.hpp>
 
@@ -18,9 +17,12 @@ struct MeshRendererDesc : ComponentDesc {
 	Mesh* m_mesh;
 	Transform m_transform;
 	std::vector<Material*> m_materials;
+	
+	bool m_castsShadows;
+	bool m_receivesShadows;
 };
 
-class MeshRenderer : public Component, RenderContext {
+class MeshRenderer : public Component {
 friend SlotMap<MeshRenderer>;
 public:
 	~MeshRenderer() override = default;
@@ -30,12 +32,19 @@ public:
 
 	bool Init(const MeshRendererDesc* a_desc);
 
-	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) override;
-	void InitRenderPass(const size_t& a_materialIndex) const override;
+	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
+	void RenderBasic() const;
 
 	Transform& GetTransform();
+	const Transform& GetTransform() const;
+
+	bool DoesCastShadows() const;
 
 private:
 	Mesh* m_mesh;
 	Transform m_transform;
+	std::vector<Material*> m_materials;
+	
+	bool m_castsShadows;
+	bool m_receivesShadows;
 };

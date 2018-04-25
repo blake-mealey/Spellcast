@@ -17,7 +17,7 @@ class Entity;
 #define DEFAULT_FAR_CLIPPING_PLANE 1000.f
 #define DEFAULT_FIELD_OF_VIEW 60.f
 
-class GraphicsSystem;
+class Graphics;
 
 class Camera;
 
@@ -52,7 +52,9 @@ public:
 
 	bool Init(const CameraDesc& a_desc);
 
-	void Render(const GraphicsSystem& a_context);
+	void Render(const Graphics& a_context);
+
+	void SetGlobalPosition(const glm::vec3& a_position);
 
 	void SetViewportUnitScale(const glm::vec2& a_scale);
 	void SetViewportUnitPosition(const glm::vec2& a_position);

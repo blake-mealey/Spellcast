@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "GraphicsSystem.h"
+#include "Graphics.h"
 #include "World.h"
 #include "Entity.h"
 #include "Geometry.h"
@@ -176,7 +176,9 @@ bool Camera::InitScreenBuffer() {
 	return glGetError() == GL_NO_ERROR;
 }
 
-void Camera::Render(const GraphicsSystem& a_context) {
+void Camera::Render(const Graphics& a_context) {
+	if (!m_enabled) return;
+
 	// Compute current viewport
 	const vec2& windowDims = a_context.GetWindowDims();
 	const vec2 lastViewportPosition = m_viewportPosition;
@@ -229,12 +231,8 @@ void Camera::Render(const GraphicsSystem& a_context) {
 	}
 	glEnable(GL_CULL_FACE);
 
-	// Rotate entities... for reasons
-	for (auto it = World::BeginEntities(); it != World::EndEntities(); ++it) {
-		it->GetTransform().Rotate(Geometry::UP, 0.01f);
-	}
-
 	// Post-processing effects
+	// TODO: Abstract this
 	glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
 	glBindVertexArray(m_screenVao);
 
@@ -300,6 +298,10 @@ void Camera::Render(const GraphicsSystem& a_context) {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_TRUE);
+}
+
+void Camera::SetGlobalPosition(const vec3& a_position) {
+	m_globalPosition = a_position;
 }
 
 void Camera::SetViewportUnitScale(const vec2& a_scale) {
