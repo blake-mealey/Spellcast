@@ -36,7 +36,7 @@ int main() {
 		simulation.Update(deltaTime, globalTime);
 		graphics.Update(deltaTime, globalTime);
 
-		// spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);
+		spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);
 	}
 
 	return 0;

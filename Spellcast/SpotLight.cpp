@@ -70,7 +70,7 @@ void SpotLight::RenderShadows(const mat4& a_viewProjectionMatrix) const {
 void SpotLight::ComputeDepthViewProjectionMatrix() {
 	const vec3 position = GetGlobalPosition();
 	const mat4 viewMatrix = lookAt(position, position + GetGlobalDirection(), Geometry::UP);
-	const mat4 projectionMatrix = perspective(GetAngleRadians(), 1.f, 0.5f, 50.f);
+	const mat4 projectionMatrix = perspective(GetAngleRadians()*2.f, 1.f, 0.5f, 50.f);
 	m_depthViewProjectionMatrix = projectionMatrix * viewMatrix;
 }
 
