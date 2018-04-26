@@ -90,3 +90,7 @@ const Transform& MeshRenderer::GetTransform() const {
 bool MeshRenderer::DoesCastShadows() const {
 	return m_castsShadows;
 }
+
+bool MeshRenderer::DoesReceiveShadows() const {
+	return m_receivesShadows;
+}

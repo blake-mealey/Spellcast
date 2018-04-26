@@ -4,6 +4,7 @@
 #include "ContentManager.h"
 
 using namespace std;
+using namespace nlohmann;
 using namespace glm;
 
 Material::Material(): m_shader(nullptr), m_albedoMap(nullptr), m_specularMap(nullptr), m_specularity(0),
@@ -11,10 +12,12 @@ Material::Material(): m_shader(nullptr), m_albedoMap(nullptr), m_specularMap(nul
 
 Material::~Material() = default;
 
-bool Material::Init(nlohmann::json& a_data) {
+bool Material::Init(json& a_data) {
 	m_shader = ContentManager::GetShaderProgram(ContentManager::FromJson<string>(a_data, "Shader", "Lighting"));
-	
-	m_albedoMap = ContentManager::GetTexture(ContentManager::FromJson<string>(a_data, "AlbedoMap"));
+
+	json albedoMap = a_data["AlbedoMap"];
+	if (albedoMap.is_null()) m_albedoMap = nullptr;
+	else m_albedoMap = ContentManager::GetTexture(ContentManager::FromJson<string>(albedoMap));
 	m_color = ContentManager::ColorFromJson(a_data, "Color", ContentManager::COLOR_WHITE);
 
 	// TODO: specular map

@@ -39,6 +39,7 @@ public:
 	const Transform& GetTransform() const;
 
 	bool DoesCastShadows() const;
+	bool DoesReceiveShadows() const;
 
 private:
 	Mesh* m_mesh;

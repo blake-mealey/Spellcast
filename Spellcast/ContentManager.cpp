@@ -10,6 +10,8 @@
 #include "SkyboxRenderer.h"
 #include "Logger.h"
 #include "DirectionLight.h"
+#include "SpotLight.h"
+#include "PointLight.h"
 
 #include <fstream>
 
@@ -295,6 +297,12 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 			break;
 		case ComponentTypeIndex::DIRECTION_LIGHT:
 			desc = new DirectionLightDesc(a_data);
+			break;
+		case ComponentTypeIndex::SPOT_LIGHT:
+			desc = new SpotLightDesc(a_data);
+			break;
+		case ComponentTypeIndex::POINT_LIGHT:
+			desc = new PointLightDesc(a_data);
 			break;
 		default: ;
 		}

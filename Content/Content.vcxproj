@@ -25,6 +25,7 @@
     <None Include="Entities\Camera.entity.json" />
     <None Include="Entities\Floor.entity.json" />
     <None Include="Entities\Skybox.entity.json" />
+    <None Include="Entities\SpotLight.entity.json" />
     <None Include="Entities\Sun.entity.json" />
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\blur.frag" />
@@ -39,6 +40,10 @@
     <None Include="Shaders\shadow_map.vert" />
     <None Include="Shaders\skybox.frag" />
     <None Include="Shaders\skybox.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Components\LightEmitter.comp.json" />
+    <ClCompile Include="Entities\PointLight.entity.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

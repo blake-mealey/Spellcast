@@ -5,6 +5,7 @@
 #include "LightingShader.h"
 #include "DirectionLight.h"
 #include "ContentManager.h"
+#include "SpotLight.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -15,7 +16,7 @@
 using namespace std;
 using namespace glm;
 
-#define OPENGL_DEBUG 1
+#define OPENGL_DEBUG 0
 
 Graphics& Graphics::Instance() {
 	static Graphics instance;
@@ -124,6 +125,9 @@ void Graphics::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 	// Render shadow maps
 	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
+		it->RenderShadowMap();
+	}
+	for (auto it = World::BeginComponents<SpotLight>(); it != World::EndComponents<SpotLight>(); ++it) {
 		it->RenderShadowMap();
 	}
 

@@ -4,6 +4,8 @@
 #include "Texture.h"
 #include "World.h"
 #include "DirectionLight.h"
+#include "SpotLight.h"
+#include "PointLight.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -176,6 +178,19 @@ void LightingShader::LoadLights() {
 		const DirectionLight& light = *it;
 		if (!light.IsEnabled()) continue;
 		directionLights.emplace_back(light.GetColor(), light.GetDirection());
+	}
+
+	for (auto it = World::BeginComponents<SpotLight>(); it != World::EndComponents<SpotLight>(); ++it) {
+		const SpotLight& light = *it;
+		if (!light.IsEnabled()) continue;
+		spotLights.emplace_back(light.GetColor(), light.GetPower(), light.GetGlobalPosition(),
+		                        light.GetAngleRadians(), light.GetGlobalDirection());
+	}
+
+	for (auto it = World::BeginComponents<PointLight>(); it != World::EndComponents<PointLight>(); ++it) {
+		const PointLight& light = *it;
+		if (!light.IsEnabled()) continue;
+		pointLights.emplace_back(light.GetColor(), light.GetPower(), light.GetGlobalPosition());
 	}
 
 	LoadLights(directionLights, spotLights, pointLights);

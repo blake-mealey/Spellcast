@@ -4,7 +4,6 @@
 #include "Simulation.h"
 
 #include <glm/glm.hpp>
-#include "DirectionLight.h"
 
 using namespace glm;
 using namespace std;
@@ -25,6 +24,8 @@ int main() {
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Scale(0.5f);
 
 	ContentManager::GetEntityDesc("Sun.entity.json")->Create();
+	auto spotLight = ContentManager::GetEntityDesc("SpotLight.entity.json")->Create();
+	auto pointLight = ContentManager::GetEntityDesc("PointLight.entity.json")->Create();
 
 	Time globalTime;
 	while (!graphics.WindowClosed()) {
@@ -34,6 +35,8 @@ int main() {
 		
 		simulation.Update(deltaTime, globalTime);
 		graphics.Update(deltaTime, globalTime);
+
+		// spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);
 	}
 
 	return 0;

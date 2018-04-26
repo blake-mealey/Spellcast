@@ -35,5 +35,14 @@
     <None Include="Shaders\shadow_map.vert" />
     <None Include="Shaders\shadow.frag" />
     <None Include="Shaders\shadow.vert" />
+    <None Include="Entities\SpotLight.entity.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Entities\PointLight.entity.json">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\LightEmitter.comp.json">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

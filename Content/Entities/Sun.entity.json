@@ -3,7 +3,8 @@
     {
       "Type": "DirectionLight",
       "Direction": [-1, -1, -3],
-      "ShadowIntensity": 0.4
+      "ShadowIntensity": 0.4,
+      "CastsShadows": true
     }
   ]
 }

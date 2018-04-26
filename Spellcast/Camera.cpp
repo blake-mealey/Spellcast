@@ -7,9 +7,10 @@
 #include "MeshRenderer.h"
 #include "Logger.h"
 #include "Uniforms.h"
+#include "DirectionLight.h"
+#include "SpotLight.h"
 
 #include <glm/gtc/matrix_transform.inl>
-#include "DirectionLight.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -238,6 +239,9 @@ void Camera::Render(const Graphics& a_context) {
 	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
 		it->RenderShadows(viewProjectionMatrix);
 	}
+	for (auto it = World::BeginComponents<SpotLight>(); it != World::EndComponents<SpotLight>(); ++it) {
+		it->RenderShadows(viewProjectionMatrix);
+	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Render skyboxes
@@ -249,7 +253,7 @@ void Camera::Render(const Graphics& a_context) {
 
 	// Post-processing effects
 	// TODO: Abstract this
-	/*glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
 	glBindVertexArray(m_screenVao);
 
 	m_copyShader.Enable();
@@ -290,7 +294,7 @@ void Camera::Render(const Graphics& a_context) {
 		m_blurShader.SetOffset(vec2(0.f, yOffset));
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.GetId(), 0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}*/
+	}
 
 	// Copy the screen buffer to the window
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -304,7 +308,7 @@ void Camera::Render(const Graphics& a_context) {
 
 
 
-	/*glDepthMask(GL_FALSE);
+	glDepthMask(GL_FALSE);
 	glBlendFunc(GL_ONE, GL_ONE);
 
 	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
@@ -313,7 +317,7 @@ void Camera::Render(const Graphics& a_context) {
 	}
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_TRUE);*/
+	glDepthMask(GL_TRUE);
 }
 
 void Camera::SetGlobalPosition(const vec3& a_position) {
