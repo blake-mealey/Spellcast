@@ -6,7 +6,9 @@
       "Angle": 30,
       "ShadowIntensity": 0.4,
       "CastsShadows": true,
-      "Direction": [0, -1, 1]
+      "Direction": [0, -1, 1],
+      "Color": "Red",
+      "Power": 20
     },
     "LightEmitter.comp.json"
   ]

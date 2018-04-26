@@ -1,5 +1,4 @@
 #include "Graphics.h"
-#include "Camera.h"
 #include "ContentManager.h"
 #include "Simulation.h"
 
@@ -13,7 +12,7 @@ int main() {
 	if (!graphics.Initialize("Spellcast")) exit(-1);
 
 	Simulation& simulation = Simulation::Instance();
-	if (!simulation.Initialize()) exit(-1);
+	if (!simulation.Initialize()) exit(-1);;
 
 	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
 	ContentManager::GetEntityDesc("Camera.entity.json")->Create();

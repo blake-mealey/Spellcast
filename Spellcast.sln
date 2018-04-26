@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dependencies", "Dependencie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Content", "Content\Content.vcxproj", "{DC5DC3A5-972E-4B43-94C7-77C13FFD667E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "Lua\Lua.vcxproj", "{80B42526-C322-407B-9316-DF0F75B7EFBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{DC5DC3A5-972E-4B43-94C7-77C13FFD667E}.Release|x64.Build.0 = Release|x64
 		{DC5DC3A5-972E-4B43-94C7-77C13FFD667E}.Release|x86.ActiveCfg = Release|Win32
 		{DC5DC3A5-972E-4B43-94C7-77C13FFD667E}.Release|x86.Build.0 = Release|Win32
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Debug|x64.ActiveCfg = Debug|x64
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Debug|x64.Build.0 = Debug|x64
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Debug|x86.ActiveCfg = Debug|Win32
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Debug|x86.Build.0 = Debug|Win32
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Release|x64.ActiveCfg = Release|x64
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Release|x64.Build.0 = Release|x64
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Release|x86.ActiveCfg = Release|Win32
+		{80B42526-C322-407B-9316-DF0F75B7EFBD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

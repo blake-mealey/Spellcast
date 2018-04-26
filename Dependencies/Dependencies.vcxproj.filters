@@ -31,6 +31,12 @@
     <Filter Include="Header Files\spdlog">
       <UniqueIdentifier>{cc0e5ff2-61bc-45eb-b0e6-a74a650789b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\sol2">
+      <UniqueIdentifier>{e309af90-ba16-406b-9af7-6a14785196c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lua">
+      <UniqueIdentifier>{dd797a80-ab97-4333-92dd-ba22efe78148}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\imgui\imgui.cpp">
@@ -265,6 +271,12 @@
     </ClInclude>
     <ClInclude Include="Include\spdlog\sinks\windebug_sink.h">
       <Filter>Header Files\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\sol2\sol.hpp">
+      <Filter>Header Files\sol2</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\sol2\sol_forward.hpp">
+      <Filter>Header Files\sol2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

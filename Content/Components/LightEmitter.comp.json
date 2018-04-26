@@ -6,7 +6,8 @@
   "ReceivesShadows": false,
   "Materials": [
     {
-	  "Emission": 1
+      "Emission": 1,
+      "Color": "RedHalfAlpha"
     }
   ]
 }
