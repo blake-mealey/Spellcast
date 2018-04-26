@@ -13,7 +13,6 @@ public:
 	void SetModelMatrix(const glm::mat4& a_value) const;
 	void SetViewMatrix(const glm::mat4& a_value) const;
 	void SetModelViewProjectionMatrix(const glm::mat4& a_value) const;
-	void SetDepthBiasModelViewProjectionMatrix(const glm::mat4& a_value) const;
 	
 	void SetMaterialColor(const glm::vec4& a_value) const;
 	void SetMaterialSpecularColor(const glm::vec4& a_value) const;
@@ -21,9 +20,6 @@ public:
 	void SetMaterialEmission(float a_value) const;
 	
 	void SetAmbientColor(const glm::vec4& a_value) const;
-	
-	void SetShadowMapTextureUnit(GLuint a_value) const;
-	void SetShadowsEnabled(bool a_value) const;
 	
 	void SetDiffuseTextureUnit(GLuint a_value) const;
 	void SetDiffuseTextureEnabled(bool a_value) const;
@@ -78,15 +74,11 @@ public:
 		const std::vector<SpotLightData>& a_spotLights, const std::vector<PointLightData>& a_pointLights) const;
 
 	void LoadLights();
+
 private:
-	const static glm::mat4 BIAS_MATRIX;
-
-	glm::mat4 m_depthViewProjectionMatrix;
-
 	uniform_loc m_modelMatrixLoc = 0;
 	uniform_loc m_viewMatrixLoc = 0;
 	uniform_loc m_modelViewProjectionMatrixLoc = 0;
-	uniform_loc m_depthBiasModelViewProjectionMatrixLoc = 0;
 
 	uniform_loc m_materialDiffuseColorLoc = 0;
 	uniform_loc m_materialSpecularColorLoc = 0;
@@ -94,9 +86,6 @@ private:
 	uniform_loc m_materialEmissivenessLoc = 0;
 	
 	uniform_loc m_ambientColorLoc = 0;
-	
-	uniform_loc m_shadowMapLoc = 0;
-	uniform_loc m_shadowsEnabledLoc = 0;
 	
 	uniform_loc m_diffuseTextureLoc = 0;
 	uniform_loc m_diffuseTextureEnabledLoc = 0;

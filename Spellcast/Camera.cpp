@@ -9,6 +9,7 @@
 #include "Uniforms.h"
 
 #include <glm/gtc/matrix_transform.inl>
+#include "DirectionLight.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -136,8 +137,11 @@ bool Camera::InitGlowBuffer() {
 	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
 		// const float factor = 1.f / pow(2, i);
 
-		m_blurTextures[i].Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
-		m_blurTempTextures[i].Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+		TextureDesc desc(1, 1, nullptr);
+		desc.m_wrapS = GL_CLAMP_TO_EDGE;
+		desc.m_wrapT = GL_CLAMP_TO_EDGE;
+		m_blurTextures[i].Init(desc);
+		m_blurTempTextures[i].Init(desc);
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -152,12 +156,16 @@ bool Camera::InitScreenBuffer() {
 	GLenum screenBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, screenBuffers);
 
+	TextureDesc desc(1, 1, nullptr);
+	desc.m_wrapS = GL_CLAMP_TO_EDGE;
+	desc.m_wrapT = GL_CLAMP_TO_EDGE;
+
 	// Normal color buffer
-	m_screenTexture.Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+	m_screenTexture.Init(desc);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_screenTexture.GetId(), 0);
 
 	// Glow color buffer
-	m_glowTexture.Init(GL_RGBA, 1, 1, nullptr, GL_CLAMP_TO_EDGE);
+	m_glowTexture.Init(desc);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_glowTexture.GetId(), 0);
 
 	// Depth buffer
@@ -214,6 +222,7 @@ void Camera::Render(const Graphics& a_context) {
 	// Compute view and projection matrices
 	const mat4 viewMatrix = lookAt(m_globalPosition, m_targetGlobalPosition, m_upVector);
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
+	const mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
 
 	// Render to the screen buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, m_screenBuffer);
@@ -224,6 +233,13 @@ void Camera::Render(const Graphics& a_context) {
 		it->Render(viewMatrix, projectionMatrix);
 	}
 
+	// Render shadows
+	glBlendFunc(GL_DST_COLOR, GL_ZERO);
+	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
+		it->RenderShadows(viewProjectionMatrix);
+	}
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Render skyboxes
 	glDisable(GL_CULL_FACE);
 	for (auto it = World::BeginComponents<SkyboxRenderer>(); it != World::EndComponents<SkyboxRenderer>(); ++it) {
@@ -233,7 +249,7 @@ void Camera::Render(const Graphics& a_context) {
 
 	// Post-processing effects
 	// TODO: Abstract this
-	glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
+	/*glBindFramebuffer(GL_FRAMEBUFFER, m_glowBuffer);
 	glBindVertexArray(m_screenVao);
 
 	m_copyShader.Enable();
@@ -274,7 +290,7 @@ void Camera::Render(const Graphics& a_context) {
 		m_blurShader.SetOffset(vec2(0.f, yOffset));
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.GetId(), 0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
+	}*/
 
 	// Copy the screen buffer to the window
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -288,7 +304,7 @@ void Camera::Render(const Graphics& a_context) {
 
 
 
-	glDepthMask(GL_FALSE);
+	/*glDepthMask(GL_FALSE);
 	glBlendFunc(GL_ONE, GL_ONE);
 
 	for (size_t i = 0; i < BLUR_LEVEL_COUNT; ++i) {
@@ -297,7 +313,7 @@ void Camera::Render(const Graphics& a_context) {
 	}
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_TRUE);
+	glDepthMask(GL_TRUE);*/
 }
 
 void Camera::SetGlobalPosition(const vec3& a_position) {

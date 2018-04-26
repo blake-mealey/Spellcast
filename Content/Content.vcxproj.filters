@@ -31,6 +31,8 @@
     <None Include="Shaders\blur.frag" />
     <None Include="Entities\Sun.entity.json" />
     <None Include="Entities\Floor.entity.json" />
+    <None Include="Shaders\shadow_map.frag" />
+    <None Include="Shaders\shadow_map.vert" />
     <None Include="Shaders\shadow.frag" />
     <None Include="Shaders\shadow.vert" />
   </ItemGroup>

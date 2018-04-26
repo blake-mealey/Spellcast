@@ -25,7 +25,7 @@ bool Image::LoadFromFile(const std::string& a_filePath) {
 	return true;
 }
 
-stbi_uc* Image::GetData() const {
+pixel_t* Image::GetData() const {
 	return m_data;
 }
 

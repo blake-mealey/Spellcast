@@ -1,11 +1,13 @@
 #version 430
 
-// Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertexPosition_model;
 
-// Values that stay constant for the whole mesh.
-uniform mat4 depthModelViewProjectionMatrix;
+uniform mat4 modelViewProjectionMatrix;
+uniform mat4 depthBiasModelViewProjectionMatrix;
 
-void main(){
-	gl_Position = depthModelViewProjectionMatrix * vec4(vertexPosition_model, 1);
+out vec4 shadowCoord;
+
+void main() {
+	gl_Position = modelViewProjectionMatrix * vec4(vertexPosition_model, 1);
+	shadowCoord = depthBiasModelViewProjectionMatrix * vec4(vertexPosition_model, 1);
 }

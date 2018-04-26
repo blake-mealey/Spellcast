@@ -7,14 +7,11 @@ layout(location = 2) in vec3 vertexNormal_model;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelViewProjectionMatrix;
-uniform mat4 depthBiasModelViewProjectionMatrix;
 
 out vec3 fragmentPosition_camera;
 out vec3 surfaceNormal_camera;
 out vec3 eyeDirection_camera;
 out vec2 fragmentUv;
-out vec4 shadowCoord;
-
 
 void main() {
 	gl_Position = modelViewProjectionMatrix * vec4(vertexPosition_model, 1);
@@ -27,6 +24,4 @@ void main() {
 	surfaceNormal_camera = (viewMatrix * modelMatrix * vec4(vertexNormal_model, 0)).xyz;
 
 	fragmentUv = vertexUv;
-
-	shadowCoord = depthBiasModelViewProjectionMatrix * vec4(vertexPosition_model, 1);
 }

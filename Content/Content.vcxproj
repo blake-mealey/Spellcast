@@ -35,6 +35,8 @@
     <None Include="Shaders\lighting.vert" />
     <None Include="Shaders\shadow.frag" />
     <None Include="Shaders\shadow.vert" />
+    <None Include="Shaders\shadow_map.frag" />
+    <None Include="Shaders\shadow_map.vert" />
     <None Include="Shaders\skybox.frag" />
     <None Include="Shaders\skybox.vert" />
   </ItemGroup>

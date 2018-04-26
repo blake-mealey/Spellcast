@@ -1,9 +1,18 @@
 #version 430
 
-// Ouput data
-layout(location = 0) out float fragmentDepth;
+const float BIAS = 0.005;
 
-void main(){
-	// Not really needed, OpenGL does it anyway
-	fragmentDepth = gl_FragCoord.z;
+uniform sampler2DShadow shadowMap;
+uniform float intensity;
+
+in vec4 shadowCoord;
+
+out vec4 fragmentColor;
+out vec4 glowColor;
+
+void main() {
+	float visibility = 1.0 - (intensity * texture(shadowMap, vec3(shadowCoord.xy, shadowCoord.z - BIAS)));
+
+	fragmentColor = vec4(vec3(visibility), 1.0);
+	glowColor = fragmentColor;
 }

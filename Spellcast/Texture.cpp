@@ -1,9 +1,24 @@
 #include "Texture.h"
-#include "ContentManager.h"
 #include "Image.h"
 #include "Logger.h"
 
 using namespace std;
+
+TextureDesc::TextureDesc(): m_width(0), m_height(0), m_internalFormat(GL_RGBA), m_format(GL_RGBA),
+                            m_type(GL_UNSIGNED_BYTE),
+                            m_wrapS(GL_REPEAT), m_wrapT(GL_REPEAT), m_minFilter(GL_LINEAR), m_magFilter(GL_LINEAR),
+                            m_compareFunc(INVALID_TEXTURE_PARAM),
+                            m_compareMode(INVALID_TEXTURE_PARAM), m_pixels(nullptr) { }
+
+TextureDesc::TextureDesc(GLsizei a_width, GLsizei a_height, const void* a_pixels) : TextureDesc() {
+	m_width = a_width;
+	m_height = a_height;
+	m_pixels = a_pixels;
+}
+
+
+
+
 
 Texture::Texture(): m_texture(0), m_format(0), m_width(0), m_height(0) {}
 
@@ -25,52 +40,42 @@ bool Texture::LoadFromFile(const std::string& a_filePath) {
 		return false;
 	}
 
-	return Init(image.GetFormat(), image.GetWidth(), image.GetHeight(), image.GetData());
+	// Create description and initialize
+	TextureDesc desc(image.GetWidth(), image.GetHeight(), image.GetData());
+	desc.m_internalFormat = image.GetFormat();
+	desc.m_format = image.GetFormat();
+	return Init(desc);
 }
 
-bool Texture::Init(const GLint a_format, const int a_width, const int a_height, const void* a_pixels,
-                   const GLint a_wrapMode) {
-	
-	return Init(a_format, a_format, GL_UNSIGNED_BYTE, a_width, a_height, a_pixels, a_wrapMode);
-}
-
-bool Texture::Init(const GLint a_internalFormat, const GLint a_format, const GLenum a_type, const int a_width,
-				   const int a_height,
-                   const void* a_pixels,
-                   const GLint a_wrapMode) {
+bool Texture::Init(const TextureDesc& a_desc) {
+	// Store metadata
+	m_width = a_desc.m_width;
+	m_height = a_desc.m_height;
+	m_format = a_desc.m_format;
 
 	// Error check
-	if (a_format < 0 || a_width < 0 || a_height < 0) {
-		Logger::Console()->warn("Invalid format or dimensions of image.");
+	if (m_width < 1 || m_height < 1) {
+		Logger::Console()->warn("Invalid dimensions of image.");
 		return false;
 	}
-
-	// Store metadata
-	m_width = a_width;
-	m_height = a_height;
-	m_format = a_format;
 
 	// Generate texture
 	glGenTextures(1, &m_texture);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	// Set format, dimensions, and data of texture
-	glTexImage2D(GL_TEXTURE_2D, 0, a_internalFormat, m_width, m_height, 0, m_format, a_type, a_pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, a_desc.m_internalFormat, m_width, m_height, 0, m_format, a_desc.m_type, a_desc.m_pixels);
 
 	// Initialize texture
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, a_wrapMode);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, a_wrapMode);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	SetParameter(GL_TEXTURE_WRAP_S, a_desc.m_wrapS);
+	SetParameter(GL_TEXTURE_WRAP_T, a_desc.m_wrapT);
+	SetParameter(GL_TEXTURE_MIN_FILTER, a_desc.m_minFilter);
+	SetParameter(GL_TEXTURE_MAG_FILTER, a_desc.m_magFilter);
+	SetParameter(GL_TEXTURE_COMPARE_FUNC, a_desc.m_compareFunc);
+	SetParameter(GL_TEXTURE_COMPARE_MODE, a_desc.m_compareMode);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return glGetError() == GL_NO_ERROR;
-}
-
-void Texture::SetParameter(const GLenum a_parameter, const GLint a_value) const {
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-	glTexParameteri(GL_TEXTURE_2D, a_parameter, a_value);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool Texture::UpdateDimensions(const int a_width, const int a_height) {
@@ -101,3 +106,6 @@ GLuint Texture::GetId() const {
 	return m_texture;
 }
 
+void Texture::SetParameter(const GLenum a_parameter, const GLint a_value) {
+	if (a_value != INVALID_TEXTURE_PARAM) glTexParameteri(GL_TEXTURE_2D, a_parameter, a_value);
+}

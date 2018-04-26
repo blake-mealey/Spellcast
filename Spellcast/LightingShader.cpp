@@ -10,13 +10,6 @@
 using namespace glm;
 using namespace std;
 
-const mat4 LightingShader::BIAS_MATRIX = mat4(
-	0.5, 0.0, 0.0, 0.0,
-	0.0, 0.5, 0.0, 0.0,
-	0.0, 0.0, 0.5, 0.0,
-	0.5, 0.5, 0.5, 1.0
-);
-
 LightingShader::~LightingShader() {
 	// TODO: Safe delete?
 	glDeleteBuffers(SSBOs::Count, m_ssbos);
@@ -49,7 +42,6 @@ bool LightingShader::Init() {
 	m_modelMatrixLoc = GetUniformLocation("modelMatrix");
 	m_viewMatrixLoc = GetUniformLocation("viewMatrix");
 	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
-	m_depthBiasModelViewProjectionMatrixLoc = GetUniformLocation("depthBiasModelViewProjectionMatrix");
 
 	m_materialDiffuseColorLoc = GetUniformLocation("materialDiffuseColor");
 	m_materialSpecularColorLoc = GetUniformLocation("materialSpecularColor");
@@ -57,9 +49,6 @@ bool LightingShader::Init() {
 	m_materialEmissivenessLoc = GetUniformLocation("materialEmissiveness");
 	
 	m_ambientColorLoc = GetUniformLocation("ambientColor");
-	
-	m_shadowMapLoc = GetUniformLocation("shadowMap");
-	m_shadowsEnabledLoc = GetUniformLocation("shadowsEnabled");
 	
 	m_diffuseTextureLoc = GetUniformLocation("diffuseTexture");
 	m_diffuseTextureEnabledLoc = GetUniformLocation("diffuseTextureEnabled");
@@ -74,28 +63,11 @@ bool LightingShader::Init() {
 
 	Enable();
 
-	const mat4 model = mat4(1.f);
-	const mat4 view = lookAt(vec3(0.f, 0.1f, -5.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
-	const mat4 projection = perspective(radians(60.f), 1024.f / 768.f, 0.1f, 1000.f);
-
-	SetModelMatrix(model);
-	SetViewMatrix(view);
-	SetModelViewProjectionMatrix(projection * view * model);
-
 	SetDiffuseTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
-	SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
 
 	SetDiffuseTextureEnabled(false);
-	SetShadowsEnabled(false);
-
-	SetMaterialColor(vec4(195.f, 144.f, 212.f, 255.f) / 255.f);
-	SetMaterialSpecularColor(vec4(51.f, 51.f, 51.f, 255.f) / 255.f);
-	SetMaterialSpecularity(1.f);
-	SetMaterialEmission(0.f);
 
 	SetAmbientColor(vec4(0.4f, 0.4f, 0.4f, 1.f));
-
-	SetUvScale(vec2(1.f));
 
 	SetBloomScale(0.1f);
 
@@ -124,7 +96,6 @@ void LightingShader::SetModelAndViewAndProjectionMatrices(const mat4& a_modelMat
 	SetModelMatrix(a_modelMatrix);
 	SetViewMatrix(a_viewMatrix);
 	SetModelViewProjectionMatrix(a_projectionMatrix * a_viewMatrix * a_modelMatrix);
-	SetDepthBiasModelViewProjectionMatrix(BIAS_MATRIX * m_depthViewProjectionMatrix * a_modelMatrix);
 }
 
 void LightingShader::SetModelMatrix(const mat4& a_value) const {
@@ -139,9 +110,9 @@ void LightingShader::SetModelViewProjectionMatrix(const mat4& a_value) const {
 	LoadUniform(m_modelViewProjectionMatrixLoc, a_value);
 }
 
-void LightingShader::SetDepthBiasModelViewProjectionMatrix(const mat4& a_value) const {
+/*void LightingShader::SetDepthBiasModelViewProjectionMatrix(const mat4& a_value) const {
 	LoadUniform(m_depthBiasModelViewProjectionMatrixLoc, a_value);
-}
+}*/
 
 void LightingShader::SetMaterialColor(const vec4& a_value) const {
 	LoadUniform(m_materialDiffuseColorLoc, a_value);
@@ -161,14 +132,6 @@ void LightingShader::SetMaterialEmission(const float a_value) const {
 
 void LightingShader::SetAmbientColor(const vec4& a_value) const {
 	LoadUniform(m_ambientColorLoc, a_value);
-}
-
-void LightingShader::SetShadowMapTextureUnit(const GLuint a_value) const {
-	LoadUniform(m_shadowMapLoc, a_value);
-}
-
-void LightingShader::SetShadowsEnabled(const bool a_value) const {
-	LoadUniform(m_shadowsEnabledLoc, a_value);
 }
 
 void LightingShader::SetDiffuseTextureUnit(const GLuint a_value) const {
@@ -209,19 +172,10 @@ void LightingShader::LoadLights() {
 
 	Enable();
 	
-	SetShadowsEnabled(false);
-
 	for (auto it = World::BeginComponents<DirectionLight>(); it != World::EndComponents<DirectionLight>(); ++it) {
 		const DirectionLight& light = *it;
 		if (!light.IsEnabled()) continue;
-		
 		directionLights.emplace_back(light.GetColor(), light.GetDirection());
-
-		if (light.CastsShadows()) {
-			light.GetShadowMap().Bind(SHADOW_TEXTURE_UNIT);
-			SetShadowsEnabled(true);
-			m_depthViewProjectionMatrix = light.GetDepthViewProjectionMatrix();
-		}
 	}
 
 	LoadLights(directionLights, spotLights, pointLights);

@@ -1,4 +1,5 @@
 #include "ShadowShader.h"
+#include "Uniforms.h"
 
 using namespace glm;
 
@@ -17,7 +18,10 @@ bool ShadowShader::Init() {
 	// Store uniform locations
 	// ------------------------------------------------------------------------------------------
 
-	m_depthModelViewProjectionMatrixLoc = GetUniformLocation("depthModelViewProjectionMatrix");
+	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
+	m_depthBiasModelViewProjectionMatrixLoc = GetUniformLocation("depthBiasModelViewProjectionMatrix");
+	m_shadowMapLoc = GetUniformLocation("shadowMap");
+	m_intensityLoc = GetUniformLocation("intensity");
 
 	// ------------------------------------------------------------------------------------------
 	// Load uniform defaults
@@ -25,13 +29,26 @@ bool ShadowShader::Init() {
 
 	Enable();
 
-	SetDepthModelViewProjectionMatrix(mat4(1.f));
+	SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+	SetIntensity(0.75f);
 
 	Disable();
 
 	return true;
 }
 
-void ShadowShader::SetDepthModelViewProjectionMatrix(const glm::mat4& a_value) const {
-	LoadUniform(m_depthModelViewProjectionMatrixLoc, a_value);
+void ShadowShader::SetModelViewProjectionMatrix(const mat4& a_value) const {
+	LoadUniform(m_modelViewProjectionMatrixLoc, a_value);
+}
+
+void ShadowShader::SetDepthBiasModelViewProjectionMatrix(const mat4& a_value) const {
+	LoadUniform(m_depthBiasModelViewProjectionMatrixLoc, a_value);
+}
+
+void ShadowShader::SetShadowMapTextureUnit(const GLuint a_value) const {
+	LoadUniform(m_shadowMapLoc, a_value);
+}
+
+void ShadowShader::SetIntensity(const float a_value) const {
+	LoadUniform(m_intensityLoc, a_value);
 }

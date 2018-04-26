@@ -8,7 +8,7 @@
       "Materials": [
         {
           "AlbedoMap": "DiamondPlate.jpg",
-          "UvScale": [15, 15],
+          "UvScale": [5, 5],
           "SpecularColor": [51, 51, 51],
           "Specularity": 1
         }
