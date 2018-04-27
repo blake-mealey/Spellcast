@@ -1,4 +1,4 @@
-#include "PlayerController.h"
+#include "FpsController.h"
 #include "Geometry.h"
 #include "ContentManager.h"
 #include "Input.h"
@@ -8,15 +8,15 @@
 using namespace glm;
 using namespace nlohmann;
 
-PlayerControllerDesc::PlayerControllerDesc(): m_moveSpeed(0.5f), m_cameraSpeed(0.2f) {}
+FpsControllerDesc::FpsControllerDesc(): m_moveSpeed(0.25f), m_cameraSpeed(0.2f) {}
 
-PlayerControllerDesc::PlayerControllerDesc(json& a_data) : PlayerControllerDesc() {
+FpsControllerDesc::FpsControllerDesc(json& a_data) : FpsControllerDesc() {
 	m_moveSpeed = ContentManager::FromJson(a_data, "MoveSpeed", m_moveSpeed);
 	m_cameraSpeed = ContentManager::FromJson(a_data, "CameraSpeed", m_cameraSpeed);
 }
 
-void PlayerControllerDesc::Create(Entity* a_entity) {
-	auto* controller = World::CreateAndGetComponent<PlayerController>();
+void FpsControllerDesc::Create(Entity* a_entity) {
+	auto* controller = World::CreateAndGetComponent<FpsController>();
 	controller->Init(this);
 	a_entity->AddComponent(controller);
 }
@@ -25,24 +25,24 @@ void PlayerControllerDesc::Create(Entity* a_entity) {
 
 
 
-PlayerController::PlayerController(): m_moveSpeed(0), m_cameraSpeed(0) {}
+FpsController::FpsController(): m_moveSpeed(0), m_cameraSpeed(0), m_locked(false) {}
 
-component_type PlayerController::GetType() {
+component_type FpsController::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
 }
 
-component_index PlayerController::GetTypeIndex() {
-	return ComponentTypeIndex::PLAYER_CONTROLLER;
+component_index FpsController::GetTypeIndex() {
+	return ComponentTypeIndex::FPS_CONTROLLER;
 }
 
-bool PlayerController::Init(const PlayerControllerDesc* a_desc) {
+bool FpsController::Init(const FpsControllerDesc* a_desc) {
 	m_moveSpeed = a_desc->m_moveSpeed;
 	m_cameraSpeed = a_desc->m_cameraSpeed;
 
 	return true;
 }
 
-void PlayerController::On(const KeyboardEvent& a_event) {
+void FpsController::On(const KeyboardEvent& a_event) {
 	if (!m_enabled || !m_active) return;
 	if (a_event.m_ended) return;
 
@@ -62,19 +62,21 @@ void PlayerController::On(const KeyboardEvent& a_event) {
 		direction = camera->GetGlobalUp();
 	} else if (IS_KEY(a_event.m_key, Q)) {
 		direction = -camera->GetGlobalUp();
-	} else if (IS_KEY(a_event.m_key, ESCAPE)) {
-		SetEnabled(false);
+	} else if (IS_KEY(a_event.m_key, ESCAPE) && a_event.m_began) {
+		m_locked = !m_locked;
 		return;
 	} else {
 		return;
 	}
 
+	if (m_locked) return;
+
 	Transform& transform = GetEntity()->GetTransform();
-	transform.Translate(m_moveSpeed * direction);
+	transform.Translate(m_moveSpeed * (a_event.m_shiftHeld ? 0.25f : 1.f) * direction);
 }
 
-void PlayerController::On(const MouseMovedEvent& a_event) {
-	if (!m_enabled || !m_active) return;
+void FpsController::On(const MouseMovedEvent& a_event) {
+	if (!m_enabled || !m_active || m_locked) return;
 
 	auto* camera = GetEntity()->GetComponent<Camera>();
 	if (!camera || !camera->IsMode(CameraMode::FPS)) return;

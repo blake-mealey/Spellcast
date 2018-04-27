@@ -27,7 +27,7 @@ struct ComponentTypeIndex {
 		DIRECTION_LIGHT,
 		SPOT_LIGHT,
 		POINT_LIGHT,
-		PLAYER_CONTROLLER,
+		FPS_CONTROLLER,
 		COUNT
 	};
 };

@@ -163,7 +163,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KeyCode.cpp" />
     <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="PlayerController.cpp" />
+    <ClCompile Include="FpsController.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="ShadowCaster.cpp" />
     <ClCompile Include="ShadowMapShader.cpp" />
@@ -195,6 +195,7 @@
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="CopyShader.h" />
     <ClInclude Include="CubeMap.h" />
+    <ClInclude Include="CubeTerrain.h" />
     <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="ArrayTexture.h" />
@@ -208,7 +209,7 @@
     <ClInclude Include="MouseButtonEvent.h" />
     <ClInclude Include="MouseMovedEvent.h" />
     <ClInclude Include="MouseScrollEvent.h" />
-    <ClInclude Include="PlayerController.h" />
+    <ClInclude Include="FpsController.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="ShadowCaster.h" />
     <ClInclude Include="ShadowMapShader.h" />

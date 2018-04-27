@@ -12,7 +12,7 @@
 #include "DirectionLight.h"
 #include "SpotLight.h"
 #include "PointLight.h"
-#include "PlayerController.h"
+#include "FpsController.h"
 
 #include <fstream>
 
@@ -305,8 +305,8 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		case ComponentTypeIndex::POINT_LIGHT:
 			desc = new PointLightDesc(a_data);
 			break;
-		case ComponentTypeIndex::PLAYER_CONTROLLER:
-			desc = new PlayerControllerDesc(a_data);
+		case ComponentTypeIndex::FPS_CONTROLLER:
+			desc = new FpsControllerDesc(a_data);
 			break;
 		default: ;
 		}

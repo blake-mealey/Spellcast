@@ -39,11 +39,12 @@ int main() {
 	ContentManager::GetEntityDesc("PointLight.entity.json")->Create()->GetTransform().SetPosition(-Geometry::UP * 10.f);
 
 	EntityDesc* spotLightDesc = ContentManager::GetEntityDesc("SpotLight.entity.json");
-	constexpr int count = 6;
+	constexpr int count = 10;
+	constexpr float distance = 3.f;
 	for (int i = 0; i < count; ++i) {
 		Entity* spotLight = spotLightDesc->Create();
 		const float angle = float(i) / float(count) * G_2_PI;
-		const vec3 position = 3.f * vec3(cos(angle), 2.f, sin(angle));
+		const vec3 position = distance * vec3(cos(angle), 2.f / distance, sin(angle));
 		spotLight->GetTransform().SetPosition(position);
 	}
 

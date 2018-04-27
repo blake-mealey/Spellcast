@@ -32,6 +32,8 @@
     <None Include="Shaders\blur.frag" />
     <None Include="Shaders\copy.frag" />
     <None Include="Shaders\copy.vert" />
+    <None Include="Shaders\cubes.frag" />
+    <None Include="Shaders\cubes.vert" />
     <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Shaders\lighting.frag" />
     <None Include="Shaders\lighting.vert" />

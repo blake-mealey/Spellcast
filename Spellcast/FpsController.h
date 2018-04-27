@@ -7,27 +7,27 @@
 
 #include <json/json.hpp>
 
-class PlayerControllerDesc : public ComponentDesc {
+class FpsControllerDesc : public ComponentDesc {
 public:
-	PlayerControllerDesc();
-	explicit PlayerControllerDesc(nlohmann::json& a_data);
+	FpsControllerDesc();
+	explicit FpsControllerDesc(nlohmann::json& a_data);
 	void Create(Entity* a_entity) override;
 
 	float m_moveSpeed;
 	float m_cameraSpeed;
 };
 
-class PlayerController : public Component,
+class FpsController : public Component,
                          public Listener<KeyboardEvent>,
                          public Listener<MouseMovedEvent> {
-friend SlotMap<PlayerController>;
+friend SlotMap<FpsController>;
 public:
-	~PlayerController() override = default;
-	PlayerController();
+	~FpsController() override = default;
+	FpsController();
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const PlayerControllerDesc* a_desc);
+	bool Init(const FpsControllerDesc* a_desc);
 
 	void On(const KeyboardEvent& a_event) override;
 	void On(const MouseMovedEvent& a_event) override;
@@ -35,4 +35,6 @@ public:
 private:
 	float m_moveSpeed;
 	float m_cameraSpeed;
+
+	bool m_locked;
 };
