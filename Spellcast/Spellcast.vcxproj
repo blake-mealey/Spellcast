@@ -168,6 +168,7 @@
     <ClCompile Include="ShadowCaster.cpp" />
     <ClCompile Include="ShadowMapShader.cpp" />
     <ClCompile Include="ShadowShader.cpp" />
+    <ClCompile Include="SimState.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="SkyboxRenderer.cpp" />
     <ClCompile Include="SkyboxShader.cpp" />
@@ -183,7 +184,6 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="System.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -213,6 +213,7 @@
     <ClInclude Include="ShadowCaster.h" />
     <ClInclude Include="ShadowMapShader.h" />
     <ClInclude Include="ShadowShader.h" />
+    <ClInclude Include="SimState.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="SkyboxRenderer.h" />
     <ClInclude Include="SkyboxShader.h" />

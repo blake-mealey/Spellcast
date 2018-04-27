@@ -15,13 +15,14 @@
 using namespace glm;
 using namespace nlohmann;
 
-const std::string CameraMode::NAMES[COUNT] = { "Target", "Forward" };
+const std::string CameraMode::NAMES[COUNT] = { "Target", "Sphere", "FPS" };
 
 CameraDesc::CameraDesc(): m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
                           m_farClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
                           m_upVector(Geometry::UP), m_fieldOfView(radians(DEFAULT_FIELD_OF_VIEW)),
                           m_localPosition(-Geometry::FORWARD),
-                          m_viewportUnitScale(vec2(1.f)), m_mode(CameraMode::TARGET) {}
+                          m_viewportUnitScale(vec2(1.f)), m_horizontalAngle(G_PI), m_verticalAngle(0.f),
+                          m_mode(CameraMode::FPS) {}
 
 CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 	m_nearClippingPlane = ContentManager::FromJson(a_data, "NearClippingPlane", m_nearClippingPlane);
@@ -39,7 +40,10 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 	m_viewportPixelScale = ContentManager::VecFromJson(a_data, "ViewportPixelScale", m_viewportPixelScale);
 	m_viewportPixelPosition = ContentManager::VecFromJson(a_data, "ViewportPixelPosition", m_viewportPixelPosition);
 
-	m_mode = ContentManager::EnumFromJson<CameraMode>(a_data, "Mode", CameraMode::TARGET);
+	m_horizontalAngle = ContentManager::FromJson(a_data, "HorizontalAngle", m_horizontalAngle);
+	m_verticalAngle = ContentManager::FromJson(a_data, "VerticalAngle", m_verticalAngle);
+
+	m_mode = ContentManager::EnumFromJson<CameraMode>(a_data, "Mode", m_mode);
 }
 
 void CameraDesc::Create(Entity* a_entity) {
@@ -47,6 +51,8 @@ void CameraDesc::Create(Entity* a_entity) {
 	camera->Init(*this);
 	a_entity->AddComponent(camera);
 }
+
+
 
 
 Camera::~Camera() {
@@ -60,7 +66,7 @@ Camera::Camera() : m_depthStencilBuffer(0), m_screenBuffer(0), m_glowBuffer(0), 
                    m_blurTextures{}, m_blurTempTextures{},
                    m_nearClippingPlane(0.f),
                    m_farClippingPlane(0.f),
-                   m_fieldOfView(0.f), m_mode(0) {};
+                   m_fieldOfView(0.f), m_horizontalAngle(0), m_verticalAngle(0), m_mode(0) {};
 
 component_type Camera::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -96,6 +102,9 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	
 	m_viewportPixelScale = a_desc.m_viewportPixelScale;
 	m_viewportPixelPosition = a_desc.m_viewportPixelPosition;
+
+	m_horizontalAngle = a_desc.m_horizontalAngle;
+	m_verticalAngle = a_desc.m_verticalAngle;
 
 	m_mode = a_desc.m_mode;
 
@@ -226,9 +235,7 @@ void Camera::Render(const Graphics& a_context) {
 	const float aspectRatio = m_viewportScale.x / m_viewportScale.y;
 
 	// Compute view and projection matrices
-	const vec3 position = GetGlobalPosition();
-	const vec3 target = (m_mode == CameraMode::FORWARD) ? position + Geometry::FORWARD : m_targetGlobalPosition;
-	const mat4 viewMatrix = lookAt(position, target, m_upVector);
+	const mat4 viewMatrix = lookAt(GetGlobalPosition(), GetGlobalTarget(), m_upVector);
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
 	const mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
 
@@ -335,10 +342,64 @@ vec3 Camera::GetGlobalPosition() const {
 	return GetEntity()->GetTransform().GetGlobalPosition() + m_localPosition;
 }
 
+vec3 Camera::GetGlobalTarget() const {
+	switch (m_mode) {
+	case CameraMode::SPHERE:
+	case CameraMode::FPS:
+		return GetGlobalPosition() + vec3(
+			cos(m_verticalAngle) * sin(m_horizontalAngle),
+			sin(m_verticalAngle),
+			cos(m_verticalAngle) * cos(m_horizontalAngle)
+		);
+	case CameraMode::TARGET:
+	default:
+		return m_targetGlobalPosition;
+	}
+}
+
+vec3 Camera::GetGlobalForward() const {
+	return normalize(GetGlobalTarget() - GetGlobalPosition());
+}
+
+vec3 Camera::GetGlobalRight() const {
+	switch (m_mode) {
+	case CameraMode::SPHERE:
+	case CameraMode::FPS:
+		return vec3(
+			sin(m_horizontalAngle - G_PI_2),
+			0.f,
+			cos(m_horizontalAngle - G_PI_2)
+		);
+	case CameraMode::TARGET:
+	default:
+		return cross(GetGlobalForward(), m_upVector);
+	}
+}
+
+vec3 Camera::GetGlobalUp() const {
+	switch (m_mode) {
+	case CameraMode::SPHERE:
+	case CameraMode::FPS:
+		return cross(GetGlobalRight(), GetGlobalForward());
+	case CameraMode::TARGET:
+	default:
+		return m_upVector;
+	}
+}
+
 void Camera::SetViewportUnitScale(const vec2& a_scale) {
 	m_viewportUnitScale = a_scale;
 }
 
 void Camera::SetViewportUnitPosition(const vec2& a_position) {
 	m_viewportUnitPosition = a_position;
+}
+
+void Camera::TranslateAngles(const vec2& a_offset) {
+	m_horizontalAngle += a_offset.x;
+	m_verticalAngle = clamp(m_verticalAngle + a_offset.y, -float(G_PI_2) + radians(5.f), float(G_PI_2) - radians(5.f));
+}
+
+bool Camera::IsMode(const int a_mode) const {
+	return m_mode == a_mode;
 }

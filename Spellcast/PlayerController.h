@@ -13,7 +13,8 @@ public:
 	explicit PlayerControllerDesc(nlohmann::json& a_data);
 	void Create(Entity* a_entity) override;
 
-	float m_speed;
+	float m_moveSpeed;
+	float m_cameraSpeed;
 };
 
 class PlayerController : public Component,
@@ -32,5 +33,6 @@ public:
 	void On(const MouseMovedEvent& a_event) override;
 
 private:
-	float m_speed;
+	float m_moveSpeed;
+	float m_cameraSpeed;
 };

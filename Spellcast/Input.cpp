@@ -11,8 +11,9 @@
 #include <algorithm>
 
 using namespace std;
+using namespace glm;
 
-Input::Input() = default;
+Input::Input(): m_keyDown{} {}
 Input::~Input() = default;
 
 Input& Input::Instance() {
@@ -33,7 +34,7 @@ bool Input::Init() {
 	return true;
 }
 
-void Input::Update(const Time& a_deltaTime, const Time& a_globalTime) {
+void Input::Update() {
 	glfwPollEvents();
 
 	const bool shift = m_keyDown[KEY(LEFT_SHIFT)] || m_keyDown[KEY(RIGHT_SHIFT)];
@@ -42,6 +43,7 @@ void Input::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	const bool super = m_keyDown[KEY(LEFT_SUPER)] || m_keyDown[KEY(RIGHT_SUPER)];
 
 	for (key_code key : KeyCode::KEYS) {
+		if (IS_KEY(key, UNKNOWN)) continue;
 		if (m_keyDown[key]) {
 			EventManager<KeyboardEvent>::Fire({
 				key,
@@ -55,6 +57,11 @@ void Input::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 			});
 		}
 	}
+}
+
+void Input::ResetMouse() {
+	m_mousePosition = Graphics::Instance().GetWindowCentre();
+	glfwSetCursorPos(Graphics::Instance().GetWindow(), m_mousePosition.x, m_mousePosition.y);
 }
 
 void Input::KeyCallback(GLFWwindow* a_window, int a_key, int a_scanCode, int a_action, int a_mods) {
@@ -92,5 +99,11 @@ void Input::ScrollCallback(GLFWwindow* a_window, double a_xOffset, double a_yOff
 }
 
 void Input::CursorPosCallback(GLFWwindow* a_window, double a_xPos, double a_yPos) {
-	EventManager<MouseMovedEvent>::Fire({ {a_xPos, a_yPos} });
+	const vec2 position = vec2(a_xPos, a_yPos);
+	EventManager<MouseMovedEvent>::Fire({
+		position,
+		position - Instance().m_mousePosition,
+		position - Graphics::Instance().GetWindowCentre()
+	});
+	Instance().m_mousePosition = position;
 }

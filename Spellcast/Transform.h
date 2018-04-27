@@ -39,6 +39,7 @@ public:
 	void SetRotation(const glm::vec3& a_axis, const float& a_radians);
 
 	void Translate(const glm::vec3& a_offset);
+	void TranslateLocal(const glm::vec3& a_offset);
 	void Scale(const float& a_scale);
 	void Scale(const glm::vec3& a_scale);
 	void Rotate(const glm::quat& a_rotation);

@@ -17,7 +17,7 @@ bool Simulation::Init() {
 	return true;
 }
 
-void Simulation::Update(const Time& a_deltaTime, const Time& a_globalTime) {
+void Simulation::Update() {
 	// Rotate entities... for reasons
 	// for (auto it = World::BeginEntities(); it != World::EndEntities(); ++it) {
 		// it->GetTransform().Rotate(Geometry::UP, 0.01f);
@@ -27,7 +27,7 @@ void Simulation::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 	// constexpr float speed = 0.3f;
 	// for (auto it = World::BeginComponents<Camera>(); it != World::EndComponents<Camera>(); ++it) {
 		// it->SetGlobalPosition(distance * vec3(
-			// cos(a_globalTime.GetSeconds()*speed), 0.1f, sin(a_globalTime.GetSeconds()*speed)));
+			// cos(SimState::Global().GetSeconds()*speed), 0.1f, sin(SimState::Global().GetSeconds()*speed)));
 	// }
 }
 
@@ -46,5 +46,5 @@ void Simulation::On(const MouseScrollEvent& a_event) {
 }
 
 void Simulation::On(const MouseMovedEvent& a_event) {
-	Logger::Console()->info("Mouse Position Event: {}", to_string(a_event.m_position));
+	// Logger::Console()->info("Mouse Position Event: {}", to_string(a_event.m_delta));
 }

@@ -2,8 +2,7 @@
   "Position": [ 0, 0, -5 ],
   "Components": [
     {
-      "Type": "Camera",
-      "Mode": "Forward"
+      "Type": "Camera"
     },
     {
       "Type": "PlayerController"

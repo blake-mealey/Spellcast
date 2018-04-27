@@ -1,14 +1,18 @@
 #include "PlayerController.h"
 #include "Geometry.h"
 #include "ContentManager.h"
+#include "Input.h"
+#include "Camera.h"
+#include "SimState.h"
 
 using namespace glm;
 using namespace nlohmann;
 
-PlayerControllerDesc::PlayerControllerDesc(): m_speed(0) {}
+PlayerControllerDesc::PlayerControllerDesc(): m_moveSpeed(0.5f), m_cameraSpeed(0.2f) {}
 
-PlayerControllerDesc::PlayerControllerDesc(json& a_data) {
-	m_speed = ContentManager::FromJson(a_data, "Speed", 0.5f);
+PlayerControllerDesc::PlayerControllerDesc(json& a_data) : PlayerControllerDesc() {
+	m_moveSpeed = ContentManager::FromJson(a_data, "MoveSpeed", m_moveSpeed);
+	m_cameraSpeed = ContentManager::FromJson(a_data, "CameraSpeed", m_cameraSpeed);
 }
 
 void PlayerControllerDesc::Create(Entity* a_entity) {
@@ -21,7 +25,7 @@ void PlayerControllerDesc::Create(Entity* a_entity) {
 
 
 
-PlayerController::PlayerController(): m_speed(0) {}
+PlayerController::PlayerController(): m_moveSpeed(0), m_cameraSpeed(0) {}
 
 component_type PlayerController::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -32,7 +36,8 @@ component_index PlayerController::GetTypeIndex() {
 }
 
 bool PlayerController::Init(const PlayerControllerDesc* a_desc) {
-	m_speed = a_desc->m_speed;
+	m_moveSpeed = a_desc->m_moveSpeed;
+	m_cameraSpeed = a_desc->m_cameraSpeed;
 
 	return true;
 }
@@ -41,31 +46,37 @@ void PlayerController::On(const KeyboardEvent& a_event) {
 	if (!m_enabled || !m_active) return;
 	if (a_event.m_ended) return;
 
+	auto* camera = GetEntity()->GetComponent<Camera>();
+	if (!camera || !camera->IsMode(CameraMode::FPS)) return;
+
 	vec3 direction;
 	if (IS_KEY(a_event.m_key, W)) {
-		direction = Geometry::FORWARD;
+		direction = camera->GetGlobalForward();
 	} else if (IS_KEY(a_event.m_key, S)) {
-		direction = -Geometry::FORWARD;
+		direction = -camera->GetGlobalForward();
 	} else if (IS_KEY(a_event.m_key, D)) {
-		direction = Geometry::RIGHT;
+		direction = camera->GetGlobalRight();
 	} else if (IS_KEY(a_event.m_key, A)) {
-		direction = -Geometry::RIGHT;
+		direction = -camera->GetGlobalRight();
 	} else if (IS_KEY(a_event.m_key, E)) {
-		direction = Geometry::UP;
+		direction = camera->GetGlobalUp();
 	} else if (IS_KEY(a_event.m_key, Q)) {
-		direction = -Geometry::UP;
+		direction = -camera->GetGlobalUp();
+	} else {
+		return;
 	}
 
-	if (length(direction) == 0.f) return;
 	Transform& transform = GetEntity()->GetTransform();
-	transform.Translate(normalize(direction) * m_speed);
+	transform.Translate(m_moveSpeed * direction);
 }
 
 void PlayerController::On(const MouseMovedEvent& a_event) {
-	
+	if (!m_enabled || !m_active) return;
+
+	auto* camera = GetEntity()->GetComponent<Camera>();
+	if (!camera || !camera->IsMode(CameraMode::FPS)) return;
+
+	camera->TranslateAngles(m_cameraSpeed * SimState::Delta().GetSeconds() * a_event.m_fromCenter * -1.f);
+
+	Input::Instance().ResetMouse();
 }
-
-
-
-
-

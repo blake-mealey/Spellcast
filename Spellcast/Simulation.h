@@ -21,7 +21,7 @@ public:
 	static Simulation& Instance();
 
 	bool Init();
-	void Update(const Time& a_deltaTime, const Time& a_globalTime) override;
+	void Update() override;
 
 	void On(const KeyboardEvent& a_event) override;
 	void On(const MouseButtonEvent& a_event) override;

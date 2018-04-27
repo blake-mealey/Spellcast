@@ -12,6 +12,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include "SimState.h"
 
 using namespace std;
 using namespace glm;
@@ -115,7 +116,7 @@ bool Graphics::Init(const string& a_windowTitle) {
 	return true;
 }
 
-void Graphics::Update(const Time& a_deltaTime, const Time& a_globalTime) {
+void Graphics::Update() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render shadow maps
@@ -134,7 +135,7 @@ void Graphics::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 		it->Render(Instance());
 	}
 
-	RenderDevTools(a_globalTime);
+	RenderDevTools();
 
 	glfwSwapBuffers(m_window);
 }
@@ -151,6 +152,10 @@ const vec2& Graphics::GetWindowDims() const {
 	return m_windowDims;
 }
 
+vec2 Graphics::GetWindowCentre() const {
+	return m_windowDims * 0.5f;
+}
+
 GLFWwindow* Graphics::GetWindow() const {
 	return m_window;
 }
@@ -161,17 +166,17 @@ void Graphics::On(const KeyboardEvent& a_event) {
 	}
 }
 
-void Graphics::RenderDevTools(const Time& a_globalTime) {
+void Graphics::RenderDevTools() {
 	ImGui_ImplGlfwGL3_NewFrame();
 
 	if (m_devToolsEnabled) {
 		ImGui::Begin("Dev Tools", &m_devToolsEnabled);
 
 		m_frameCount++;
-		if (a_globalTime - m_lastTime >= 1.0) {
+		if (SimState::Global() - m_lastTime >= 1.0) {
 			m_framesPerSecond = double(m_frameCount);
 			m_frameCount = 0;
-			m_lastTime = a_globalTime;
+			m_lastTime = SimState::Global();
 		}
 
 		ImGui::LabelText("FPS", "%.0f", m_framesPerSecond);

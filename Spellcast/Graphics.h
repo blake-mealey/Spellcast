@@ -3,6 +3,7 @@
 #include "System.h"
 #include "KeyboardEvent.h"
 #include "Listener.h"
+#include "Time.h"
 
 #include <glm/glm.hpp>
 
@@ -24,18 +25,19 @@ public:
 	static void WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_height);
 
 	bool Init(const std::string& a_windowTitle);
-	void Update(const Time& a_deltaTime, const Time& a_globalTime) override;
+	void Update() override;
 
 	bool WindowClosed() const;
 	static Time GetGlobalTime();
 
 	const glm::vec2& GetWindowDims() const;
+	glm::vec2 GetWindowCentre() const;
 	GLFWwindow* GetWindow() const;
 
 	void On(const KeyboardEvent& a_event) override;
 
 private:
-	void RenderDevTools(const Time& a_globalTime);
+	void RenderDevTools();
 
 	void SetWindowDims(const glm::vec2& a_windowDims);
 

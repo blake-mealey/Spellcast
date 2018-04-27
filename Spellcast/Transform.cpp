@@ -118,6 +118,10 @@ void Transform::Translate(const vec3& a_offset) {
 	SetPosition(m_position + a_offset);
 }
 
+void Transform::TranslateLocal(const vec3& a_offset) {
+	SetPosition(m_position + GetLocalDirection(a_offset));
+}
+
 void Transform::Scale(const float& a_scale) {
 	SetScale(m_scale * a_scale);
 }

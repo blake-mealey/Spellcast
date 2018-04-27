@@ -3,6 +3,8 @@
 #include "System.h"
 #include "KeyCode.h"
 
+#include <glm/glm.hpp>
+
 struct GLFWwindow;
 
 class Input : public System {
@@ -15,7 +17,9 @@ public:
 	static Input& Instance();
 
 	bool Init();
-	void Update(const Time& a_deltaTime, const Time& a_globalTime) override;
+	void Update() override;
+
+	void ResetMouse();
 
 	static void KeyCallback(GLFWwindow* a_window, int a_key, int a_scanCode, int a_action, int a_mods);
 	static void MouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
@@ -23,5 +27,6 @@ public:
 	static void CursorPosCallback(GLFWwindow* a_window, double a_xPos, double a_yPos);
 
 private:
+	glm::vec2 m_mousePosition;
 	bool m_keyDown[KEY_LAST];
 };

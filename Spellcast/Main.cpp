@@ -4,6 +4,7 @@
 #include "ContentManager.h"
 
 #include <glm/glm.hpp>
+#include "SimState.h"
 
 using namespace glm;
 using namespace std;
@@ -37,15 +38,12 @@ int main() {
 	auto pointLight = ContentManager::GetEntityDesc("PointLight.entity.json")->Create();
 
 	// Simulation loop
-	Time globalTime;
 	while (!graphics.WindowClosed()) {
 		// Update time
-		const Time lastTime = globalTime;
-		globalTime = Graphics::GetGlobalTime();
-		const Time deltaTime = globalTime - lastTime;
+		SimState::Update();
 
 		// Update systems
-		for (System* system : systems) system->Update(deltaTime, globalTime);
+		for (System* system : systems) system->Update();
 
 		// TODO: Remove
 		spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);

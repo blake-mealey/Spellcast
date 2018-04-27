@@ -22,7 +22,7 @@ class Graphics;
 class Camera;
 
 struct CameraMode {
-	enum { TARGET, FORWARD, COUNT };
+	enum { TARGET = 0, SPHERE, FPS, COUNT };
 	static const std::string NAMES[COUNT];
 };
 
@@ -46,6 +46,9 @@ struct CameraDesc : ComponentDesc {
 	glm::vec2 m_viewportPixelScale;
 	glm::vec2 m_viewportPixelPosition;
 
+	float m_horizontalAngle;
+	float m_verticalAngle;
+
 	int m_mode;
 };
 
@@ -63,9 +66,18 @@ public:
 
 	void SetLocalPosition(const glm::vec3& a_position);
 	glm::vec3 GetGlobalPosition() const;
+	
+	glm::vec3 GetGlobalTarget() const;
+	glm::vec3 GetGlobalForward() const;
+	glm::vec3 GetGlobalRight() const;
+	glm::vec3 GetGlobalUp() const;
 
 	void SetViewportUnitScale(const glm::vec2& a_scale);
 	void SetViewportUnitPosition(const glm::vec2& a_position);
+	
+	void TranslateAngles(const glm::vec2& a_offset);
+	
+	bool IsMode(int a_mode) const;
 
 private:
 	CopyShader m_copyShader;
@@ -106,6 +118,9 @@ private:
 
 	glm::vec2 m_viewportScale;
 	glm::vec2 m_viewportPosition;
+
+	float m_horizontalAngle;
+	float m_verticalAngle;
 
 	int m_mode;
 };
