@@ -62,6 +62,9 @@ void PlayerController::On(const KeyboardEvent& a_event) {
 		direction = camera->GetGlobalUp();
 	} else if (IS_KEY(a_event.m_key, Q)) {
 		direction = -camera->GetGlobalUp();
+	} else if (IS_KEY(a_event.m_key, ESCAPE)) {
+		SetEnabled(false);
+		return;
 	} else {
 		return;
 	}

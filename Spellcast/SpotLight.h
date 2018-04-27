@@ -48,6 +48,7 @@ public:
 
 	const glm::vec3& GetDirection() const;
 	glm::vec3 GetGlobalDirection() const;
+	void SetDirection(glm::vec3 a_direction);
 
 	float GetAngleDegrees() const;
 	float GetAngleRadians() const;

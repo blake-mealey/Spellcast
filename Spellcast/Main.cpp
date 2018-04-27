@@ -5,6 +5,8 @@
 
 #include <glm/glm.hpp>
 #include "SimState.h"
+#include "Geometry.h"
+#include "SpotLight.h"
 
 using namespace glm;
 using namespace std;
@@ -29,24 +31,43 @@ int main() {
 	ContentManager::GetEntityDesc("Player.entity.json")->Create()->GetTransform().Translate({});
 	
 	ContentManager::GetEntityDesc("Floor.entity.json")->Create();
-	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate({0.f, -1.f, 0.f});
-	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate({0.f, 1.f, 0.f});
+	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(-Geometry::UP);
+	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(Geometry::UP);
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Scale(0.5f);
 
 	ContentManager::GetEntityDesc("Sun.entity.json")->Create();
-	auto spotLight = ContentManager::GetEntityDesc("SpotLight.entity.json")->Create();
-	auto pointLight = ContentManager::GetEntityDesc("PointLight.entity.json")->Create();
+	ContentManager::GetEntityDesc("PointLight.entity.json")->Create()->GetTransform().SetPosition(-Geometry::UP * 10.f);
+
+	EntityDesc* spotLightDesc = ContentManager::GetEntityDesc("SpotLight.entity.json");
+	constexpr int count = 6;
+	for (int i = 0; i < count; ++i) {
+		Entity* spotLight = spotLightDesc->Create();
+		const float angle = float(i) / float(count) * G_2_PI;
+		const vec3 position = 3.f * vec3(cos(angle), 2.f, sin(angle));
+		spotLight->GetTransform().SetPosition(position);
+	}
+
 
 	// Simulation loop
 	while (!graphics.WindowClosed()) {
 		// Update time
 		SimState::Update();
 
+		// TODO: Remove/move
+		for (auto it = World::BeginComponents<SpotLight>(); it != World::EndComponents<SpotLight>(); ++it) {
+			Transform& transform = it->GetEntity()->GetTransform();
+			const vec3 position = {
+				transform.GetLocalPosition().x,
+				(2.f + sin(SimState::Global().GetSeconds())),
+				transform.GetLocalPosition().z
+			};
+			transform.SetPosition(position);
+			it->SetDirection(-position);
+			transform.Rotate(Geometry::UP, 0.02f);
+		}
+
 		// Update systems
 		for (System* system : systems) system->Update();
-
-		// TODO: Remove
-		spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);
 	}
 
 	// Exit normally

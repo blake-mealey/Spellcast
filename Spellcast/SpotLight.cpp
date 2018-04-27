@@ -45,7 +45,7 @@ bool SpotLight::Init(const SpotLightDesc* a_desc) {
 	m_color = a_desc->m_color;
 	m_power = a_desc->m_power;
 	m_transform = a_desc->m_transform;
-	m_direction = a_desc->m_direction;
+	m_direction = normalize(a_desc->m_direction);
 	m_angleDegrees = a_desc->m_angleDegrees;
 
 	m_shadowIntensity = a_desc->m_shadowIntensity;
@@ -100,6 +100,10 @@ const vec3& SpotLight::GetDirection() const {
 
 vec3 SpotLight::GetGlobalDirection() const {
 	return m_transform.GetGlobalDirection(m_direction);
+}
+
+void SpotLight::SetDirection(const vec3 a_direction) {
+	m_direction = normalize(a_direction);
 }
 
 float SpotLight::GetAngleDegrees() const {

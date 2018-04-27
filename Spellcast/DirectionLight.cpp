@@ -79,6 +79,6 @@ const vec3& DirectionLight::GetDirection() const {
 	return m_direction;
 }
 
-void DirectionLight::SetDirection(const glm::vec3& a_direction) {
+void DirectionLight::SetDirection(const vec3& a_direction) {
 	m_direction = normalize(a_direction);
 }
