@@ -15,11 +15,13 @@
 using namespace glm;
 using namespace nlohmann;
 
+const std::string CameraMode::NAMES[COUNT] = { "Target", "Forward" };
+
 CameraDesc::CameraDesc(): m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
                           m_farClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
                           m_upVector(Geometry::UP), m_fieldOfView(radians(DEFAULT_FIELD_OF_VIEW)),
-                          m_globalPosition(-Geometry::FORWARD),
-                          m_viewportUnitScale(vec2(1.f)) {}
+                          m_localPosition(-Geometry::FORWARD),
+                          m_viewportUnitScale(vec2(1.f)), m_mode(CameraMode::TARGET) {}
 
 CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 	m_nearClippingPlane = ContentManager::FromJson(a_data, "NearClippingPlane", m_nearClippingPlane);
@@ -28,7 +30,7 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 	m_upVector = ContentManager::VecFromJson(a_data, "UpVector", m_upVector);
 	m_fieldOfView = radians(ContentManager::FromJson(a_data, "FieldOfView", DEFAULT_FIELD_OF_VIEW));
 
-	m_globalPosition = ContentManager::VecFromJson(a_data, "Position", m_globalPosition);
+	m_localPosition = ContentManager::VecFromJson(a_data, "Position", m_localPosition);
 	m_targetGlobalPosition = ContentManager::VecFromJson(a_data, "Target", m_targetGlobalPosition);
 
 	m_viewportUnitScale = ContentManager::VecFromJson(a_data, "ViewportUnitScale", m_viewportUnitScale);
@@ -36,6 +38,8 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 
 	m_viewportPixelScale = ContentManager::VecFromJson(a_data, "ViewportPixelScale", m_viewportPixelScale);
 	m_viewportPixelPosition = ContentManager::VecFromJson(a_data, "ViewportPixelPosition", m_viewportPixelPosition);
+
+	m_mode = ContentManager::EnumFromJson<CameraMode>(a_data, "Mode", CameraMode::TARGET);
 }
 
 void CameraDesc::Create(Entity* a_entity) {
@@ -56,7 +60,7 @@ Camera::Camera() : m_depthStencilBuffer(0), m_screenBuffer(0), m_glowBuffer(0), 
                    m_blurTextures{}, m_blurTempTextures{},
                    m_nearClippingPlane(0.f),
                    m_farClippingPlane(0.f),
-                   m_fieldOfView(0.f) {};
+                   m_fieldOfView(0.f), m_mode(0) {};
 
 component_type Camera::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -84,7 +88,7 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	m_upVector = a_desc.m_upVector;
 	m_fieldOfView = a_desc.m_fieldOfView;
 
-	m_globalPosition = a_desc.m_globalPosition;
+	m_localPosition = a_desc.m_localPosition;
 	m_targetGlobalPosition = a_desc.m_targetGlobalPosition;
 
 	m_viewportUnitScale = a_desc.m_viewportUnitScale;
@@ -92,6 +96,8 @@ bool Camera::Init(const CameraDesc& a_desc) {
 	
 	m_viewportPixelScale = a_desc.m_viewportPixelScale;
 	m_viewportPixelPosition = a_desc.m_viewportPixelPosition;
+
+	m_mode = a_desc.m_mode;
 
 	return true;
 }
@@ -190,7 +196,6 @@ void Camera::Render(const Graphics& a_context) {
 
 	// Compute current viewport
 	const vec2& windowDims = a_context.GetWindowDims();
-	const vec2 lastViewportPosition = m_viewportPosition;
 	const vec2 lastViewportScale = m_viewportScale;
 	m_viewportPosition = (windowDims * m_viewportUnitPosition) + m_viewportPixelPosition;
 	m_viewportScale = (windowDims * m_viewportUnitScale) + m_viewportPixelScale;
@@ -221,7 +226,9 @@ void Camera::Render(const Graphics& a_context) {
 	const float aspectRatio = m_viewportScale.x / m_viewportScale.y;
 
 	// Compute view and projection matrices
-	const mat4 viewMatrix = lookAt(m_globalPosition, m_targetGlobalPosition, m_upVector);
+	const vec3 position = GetGlobalPosition();
+	const vec3 target = (m_mode == CameraMode::FORWARD) ? position + Geometry::FORWARD : m_targetGlobalPosition;
+	const mat4 viewMatrix = lookAt(position, target, m_upVector);
 	const mat4 projectionMatrix = perspective(m_fieldOfView, aspectRatio, m_nearClippingPlane, m_farClippingPlane);
 	const mat4 viewProjectionMatrix = projectionMatrix * viewMatrix;
 
@@ -320,8 +327,12 @@ void Camera::Render(const Graphics& a_context) {
 	glDepthMask(GL_TRUE);
 }
 
-void Camera::SetGlobalPosition(const vec3& a_position) {
-	m_globalPosition = a_position;
+void Camera::SetLocalPosition(const vec3& a_position) {
+	m_localPosition = a_position;
+}
+
+vec3 Camera::GetGlobalPosition() const {
+	return GetEntity()->GetTransform().GetGlobalPosition() + m_localPosition;
 }
 
 void Camera::SetViewportUnitScale(const vec2& a_scale) {

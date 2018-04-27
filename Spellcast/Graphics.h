@@ -1,10 +1,10 @@
 #pragma once
 
 #include "System.h"
-
-#include <glm/glm.hpp>
 #include "KeyboardEvent.h"
 #include "Listener.h"
+
+#include <glm/glm.hpp>
 
 #define INITIAL_SCREEN_WIDTH 1024
 #define INITIAL_SCREEN_HEIGHT 768

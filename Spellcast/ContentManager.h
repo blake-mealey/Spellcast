@@ -53,6 +53,12 @@ public:
 	static void NoFileWarning(const char* a_fileType, const char* a_filePath);
 
 	template <typename T>
+	static int EnumFromJson(nlohmann::json& a_data, const std::string& a_key, int a_default = 0);
+
+	template <typename T>
+	static int EnumFromJson(nlohmann::json& a_data, int a_default = 0);
+
+	template <typename T>
 	static T FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default = T());
 
 	template <typename T>
@@ -79,6 +85,23 @@ private:
 	static std::unordered_map<std::string, ComponentDesc*> s_componentDescs;
 	static std::unordered_map<std::string, EntityDesc*> s_entityDescs;
 };
+
+template <typename T>
+int ContentManager::EnumFromJson(nlohmann::json& a_data, const std::string& a_key, const int a_default) {
+	return EnumFromJson<T>(a_data[a_key], a_default);
+}
+
+template <typename T>
+int ContentManager::EnumFromJson(nlohmann::json& a_data, const int a_default) {
+	if (a_data.is_string()) {
+		const std::string name = a_data.get<std::string>();
+		for (int i = 0; i < T::COUNT; ++i) if (T::NAMES[i] == name) return i;
+	} else if (a_data.is_number_integer()) {
+		const int value = a_data.get<int>();
+		if (value >= 0 && value < T::COUNT) return value;
+	}	
+	return a_default;
+}
 
 template <typename T>
 T ContentManager::FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default) {

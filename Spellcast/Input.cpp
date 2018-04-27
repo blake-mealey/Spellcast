@@ -3,10 +3,10 @@
 #include "KeyboardEvent.h"
 #include "MouseButtonEvent.h"
 #include "EventManager.h"
-
-#include <GLFW/glfw3.h>
 #include "MouseScrollEvent.h"
 #include "MouseMovedEvent.h"
+
+#include <GLFW/glfw3.h>
 
 Input::Input() = default;
 Input::~Input() = default;

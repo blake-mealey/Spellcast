@@ -1,10 +1,11 @@
 #include "Component.h"
 
-Component::Component() : m_enabled(true), m_id(INVALID_COMPONENT), m_active(false) {}
+Component::Component() : m_enabled(true), m_id(INVALID_COMPONENT), m_active(false), m_entity(INVALID_ENTITY) {}
 
 Component::~Component() {
 	m_active = false;
 	m_enabled = true;
+	m_entity = INVALID_ENTITY;
 }
 
 component_type Component::GetId() const {
@@ -25,4 +26,8 @@ component_type Component::GetType() {
 
 component_index Component::GetTypeIndex() {
 	return ComponentTypeIndex::BASE_COMPONENT;
+}
+
+Entity* Component::GetEntity() const {
+	return World::GetEntity(m_entity);
 }

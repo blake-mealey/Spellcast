@@ -24,7 +24,8 @@ int main() {
 
 	// Create entities
 	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
-	ContentManager::GetEntityDesc("Camera.entity.json")->Create();
+	// ContentManager::GetEntityDesc("Camera.entity.json")->Create();
+	ContentManager::GetEntityDesc("Player.entity.json")->Create()->GetTransform().Translate({});
 	
 	ContentManager::GetEntityDesc("Floor.entity.json")->Create();
 	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate({0.f, -1.f, 0.f});

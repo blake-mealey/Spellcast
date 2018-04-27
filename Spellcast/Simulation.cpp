@@ -1,10 +1,7 @@
 #include "Simulation.h"
-#include "World.h"
-#include "Camera.h"
 #include "Logger.h"
 
 #include <glm/gtx/string_cast.hpp>
-#include <glm/glm.hpp>
 
 using namespace glm;
 
@@ -26,12 +23,12 @@ void Simulation::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 		// it->GetTransform().Rotate(Geometry::UP, 0.01f);
 	// }
 
-	constexpr float distance = 10.f;
-	constexpr float speed = 0.3f;
-	for (auto it = World::BeginComponents<Camera>(); it != World::EndComponents<Camera>(); ++it) {
-		it->SetGlobalPosition(distance * vec3(
-			cos(a_globalTime.GetSeconds()*speed), 0.1f, sin(a_globalTime.GetSeconds()*speed)));
-	}
+	// constexpr float distance = 10.f;
+	// constexpr float speed = 0.3f;
+	// for (auto it = World::BeginComponents<Camera>(); it != World::EndComponents<Camera>(); ++it) {
+		// it->SetGlobalPosition(distance * vec3(
+			// cos(a_globalTime.GetSeconds()*speed), 0.1f, sin(a_globalTime.GetSeconds()*speed)));
+	// }
 }
 
 void Simulation::On(const KeyboardEvent& a_event) {

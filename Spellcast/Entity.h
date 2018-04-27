@@ -56,6 +56,7 @@ private:
 
 template <class T>
 void Entity::AddComponent(T* a_component) {
+	a_component->m_entity = m_id;
 	m_components[ComponentTraits<T>::GetTypeIndex()].push_back(a_component->GetId());
 }
 

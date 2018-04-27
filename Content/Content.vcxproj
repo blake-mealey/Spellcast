@@ -24,6 +24,7 @@
     <None Include="Entities\Boulder_all.entity.json" />
     <None Include="Entities\Camera.entity.json" />
     <None Include="Entities\Floor.entity.json" />
+    <None Include="Entities\Player.entity.json" />
     <None Include="Entities\Skybox.entity.json" />
     <None Include="Entities\SpotLight.entity.json" />
     <None Include="Entities\Sun.entity.json" />

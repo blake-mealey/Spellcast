@@ -21,6 +21,11 @@ class Graphics;
 
 class Camera;
 
+struct CameraMode {
+	enum { TARGET, FORWARD, COUNT };
+	static const std::string NAMES[COUNT];
+};
+
 struct CameraDesc : ComponentDesc {
 	CameraDesc();
 	explicit CameraDesc(nlohmann::json& a_data);
@@ -32,7 +37,7 @@ struct CameraDesc : ComponentDesc {
 	glm::vec3 m_upVector;
 	float m_fieldOfView;
 
-	glm::vec3 m_globalPosition;
+	glm::vec3 m_localPosition;
 	glm::vec3 m_targetGlobalPosition;
 
 	glm::vec2 m_viewportUnitScale;
@@ -40,6 +45,8 @@ struct CameraDesc : ComponentDesc {
 	
 	glm::vec2 m_viewportPixelScale;
 	glm::vec2 m_viewportPixelPosition;
+
+	int m_mode;
 };
 
 class Camera : public Component {
@@ -54,7 +61,8 @@ public:
 
 	void Render(const Graphics& a_context);
 
-	void SetGlobalPosition(const glm::vec3& a_position);
+	void SetLocalPosition(const glm::vec3& a_position);
+	glm::vec3 GetGlobalPosition() const;
 
 	void SetViewportUnitScale(const glm::vec2& a_scale);
 	void SetViewportUnitPosition(const glm::vec2& a_position);
@@ -87,7 +95,7 @@ private:
 	glm::vec3 m_upVector;
 	float m_fieldOfView;
 
-	glm::vec3 m_globalPosition;
+	glm::vec3 m_localPosition;
 	glm::vec3 m_targetGlobalPosition;
 
 	glm::vec2 m_viewportUnitScale;
@@ -98,4 +106,6 @@ private:
 
 	glm::vec2 m_viewportScale;
 	glm::vec2 m_viewportPosition;
+
+	int m_mode;
 };

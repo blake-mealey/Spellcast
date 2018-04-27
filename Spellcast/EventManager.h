@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Listener.h"
-
 #include <array>
 #include <vector>
 

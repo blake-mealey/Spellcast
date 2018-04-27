@@ -14,6 +14,7 @@ public:
 
 class Component {
 friend SlotMap<Component>;
+friend Entity;
 public:
 	Component();
 	virtual ~Component();
@@ -25,9 +26,13 @@ public:
 
 	static component_type GetType();
 	static component_index GetTypeIndex();
+	
+	Entity* GetEntity() const;
 
 protected:
 	bool m_enabled;
 	component_id m_id;
 	bool m_active;
+
+	entity_id m_entity;
 };

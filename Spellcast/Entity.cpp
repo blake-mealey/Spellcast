@@ -1,5 +1,4 @@
 #include "Entity.h"
-#include <iostream>
 #include "ContentManager.h"
 #include "Logger.h"
 
@@ -36,7 +35,7 @@ Entity* EntityDesc::Create() {
 
 
 
-Entity::Entity() : m_active(false), m_id(INVALID_ENTITY), m_parent(INVALID_ENTITY), m_components({}) {}
+Entity::Entity() : m_active(false), m_id(INVALID_ENTITY), m_parent(INVALID_ENTITY) {}
 
 Entity::~Entity() {
 	m_active = false;

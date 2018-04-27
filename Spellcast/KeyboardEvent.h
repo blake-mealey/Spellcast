@@ -1,6 +1,6 @@
 #pragma once
 
-typedef int key_code;
+#include "KeyCode.h"
 
 struct KeyboardEvent {
 	key_code m_key;

@@ -36,6 +36,7 @@
     <None Include="Shaders\shadow.frag" />
     <None Include="Shaders\shadow.vert" />
     <None Include="Entities\SpotLight.entity.json" />
+    <None Include="Entities\Player.entity.json" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entities\PointLight.entity.json">

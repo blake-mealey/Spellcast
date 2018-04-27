@@ -3,7 +3,7 @@
 using namespace glm;
 
 const vec3 Geometry::FORWARD = vec3(0.f, 0.f, 1.f);
-const vec3 Geometry::RIGHT = vec3(1.f, 0.f, 0.f);
+const vec3 Geometry::RIGHT = vec3(-1.f, 0.f, 0.f);
 const vec3 Geometry::UP = vec3(0.f, 1.f, 0.f);
 
 vec3 Geometry::Project(const vec3& a_vectorA, const vec3& a_vectorB) {
