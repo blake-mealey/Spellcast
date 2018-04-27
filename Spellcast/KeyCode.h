@@ -3,6 +3,8 @@
 #define KEY(K) (KeyCode::KEYS[KeyCode::K])
 #define IS_KEY(v, K) (v == KEY(K))
 
+#define KEY_LAST 348
+
 typedef int key_index;
 typedef int key_code;
 

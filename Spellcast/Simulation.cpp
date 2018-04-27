@@ -33,7 +33,7 @@ void Simulation::Update(const Time& a_deltaTime, const Time& a_globalTime) {
 
 void Simulation::On(const KeyboardEvent& a_event) {
 	Logger::Console()->info("Keyboard Event: {} was {}",
-		a_event.m_key, a_event.m_pressed ? "Pressed" : a_event.m_released ? "Released" : "Repeated");
+		a_event.m_key, a_event.m_began ? "Pressed" : a_event.m_ended ? "Released" : "Held");
 }
 
 void Simulation::On(const MouseButtonEvent& a_event) {

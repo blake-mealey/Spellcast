@@ -156,7 +156,7 @@ GLFWwindow* Graphics::GetWindow() const {
 }
 
 void Graphics::On(const KeyboardEvent& a_event) {
-	if (IS_KEY(a_event.m_key, F4) && a_event.m_pressed) {
+	if (IS_KEY(a_event.m_key, F4) && a_event.m_began) {
 		glfwSetWindowShouldClose(m_window, 1);
 	}
 }

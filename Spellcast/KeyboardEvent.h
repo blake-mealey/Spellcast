@@ -5,9 +5,9 @@
 struct KeyboardEvent {
 	key_code m_key;
 
-	bool m_pressed;
-	bool m_released;
-	bool m_repeated;
+	bool m_began;
+	bool m_ended;
+	bool m_changed;
 
 	bool m_shiftHeld;
 	bool m_ctrlHeld;

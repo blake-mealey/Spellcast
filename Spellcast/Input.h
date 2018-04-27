@@ -1,6 +1,7 @@
 #pragma once
 
 #include "System.h"
+#include "KeyCode.h"
 
 struct GLFWwindow;
 
@@ -20,4 +21,7 @@ public:
 	static void MouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
 	static void ScrollCallback(GLFWwindow* a_window, double a_xOffset, double a_yOffset);
 	static void CursorPosCallback(GLFWwindow* a_window, double a_xPos, double a_yPos);
+
+private:
+	bool m_keyDown[KEY_LAST];
 };

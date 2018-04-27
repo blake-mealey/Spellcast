@@ -8,7 +8,7 @@ using namespace nlohmann;
 PlayerControllerDesc::PlayerControllerDesc(): m_speed(0) {}
 
 PlayerControllerDesc::PlayerControllerDesc(json& a_data) {
-	m_speed = ContentManager::FromJson(a_data, "Speed", 1.f);
+	m_speed = ContentManager::FromJson(a_data, "Speed", 0.5f);
 }
 
 void PlayerControllerDesc::Create(Entity* a_entity) {
@@ -39,7 +39,7 @@ bool PlayerController::Init(const PlayerControllerDesc* a_desc) {
 
 void PlayerController::On(const KeyboardEvent& a_event) {
 	if (!m_enabled || !m_active) return;
-	if (a_event.m_released) return;
+	if (a_event.m_ended) return;
 
 	vec3 direction;
 	if (IS_KEY(a_event.m_key, W)) {
