@@ -38,7 +38,7 @@ void Graphics::WindowSizeCallback(GLFWwindow* a_window, int a_width, int a_heigh
 	Instance().SetWindowDims(vec2(a_width, a_height));
 }
 
-bool Graphics::Initialize(const string& a_windowTitle) {
+bool Graphics::Init(const string& a_windowTitle) {
 	// Initialize GLFW
 	if (!glfwInit()) {
 		Logger::Console()->error("Could not initialize GLFW.");
@@ -65,9 +65,6 @@ bool Graphics::Initialize(const string& a_windowTitle) {
 	glfwGetFramebufferSize(m_window, &width, &height);
 	glfwSwapInterval(1);
 	m_windowDims = vec2(width, height);
-
-	// TODO: GLFW input callbacks
-	//glfwSetMouseButtonCallback()
 
 	// Window callbacks
 	glfwSetWindowSizeCallback(m_window, WindowSizeCallback);
@@ -108,7 +105,7 @@ bool Graphics::Initialize(const string& a_windowTitle) {
 	// Initialize ImGui
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	ImGui_ImplGlfwGL3_Init(m_window, true);
+	ImGui_ImplGlfwGL3_Init(m_window, false);
 	io.NavFlags |= ImGuiNavFlags_EnableGamepad | ImGuiNavFlags_EnableKeyboard;
 	ImGui::StyleColorsDark();
 
@@ -119,8 +116,6 @@ bool Graphics::Initialize(const string& a_windowTitle) {
 }
 
 void Graphics::Update(const Time& a_deltaTime, const Time& a_globalTime) {
-	glfwPollEvents();
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render shadow maps
@@ -154,6 +149,16 @@ Time Graphics::GetGlobalTime() {
 
 const vec2& Graphics::GetWindowDims() const {
 	return m_windowDims;
+}
+
+GLFWwindow* Graphics::GetWindow() const {
+	return m_window;
+}
+
+void Graphics::On(const KeyboardEvent& a_event) {
+	if (a_event.m_key == GLFW_KEY_F4 && a_event.m_pressed) {
+		glfwSetWindowShouldClose(m_window, 1);
+	}
 }
 
 void Graphics::RenderDevTools(const Time& a_globalTime) {

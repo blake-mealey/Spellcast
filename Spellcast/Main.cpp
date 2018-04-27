@@ -1,6 +1,7 @@
 #include "Graphics.h"
-#include "ContentManager.h"
+#include "Input.h"
 #include "Simulation.h"
+#include "ContentManager.h"
 
 #include <glm/glm.hpp>
 
@@ -8,12 +9,20 @@ using namespace glm;
 using namespace std;
 
 int main() {
+	// Initialize systems
 	Graphics& graphics = Graphics::Instance();
-	if (!graphics.Initialize("Spellcast")) exit(-1);
+	if (!graphics.Init("Spellcast")) exit(-1);
+
+	Input& input = Input::Instance();
+	if (!input.Init()) exit(-1);
 
 	Simulation& simulation = Simulation::Instance();
-	if (!simulation.Initialize()) exit(-1);;
+	if (!simulation.Init()) exit(-1);
 
+	// Order of execution
+	vector<System*> systems = { &input, &simulation, &graphics };
+
+	// Create entities
 	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
 	ContentManager::GetEntityDesc("Camera.entity.json")->Create();
 	
@@ -26,17 +35,21 @@ int main() {
 	auto spotLight = ContentManager::GetEntityDesc("SpotLight.entity.json")->Create();
 	auto pointLight = ContentManager::GetEntityDesc("PointLight.entity.json")->Create();
 
+	// Simulation loop
 	Time globalTime;
 	while (!graphics.WindowClosed()) {
+		// Update time
 		const Time lastTime = globalTime;
 		globalTime = Graphics::GetGlobalTime();
 		const Time deltaTime = globalTime - lastTime;
-		
-		simulation.Update(deltaTime, globalTime);
-		graphics.Update(deltaTime, globalTime);
 
+		// Update systems
+		for (System* system : systems) system->Update(deltaTime, globalTime);
+
+		// TODO: Remove
 		spotLight->GetTransform().Rotate(vec3(0.f, 1.f, 0.f), 0.01f);
 	}
 
+	// Exit normally
 	return 0;
 }

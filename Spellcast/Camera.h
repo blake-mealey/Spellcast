@@ -8,7 +8,6 @@
 #include <json/json.hpp>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
-#include "ShadowShader.h"
 
 class Entity;
 
