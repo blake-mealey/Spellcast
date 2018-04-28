@@ -11,6 +11,7 @@
 #include "SpotLight.h"
 
 #include <glm/gtc/matrix_transform.inl>
+#include "CubeTerrain.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -48,7 +49,7 @@ CameraDesc::CameraDesc(json& a_data): CameraDesc() {
 
 void CameraDesc::Create(Entity* a_entity) {
 	auto* camera = World::CreateAndGetComponent<Camera>();
-	camera->Init(*this);
+	if (!camera->Init(*this)) Logger::Console()->warn("Camera init failed.");
 	a_entity->AddComponent(camera);
 }
 
@@ -242,6 +243,11 @@ void Camera::Render(const Graphics& a_context) {
 	// Render to the screen buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, m_screenBuffer);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Render terrain
+	for (auto it = World::BeginComponents<CubeTerrain>(); it != World::EndComponents<CubeTerrain>(); ++it) {
+		it->Render(viewProjectionMatrix);
+	}
 
 	// Render meshes
 	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {

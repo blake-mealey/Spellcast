@@ -1,6 +1,6 @@
 // From: http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
 
-float hsv_get_v(vec3 c) {
+float hsv_get_v(vec4 c) {
     return max(c.r, max(c.g, c.b));
 }
 

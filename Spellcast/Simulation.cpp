@@ -32,17 +32,17 @@ void Simulation::Update() {
 }
 
 void Simulation::On(const KeyboardEvent& a_event) {
-	Logger::Console()->info("Keyboard Event: {} was {}",
-		a_event.m_key, a_event.m_began ? "Pressed" : a_event.m_ended ? "Released" : "Held");
+	// Logger::Console()->info("Keyboard Event: {} was {}",
+		// a_event.m_key, a_event.m_began ? "Pressed" : a_event.m_ended ? "Released" : "Held");
 }
 
 void Simulation::On(const MouseButtonEvent& a_event) {
-	Logger::Console()->info("Mouse Button Event: {} was {}",
-		a_event.m_left ? "Left" : a_event.m_right ? "Right" : "Middle", a_event.m_pressed ? "Pressed" : "Released");
+	// Logger::Console()->info("Mouse Button Event: {} was {}",
+		// a_event.m_left ? "Left" : a_event.m_right ? "Right" : "Middle", a_event.m_pressed ? "Pressed" : "Released");
 }
 
 void Simulation::On(const MouseScrollEvent& a_event) {
-	Logger::Console()->info("Mouse Scroll Event: {}", to_string(a_event.m_offset));
+	// Logger::Console()->info("Mouse Scroll Event: {}", to_string(a_event.m_offset));
 }
 
 void Simulation::On(const MouseMovedEvent& a_event) {

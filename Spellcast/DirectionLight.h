@@ -29,7 +29,7 @@ public:
 	static component_type GetType();
 	static component_index GetTypeIndex();
 	
-	bool Init(const DirectionLightDesc* a_desc);
+	bool Init(const DirectionLightDesc& a_desc);
 	bool InitShadowMap() override;
 	
 	void RenderShadowMap() override;

@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "Camera.h"
 #include "SimState.h"
+#include "Logger.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -17,7 +18,7 @@ FpsControllerDesc::FpsControllerDesc(json& a_data) : FpsControllerDesc() {
 
 void FpsControllerDesc::Create(Entity* a_entity) {
 	auto* controller = World::CreateAndGetComponent<FpsController>();
-	controller->Init(this);
+	if (!controller->Init(*this)) Logger::Console()->warn("FpsController init failed.");
 	a_entity->AddComponent(controller);
 }
 
@@ -35,9 +36,9 @@ component_index FpsController::GetTypeIndex() {
 	return ComponentTypeIndex::FPS_CONTROLLER;
 }
 
-bool FpsController::Init(const FpsControllerDesc* a_desc) {
-	m_moveSpeed = a_desc->m_moveSpeed;
-	m_cameraSpeed = a_desc->m_cameraSpeed;
+bool FpsController::Init(const FpsControllerDesc& a_desc) {
+	m_moveSpeed = a_desc.m_moveSpeed;
+	m_cameraSpeed = a_desc.m_cameraSpeed;
 
 	return true;
 }

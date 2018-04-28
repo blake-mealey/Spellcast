@@ -27,7 +27,7 @@ public:
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const FpsControllerDesc* a_desc);
+	bool Init(const FpsControllerDesc& a_desc);
 
 	void On(const KeyboardEvent& a_event) override;
 	void On(const MouseMovedEvent& a_event) override;

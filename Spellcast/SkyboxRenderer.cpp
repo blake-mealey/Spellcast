@@ -1,6 +1,7 @@
 #include "SkyboxRenderer.h"
 #include "Uniforms.h"
 #include "Mesh.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ SkyboxRendererDesc::SkyboxRendererDesc(nlohmann::json& a_data) : SkyboxRendererD
 
 void SkyboxRendererDesc::Create(Entity* a_entity) {
 	auto* renderer = World::CreateAndGetComponent<SkyboxRenderer>();
-	renderer->Init(this);
+	if (!renderer->Init(*this)) Logger::Console()->warn("SkyboxRenderer init failed.");
 	a_entity->AddComponent(renderer);
 }
 
@@ -31,10 +32,10 @@ component_index SkyboxRenderer::GetTypeIndex() {
 	return ComponentTypeIndex::SKYBOX_RENDERER;
 }
 
-bool SkyboxRenderer::Init(const SkyboxRendererDesc* a_desc) {
-	m_cubeMap = a_desc->m_cubeMap;
-	m_mesh = a_desc->m_mesh;
-	m_sunStrip = a_desc->m_sunStrip;
+bool SkyboxRenderer::Init(const SkyboxRendererDesc& a_desc) {
+	m_cubeMap = a_desc.m_cubeMap;
+	m_mesh = a_desc.m_mesh;
+	m_sunStrip = a_desc.m_sunStrip;
 
 	return m_shader.Init();
 }

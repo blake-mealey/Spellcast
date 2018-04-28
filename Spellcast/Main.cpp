@@ -37,6 +37,8 @@ int main() {
 
 	ContentManager::GetEntityDesc("Sun.entity.json")->Create();
 	ContentManager::GetEntityDesc("PointLight.entity.json")->Create()->GetTransform().SetPosition(-Geometry::UP * 10.f);
+	
+	ContentManager::GetEntityDesc("CubeTerrain.entity.json")->Create();
 
 	EntityDesc* spotLightDesc = ContentManager::GetEntityDesc("SpotLight.entity.json");
 	constexpr int count = 10;

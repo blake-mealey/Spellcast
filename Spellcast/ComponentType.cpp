@@ -8,7 +8,8 @@ const std::string ComponentType::DISPLAY_NAMES[ComponentTypeIndex::COUNT] = {
 	"DirectionLight",
 	"SpotLight",
 	"PointLight",
-	"FpsController"
+	"FpsController",
+	"CubeTerrain"
 };
 
 component_index ComponentType::GetIndex(const std::string& a_name) {

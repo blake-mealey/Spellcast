@@ -1,5 +1,6 @@
 #include "PointLight.h"
 #include "ContentManager.h"
+#include "Logger.h"
 
 using namespace nlohmann;
 using namespace glm;
@@ -14,7 +15,7 @@ PointLightDesc::PointLightDesc(json& a_data) {
 
 void PointLightDesc::Create(Entity* a_entity) {
 	auto light = World::CreateAndGetComponent<PointLight>();
-	light->Init(this);
+	if (!light->Init(*this)) Logger::Console()->warn("PointLight init failed.");
 	light->GetTransform().SetParent(&a_entity->GetTransform());
 	a_entity->AddComponent(light);
 }
@@ -32,11 +33,11 @@ component_index PointLight::GetTypeIndex() {
 	return ComponentTypeIndex::POINT_LIGHT;
 }
 
-bool PointLight::Init(const PointLightDesc* a_desc) {
-	m_color = a_desc->m_color;
-	m_power = a_desc->m_power;
+bool PointLight::Init(const PointLightDesc& a_desc) {
+	m_color = a_desc.m_color;
+	m_power = a_desc.m_power;
 
-	m_transform = a_desc->m_transform;
+	m_transform = a_desc.m_transform;
 
 	return true;
 }

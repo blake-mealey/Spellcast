@@ -26,7 +26,7 @@ public:
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const PointLightDesc* a_desc);
+	bool Init(const PointLightDesc& a_desc);
 
 	const glm::vec3& GetColor() const;
 	float GetPower() const;

@@ -28,6 +28,7 @@ struct ComponentTypeIndex {
 		SPOT_LIGHT,
 		POINT_LIGHT,
 		FPS_CONTROLLER,
+		CUBE_TERRAIN,
 		COUNT
 	};
 };

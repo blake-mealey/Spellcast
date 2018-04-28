@@ -30,7 +30,7 @@ public:
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const MeshRendererDesc* a_desc);
+	bool Init(const MeshRendererDesc& a_desc);
 
 	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_projectionMatrix) const;
 	void RenderBasic() const;

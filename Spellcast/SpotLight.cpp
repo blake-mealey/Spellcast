@@ -2,6 +2,7 @@
 #include "ContentManager.h"
 #include <glm/gtc/matrix_transform.inl>
 #include "Geometry.h"
+#include "Logger.h"
 
 using namespace nlohmann;
 using namespace glm;
@@ -23,7 +24,7 @@ SpotLightDesc::SpotLightDesc(json& a_data) {
 
 void SpotLightDesc::Create(Entity* a_entity) {
 	auto light = World::CreateAndGetComponent<SpotLight>();
-	light->Init(this);
+	if (!light->Init(*this)) Logger::Console()->warn("SpotLight init failed.");
 	light->GetTransform().SetParent(&a_entity->GetTransform());
 	a_entity->AddComponent(light);
 }
@@ -41,16 +42,16 @@ component_index SpotLight::GetTypeIndex() {
 	return ComponentTypeIndex::SPOT_LIGHT;
 }
 
-bool SpotLight::Init(const SpotLightDesc* a_desc) {
-	m_color = a_desc->m_color;
-	m_power = a_desc->m_power;
-	m_transform = a_desc->m_transform;
-	m_direction = normalize(a_desc->m_direction);
-	m_angleDegrees = a_desc->m_angleDegrees;
+bool SpotLight::Init(const SpotLightDesc& a_desc) {
+	m_color = a_desc.m_color;
+	m_power = a_desc.m_power;
+	m_transform = a_desc.m_transform;
+	m_direction = normalize(a_desc.m_direction);
+	m_angleDegrees = a_desc.m_angleDegrees;
 
-	m_shadowIntensity = a_desc->m_shadowIntensity;
-	m_castsShadows = a_desc->m_castsShadows;
-	m_shadowMapSize = a_desc->m_shadowMapSize;
+	m_shadowIntensity = a_desc.m_shadowIntensity;
+	m_castsShadows = a_desc.m_castsShadows;
+	m_shadowMapSize = a_desc.m_shadowMapSize;
 
 	if (m_castsShadows) return InitShadowMap();
 

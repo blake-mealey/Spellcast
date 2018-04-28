@@ -3,6 +3,7 @@
 #include "Mesh.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include "Logger.h"
 
 using namespace std;
 using namespace glm;
@@ -30,7 +31,7 @@ MeshRendererDesc::MeshRendererDesc(json& a_data): MeshRendererDesc() {
 
 void MeshRendererDesc::Create(Entity* a_entity) {
 	auto* renderer = World::CreateAndGetComponent<MeshRenderer>();
-	renderer->Init(this);
+	if (!renderer->Init(*this)) Logger::Console()->warn("MeshRenderer init failed.");
 	renderer->GetTransform().SetParent(&a_entity->GetTransform());
 	a_entity->AddComponent(renderer);
 }
@@ -48,13 +49,13 @@ component_index MeshRenderer::GetTypeIndex() {
 	return ComponentTypeIndex::MESH_RENDERER;
 }
 
-bool MeshRenderer::Init(const MeshRendererDesc* a_desc) {
-	m_mesh = a_desc->m_mesh;
-	m_transform = a_desc->m_transform;
-	m_materials = std::vector<Material*>(a_desc->m_materials);
+bool MeshRenderer::Init(const MeshRendererDesc& a_desc) {
+	m_mesh = a_desc.m_mesh;
+	m_transform = a_desc.m_transform;
+	m_materials = std::vector<Material*>(a_desc.m_materials);
 
-	m_castsShadows = a_desc->m_castsShadows;
-	m_receivesShadows = a_desc->m_receivesShadows;
+	m_castsShadows = a_desc.m_castsShadows;
+	m_receivesShadows = a_desc.m_receivesShadows;
 
 	return true;
 }

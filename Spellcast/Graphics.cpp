@@ -17,7 +17,7 @@
 using namespace std;
 using namespace glm;
 
-#define OPENGL_DEBUG 0
+#define OPENGL_DEBUG 1
 
 Graphics& Graphics::Instance() {
 	static Graphics instance;

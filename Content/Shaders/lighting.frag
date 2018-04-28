@@ -1,6 +1,6 @@
 #version 430
 
-#pragma include "includes/hsv.glsl"
+#pragma include "includes/lighting.glsl"
 
 struct PointLight {
 	vec3 color;
@@ -98,7 +98,5 @@ void main() {
 		}
 	}
 
-	vec3 hsv = hsv_from_rgb(fragmentColor);
-	glowColor = fragmentColor * (bloomScale + materialEmissiveness * 0.5) * hsv.z * hsv.z;
-	glowColor = vec4(glowColor.rgb, 1.f);
+	glowColor = lighting_glow_color(fragmentColor, bloomScale, materialEmissiveness);
 }

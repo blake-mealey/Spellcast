@@ -3,6 +3,7 @@
 #include "ContentManager.h"
 
 #include <glm/gtc/matrix_transform.inl>
+#include "Logger.h"
 
 using namespace glm;
 
@@ -20,7 +21,7 @@ DirectionLightDesc::DirectionLightDesc(nlohmann::json& a_data) {
 
 void DirectionLightDesc::Create(Entity* a_entity) {
 	auto* light = World::CreateAndGetComponent<DirectionLight>();
-	light->Init(this);
+	if (!light->Init(*this)) Logger::Console()->warn("DirectionLight init failed.");
 	a_entity->AddComponent(light);
 }
 
@@ -38,13 +39,13 @@ component_index DirectionLight::GetTypeIndex() {
 	return ComponentTypeIndex::DIRECTION_LIGHT;
 }
 
-bool DirectionLight::Init(const DirectionLightDesc* a_desc) {
-	m_color = a_desc->m_color;
-	m_direction = normalize(a_desc->m_direction);
+bool DirectionLight::Init(const DirectionLightDesc& a_desc) {
+	m_color = a_desc.m_color;
+	m_direction = normalize(a_desc.m_direction);
 
-	m_shadowIntensity = a_desc->m_shadowIntensity;
-	m_castsShadows = a_desc->m_castsShadows;
-	m_shadowMapSize = a_desc->m_shadowMapSize;
+	m_shadowIntensity = a_desc.m_shadowIntensity;
+	m_castsShadows = a_desc.m_castsShadows;
+	m_shadowMapSize = a_desc.m_shadowMapSize;
 
 	if (m_castsShadows) return InitShadowMap();
 

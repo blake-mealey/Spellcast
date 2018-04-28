@@ -157,7 +157,10 @@
     <ClCompile Include="ComponentType.cpp" />
     <ClCompile Include="ContentManager.cpp" />
     <ClCompile Include="CopyShader.cpp" />
+    <ClCompile Include="CubeChunk.cpp" />
     <ClCompile Include="CubeMap.cpp" />
+    <ClCompile Include="CubeTerrain.cpp" />
+    <ClCompile Include="CubeTerrainShader.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -194,8 +197,10 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentType.h" />
     <ClInclude Include="CopyShader.h" />
+    <ClInclude Include="CubeChunk.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubeTerrain.h" />
+    <ClInclude Include="CubeTerrainShader.h" />
     <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="ArrayTexture.h" />

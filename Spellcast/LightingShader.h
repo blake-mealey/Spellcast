@@ -73,7 +73,7 @@ public:
 	void LoadLights(const std::vector<DirectionLightData>& a_directionLights,
 		const std::vector<SpotLightData>& a_spotLights, const std::vector<PointLightData>& a_pointLights) const;
 
-	void LoadLights();
+	void LoadLights() const;
 
 private:
 	uniform_loc m_modelMatrixLoc = 0;

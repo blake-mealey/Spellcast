@@ -13,6 +13,7 @@
 #include "SpotLight.h"
 #include "PointLight.h"
 #include "FpsController.h"
+#include "CubeTerrain.h"
 
 #include <fstream>
 
@@ -307,6 +308,9 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 			break;
 		case ComponentTypeIndex::FPS_CONTROLLER:
 			desc = new FpsControllerDesc(a_data);
+			break;
+		case ComponentTypeIndex::CUBE_TERRAIN:
+			desc = new CubeTerrainDesc(a_data);
 			break;
 		default: ;
 		}

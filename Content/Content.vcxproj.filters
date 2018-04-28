@@ -39,6 +39,8 @@
     <None Include="Entities\Player.entity.json" />
     <None Include="Shaders\cubes.vert" />
     <None Include="Shaders\cubes.frag" />
+    <None Include="Entities\CubeTerrain.entity.json" />
+    <None Include="Shaders\includes\lighting.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entities\PointLight.entity.json">

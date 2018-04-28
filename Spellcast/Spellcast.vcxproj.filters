@@ -168,6 +168,15 @@
     <ClCompile Include="FpsController.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="CubeChunk.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeTerrain.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeTerrainShader.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System.h">
@@ -304,6 +313,12 @@
     </ClInclude>
     <ClInclude Include="FpsController.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeChunk.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeTerrainShader.h">
+      <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

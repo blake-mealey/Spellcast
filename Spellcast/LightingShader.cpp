@@ -167,7 +167,7 @@ void LightingShader::LoadLights(const vector<DirectionLightData>& a_directionLig
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void LightingShader::LoadLights() {
+void LightingShader::LoadLights() const {
 	vector<DirectionLightData> directionLights;
 	vector<SpotLightData> spotLights;
 	vector<PointLightData> pointLights;

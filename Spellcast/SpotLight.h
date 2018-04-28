@@ -32,7 +32,7 @@ public:
 	static component_type GetType();
 	static component_index GetTypeIndex();
 
-	bool Init(const SpotLightDesc* a_desc);
+	bool Init(const SpotLightDesc& a_desc);
 	
 	void RenderShadowMap() override;
 	void RenderShadows(const glm::mat4& a_viewProjectionMatrix) const override;
