@@ -88,32 +88,33 @@ bool CubeChunk::Update() {
 
 				// view from negative y
 				if (y == 0 || !m_chunk[x][y - 1][z]) {
-					vertices[i++] = byte4(x,     y,     z,     type);
-					vertices[i++] = byte4(x + 1, y,     z,     type);
-					vertices[i++] = byte4(x,     y,     z + 1, type);
-					vertices[i++] = byte4(x,     y,     z + 1, type);
-					vertices[i++] = byte4(x + 1, y,     z,     type);
-					vertices[i++] = byte4(x + 1, y,     z + 1, type);
+					vertices[i++] = byte4(x,     y,     z,     -type);
+					vertices[i++] = byte4(x + 1, y,     z,     -type);
+					vertices[i++] = byte4(x,     y,     z + 1, -type);
+					vertices[i++] = byte4(x,     y,     z + 1, -type);
+					vertices[i++] = byte4(x + 1, y,     z,     -type);
+					vertices[i++] = byte4(x + 1, y,     z + 1, -type);
 				}
 
 				// view from positive y
 				if (y == CY - 1 || !m_chunk[x][y + 1][z]) {
-					vertices[i++] = byte4(x,     y + 1, z,     type);
-					vertices[i++] = byte4(x,     y + 1, z + 1, type);
-					vertices[i++] = byte4(x + 1, y + 1, z,     type);
-					vertices[i++] = byte4(x + 1, y + 1, z,     type);
-					vertices[i++] = byte4(x,     y + 1, z + 1, type);
-					vertices[i++] = byte4(x + 1, y + 1, z + 1, type);
+					vertices[i++] = byte4(x,     y + 1, z,     -type);
+					vertices[i++] = byte4(x,     y + 1, z + 1, -type);
+					vertices[i++] = byte4(x + 1, y + 1, z,     -type);
+					vertices[i++] = byte4(x + 1, y + 1, z,     -type);
+					vertices[i++] = byte4(x,     y + 1, z + 1, -type);
+					vertices[i++] = byte4(x + 1, y + 1, z + 1, -type);
 				}
 			}
 		}
 	}
 
 	m_elements = i;
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, m_elements * sizeof(byte4), vertices, GL_STATIC_DRAW);
 
-	return glGetError() != GL_NO_ERROR;
+	return glGetError() == GL_NO_ERROR;
 }
 
 void CubeChunk::Render() {

@@ -33,7 +33,7 @@ bool Texture::LoadFromFile(const std::string& a_filePath) {
 	Image image;
 	if (!image.LoadFromFile(a_filePath)) return false;
 
-	// Add image to texture
+	// Error check
 	const GLint format = image.GetFormat();
 	if (format < 0) {
 		Logger::Console()->warn("Invalid format of image.");

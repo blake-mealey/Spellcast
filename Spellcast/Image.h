@@ -12,6 +12,7 @@ public:
 	~Image();
 
 	bool LoadFromFile(const std::string& a_filePath);
+	Image* GetSubImage(size_t a_x, size_t a_y, size_t a_width, size_t a_height) const;
 	
 	pixel_t* GetData() const;
 	GLint GetFormat() const;
@@ -24,4 +25,6 @@ private:
 
 	int m_width;
 	int m_height;
+
+	bool m_fromStb;
 };

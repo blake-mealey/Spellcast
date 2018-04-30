@@ -177,6 +177,9 @@
     <ClCompile Include="CubeTerrainShader.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="TerrainMaterial.cpp">
+      <Filter>Source Files\Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System.h">
@@ -319,6 +322,9 @@
     </ClInclude>
     <ClInclude Include="CubeTerrainShader.h">
       <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainMaterial.h">
+      <Filter>Header Files\Content</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

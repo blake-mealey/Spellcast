@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include <string>
+
 #define INVALID_ARRAY_TEXTURE_PARAM -1
 
 class ArrayTextureDesc {
@@ -38,6 +40,8 @@ class ArrayTexture {
 public:
 	ArrayTexture();
 	~ArrayTexture();
+
+	bool LoadFromFile(const std::string& a_filePath, bool a_useHeightAsWidth = true);
 
 	bool Init(const ArrayTextureDesc& a_desc);
 

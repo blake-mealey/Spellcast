@@ -5,6 +5,7 @@
 #include "CubeTerrainShader.h"
 
 #include <json/json.hpp>
+#include "TerrainMaterial.h"
 
 // Based on the tutorials from: https://en.wikibooks.org/wiki/OpenGL_Programming/Glescraft_1
 
@@ -28,6 +29,8 @@ public:
 	void Render(const glm::mat4& a_viewProjectionMatrix);
 
 private:
+	TerrainMaterial m_material;
+
 	CubeTerrainShader m_shader;
 	CubeChunk m_chunk;
 };

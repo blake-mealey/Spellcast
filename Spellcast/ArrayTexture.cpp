@@ -1,9 +1,10 @@
 #include "ArrayTexture.h"
 #include "Logger.h"
+#include "Image.h"
 
 ArrayTextureDesc::ArrayTextureDesc(): m_width(0), m_height(0), m_maxSize(0), m_internalFormat(GL_RGBA),
-                                      m_wrapS(GL_CLAMP_TO_EDGE),
-                                      m_wrapT(GL_CLAMP_TO_EDGE),
+                                      m_wrapS(GL_REPEAT),
+                                      m_wrapT(GL_REPEAT),
                                       m_minFilter(GL_LINEAR), m_magFilter(GL_LINEAR),
                                       m_compareFunc(INVALID_ARRAY_TEXTURE_PARAM),
                                       m_compareMode(INVALID_ARRAY_TEXTURE_PARAM) {}
@@ -17,6 +18,44 @@ ArrayTexture::ArrayTexture(): m_arrayTexture(0), m_width(0), m_height(0), m_maxS
 
 ArrayTexture::~ArrayTexture() {
 	if (m_arrayTexture) glDeleteTextures(1, &m_arrayTexture);
+}
+
+bool ArrayTexture::LoadFromFile(const std::string& a_filePath, bool a_useHeightAsWidth) {
+	// Load file
+	Image image;
+	if (!image.LoadFromFile(a_filePath)) return false;
+
+	// Error check
+	const GLint format = image.GetFormat();
+	if (format < 0) {
+		Logger::Console()->warn("Invalid format of image.");
+		return false;
+	}
+
+	// Initialize array
+	ArrayTextureDesc desc;
+	desc.m_width = a_useHeightAsWidth ? image.GetHeight() : image.GetWidth();
+	desc.m_height = desc.m_width;
+	desc.m_maxSize = a_useHeightAsWidth ? image.GetWidth() / desc.m_width : image.GetHeight() / desc.m_height;
+	desc.m_internalFormat = format;
+	if (!Init(desc)) return false;
+
+	// Add sub textures
+	for (size_t i = 0; i < desc.m_maxSize; ++i) {
+		// Copy the sub image
+		Image* subImage = image.GetSubImage(i * desc.m_width, 0, desc.m_width, desc.m_height);
+
+		// Initialize the sub texture
+		ArraySubTextureDesc sub;
+		sub.m_format = desc.m_internalFormat;
+		sub.m_pixels = subImage->GetData();
+		if (AddSubTexture(sub) < 0) return false;
+
+		// Delete the sub image when we are done with it
+		delete subImage;
+	}
+
+	return true;
 }
 
 bool ArrayTexture::Init(const ArrayTextureDesc& a_desc) {
@@ -36,7 +75,8 @@ bool ArrayTexture::Init(const ArrayTextureDesc& a_desc) {
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_arrayTexture);
 
 	// Set format and dimensions of array texture
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, a_desc.m_internalFormat, m_width, m_height, m_maxSize);
+	const GLenum format = a_desc.m_internalFormat == GL_RGB ? GL_RGB8 : GL_RGBA8;
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, format, m_width, m_height, m_maxSize);
 
 	// Initialize texture
 	SetParameter(GL_TEXTURE_WRAP_S, a_desc.m_wrapS);

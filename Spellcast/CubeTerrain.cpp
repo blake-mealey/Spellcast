@@ -1,6 +1,7 @@
 #include "CubeTerrain.h"
 #include "ContentManager.h"
 #include "Logger.h"
+#include "Uniforms.h"
 
 using namespace nlohmann;
 using namespace glm;
@@ -31,6 +32,7 @@ component_index CubeTerrain::GetTypeIndex() {
 bool CubeTerrain::Init(const CubeTerrainDesc& a_desc) {
 	if (!m_shader.Init()) return false;
 	if (!m_chunk.Init()) return false;
+	if (!m_material.Init()) return false;
 
 	m_chunk.Set(0, 0, 0, 20);
 
@@ -38,7 +40,7 @@ bool CubeTerrain::Init(const CubeTerrainDesc& a_desc) {
 		for (int z = 0; z < CZ; ++z) {
 			const int height = 3 * (sin(x) + cos(z) + 2);
 			for (int y = 0; y < height; ++y) {
-				m_chunk.Set(x, y, z, y*10);
+				m_chunk.Set(x, y, z, y);
 			}
 		}
 	}
@@ -49,6 +51,11 @@ bool CubeTerrain::Init(const CubeTerrainDesc& a_desc) {
 void CubeTerrain::Render(const mat4& a_viewProjectionMatrix) {
 	m_shader.Enable();
 
+	if (m_material.HasAlbedoMaps()) {
+		m_material.GetAlbedoMaps()->Bind(ALBEDO_TEXTURE_UNIT);
+	}
+
 	m_shader.SetModelViewProjectionMatrix(a_viewProjectionMatrix * mat4(1.f));
+	m_shader.SetModelMatrix(mat4(1.f));
 	m_chunk.Render();
 }

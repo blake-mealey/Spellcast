@@ -178,6 +178,7 @@
     <ClCompile Include="BlurShader.cpp" />
     <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="TerrainMaterial.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="SkyboxShader.h" />
     <ClInclude Include="SlotMap.h" />
     <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="TerrainMaterial.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="LightingShader.h" />

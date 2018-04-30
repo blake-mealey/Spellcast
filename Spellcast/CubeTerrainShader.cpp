@@ -1,4 +1,5 @@
 #include "CubeTerrainShader.h"
+#include "Uniforms.h"
 
 using namespace glm;
 
@@ -18,6 +19,8 @@ bool CubeTerrainShader::Init() {
 	// ------------------------------------------------------------------------------------------
 
 	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
+	m_modelMatrixLoc = GetUniformLocation("modelMatrix");
+	m_albedoMapsLoc = GetUniformLocation("albedoMaps");
 
 	// ------------------------------------------------------------------------------------------
 	// Load uniform defaults
@@ -26,6 +29,8 @@ bool CubeTerrainShader::Init() {
 	Enable();
 
 	SetModelViewProjectionMatrix(mat4(1.f));
+	SetModelMatrix(mat4(1.f));
+	SetAlbedoMapsTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
 
 	Disable();
 
@@ -34,4 +39,12 @@ bool CubeTerrainShader::Init() {
 
 void CubeTerrainShader::SetModelViewProjectionMatrix(const mat4& a_value) const {
 	LoadUniform(m_modelViewProjectionMatrixLoc, a_value);
+}
+
+void CubeTerrainShader::SetModelMatrix(const glm::mat4& a_value) const {
+	LoadUniform(m_modelMatrixLoc, a_value);
+}
+
+void CubeTerrainShader::SetAlbedoMapsTextureUnit(const GLuint a_value) const {
+	LoadUniform(m_albedoMapsLoc, a_value);
 }
