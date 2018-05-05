@@ -11,6 +11,20 @@ class Material;
 
 typedef GLint uniform_loc;
 
+struct ShaderSource {
+	ShaderSource(): m_valid(false), m_lines(0), m_start(0) {}
+
+	bool m_valid;
+	
+	std::string m_resolvedFilePath;
+	
+	size_t m_lines;
+	size_t m_start;
+	std::string m_source;
+	
+	std::vector<ShaderSource> m_includes;
+};
+
 class ShaderProgram {
 public:
 	ShaderProgram();
@@ -43,14 +57,13 @@ protected:
 	static void LoadUniform(const uniform_loc& a_location, const glm::mat4& a_value);
 
 private:
-	static const std::regex S_NEW_LINE;
-	static const std::regex S_DIRECTIVE;
-	static const std::regex S_INCLUDE;
-	
-	bool PreprocessShaderSource(const std::string& a_filePath, std::string& a_source, std::string& a_resolvedFilePath) const;
-	bool PreprocessShaderSource(const std::string& a_filePath, std::string& a_source) const;
-	static void FlattenSource(std::string& a_source);
+	static const std::regex DIRECTIVE_REGEX;
+	static const std::regex INCLUDE_REGEX;
+	static const std::regex LINE_NUMBER_REGEX;
 
+	static const ShaderSource& GetShaderSourceByLineNumber(const ShaderSource& a_shaderSource, size_t a_lineNumber);
+	ShaderSource GetShaderSource(const std::string& a_filePath) const;
+	
 	void DeleteShaders();
 
 	std::vector<GLuint> m_shaders;

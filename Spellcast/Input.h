@@ -19,7 +19,11 @@ public:
 	bool Init();
 	void Update() override;
 
-	void ResetMouse();
+	void ResetMousePosition();
+	void SetMousePosition(const glm::vec2& a_position);
+
+	bool KeyDown(key_index a_key);
+	bool MouseDown(mouse_index a_button);
 
 	static void KeyCallback(GLFWwindow* a_window, int a_key, int a_scanCode, int a_action, int a_mods);
 	static void MouseButtonCallback(GLFWwindow* a_window, int a_button, int a_action, int a_mods);
@@ -29,4 +33,5 @@ public:
 private:
 	glm::vec2 m_mousePosition;
 	bool m_keyDown[KEY_LAST];
+	bool m_mouseDown[MouseButton::COUNT];
 };

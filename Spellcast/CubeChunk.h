@@ -5,9 +5,9 @@
 
 #include <cstdint>
 
-#define CX 16
-#define CY 16
-#define CZ 16
+#define CX 64
+#define CY 64
+#define CZ 64
 
 typedef uint8_t cube_t;
 typedef glm::tvec4<GLbyte> byte4;
@@ -30,7 +30,8 @@ public:
 private:
 	cube_t m_chunk[CX][CY][CZ];
 	GLuint m_vao;
-	GLuint m_vbo;
+	GLuint m_vertices;
+	GLuint m_normals;
 	int m_elements;
 	bool m_changed;
 };

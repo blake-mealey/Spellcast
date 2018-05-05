@@ -7,11 +7,12 @@
 #include <regex>
 
 using namespace std;
+using namespace fmt;
 using namespace glm;
 
-const regex ShaderProgram::S_NEW_LINE(R"(\/\/.*)");
-const regex ShaderProgram::S_DIRECTIVE(R"(^#pragma (.*))");
-const regex ShaderProgram::S_INCLUDE(R"(include (?:<(.*)>|'(.*)'|\"(.*)\"))");
+const regex ShaderProgram::DIRECTIVE_REGEX(R"(^#pragma (.*))");
+const regex ShaderProgram::INCLUDE_REGEX(R"(include (?:<(.*)>|'(.*)'|\"(.*)\"))");
+const regex ShaderProgram::LINE_NUMBER_REGEX(R"(^([\d+])\((\d+)\))");
 
 ShaderProgram::ShaderProgram(): m_program(0), m_invalidUniform(false) { }
 
@@ -49,11 +50,9 @@ void ShaderProgram::Disable() {
 }
 
 bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePath) {
-	// Try reading source from file
-	string source, resolvedFilePath;
-	if (!PreprocessShaderSource(a_filePath, source, resolvedFilePath)) {
-		return false;
-	}
+	// Try getting the source from the file
+	ShaderSource shaderSource = GetShaderSource(a_filePath);
+	if (!shaderSource.m_valid) return false;
 
 	// Try to create a shader object
 	const GLuint shader = glCreateShader(a_shaderType);
@@ -66,7 +65,7 @@ bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePat
 	m_shaders.push_back(shader);
 
 	// Attach and compile the source to the shader
-	const GLchar *sourcePointer = source.c_str();
+	const GLchar *sourcePointer = shaderSource.m_source.c_str();
 	glShaderSource(shader, 1, &sourcePointer, nullptr);
 	glCompileShader(shader);
 
@@ -78,9 +77,27 @@ bool ShaderProgram::AddShader(const GLenum a_shaderType, const string& a_filePat
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 		string info(length, ' ');
 		glGetShaderInfoLog(shader, info.length(), &length, &info[0]);
-		Logger::Console()->warn("Could not compile shader {}:", resolvedFilePath, info);
-		Logger::Console()->warn(info);
-		Logger::File()->warn("Could not compile shader {}:\n\n{}\n{}", resolvedFilePath, source, info);
+
+		smatch matches;
+		string error = info;
+		ShaderSource& errorSource = shaderSource;
+		if (regex_search(info, matches, LINE_NUMBER_REGEX)) {
+			// Get line and column numbers from error message
+			size_t lineNumber = stoi(matches[2], nullptr);
+			const size_t columnNumber = stoi(matches[2], nullptr);
+
+			// Get the shader source which the error occurred in and update the line number
+			errorSource = GetShaderSourceByLineNumber(shaderSource, lineNumber);
+			lineNumber -= errorSource.m_start;
+
+			// Construct the error message with the new line number
+			error = format("{}({}){}", lineNumber, columnNumber, matches.suffix().str());
+		}
+
+		// Log the error message
+		Logger::Console()->warn("Could not compile shader {}: {}", errorSource.m_resolvedFilePath, error);
+		Logger::File()->warn("Could not compile shader {}:\n\n{}\n{}", errorSource.m_resolvedFilePath, errorSource.m_source, error);
+
 		return false;
 	}
 
@@ -169,70 +186,92 @@ void ShaderProgram::LoadUniform(const uniform_loc& a_location, const mat4& a_val
 	glUniformMatrix4fv(a_location, 1, false, &a_value[0][0]);
 }
 
-bool ShaderProgram::PreprocessShaderSource(const string& a_filePath, string& a_source, string& a_resolvedFilePath) const {
-	// Get the content path for the file
-	a_resolvedFilePath = ContentManager::GetContentPath(a_filePath, "Shaders/");
+const ShaderSource& ShaderProgram::
+GetShaderSourceByLineNumber(const ShaderSource& a_shaderSource, size_t a_lineNumber) {
+	for (const ShaderSource& include : a_shaderSource.m_includes) {
+		// Check if the line number is in the range of the include
+		if (include.m_start <= a_lineNumber && include.m_start + include.m_lines - 1 >= a_lineNumber) {
+			return GetShaderSourceByLineNumber(include, a_lineNumber);
+		}
+	}
+	return a_shaderSource;
+}
 
-	// TODO: Try different directories
-	// Load the initial source
-	string searchSource;
-	if (!ContentManager::ReadFile(a_resolvedFilePath, searchSource)) {
-		ContentManager::NoFileWarning("shader", a_resolvedFilePath.c_str());
-		return false;
+ShaderSource ShaderProgram::GetShaderSource(const string& a_filePath) const {
+	// Define invalid shader source struct
+	ShaderSource shaderSource;
+
+	// List roots to look in (TODO: Relative to "parent")
+	const std::string content = ContentManager::GetContentPath("", "Shaders/");
+	const string roots[] = { content, content + "Include/" };
+
+	// Attempt to read the source
+	istringstream sourceStream;
+	bool success = false;
+	for (const std::string& root : roots) {
+		shaderSource.m_resolvedFilePath = root + a_filePath;
+		string source;
+		success = ContentManager::ReadFile(shaderSource.m_resolvedFilePath, source);
+		if (success) {
+			sourceStream = istringstream(source);
+			break;
+		}
+	}
+
+	// If no source was found, log and return
+	if (!success) {
+		Logger::Console()->warn("No shader was found with relative path: {}", a_filePath);
+		return shaderSource;
 	}
 
 	// Search for preprocessor directives
-	smatch matches;
 	stringstream source;
-	while (regex_search(searchSource, matches, S_DIRECTIVE)) {
-		const string& arg = matches[1];
-		smatch argMatches;
+	for (string line; getline(sourceStream, line); ) {
+		// Check if line is a directive
+		smatch matches;
+		if (regex_match(line, matches, DIRECTIVE_REGEX)) {
+			// Get the directive argument (everything after '#pragma ')
+			const string& arg = matches[1];
 
-		// Handle include directive
-		if (regex_match(arg, argMatches, S_INCLUDE)) {
-			// Different capture group for '', "", <>. One group will contain path, other two will be empty string
-			const string includePath = argMatches[1].str() + argMatches[2].str() + argMatches[3].str();
-			string includeSource;
-			if (!PreprocessShaderSource(includePath, includeSource)) return false;
-			
-			// Flatten before including so we don't break line numbers
-			// TODO: Properly keep track of lines and report correct file name and line number in logger
-			FlattenSource(includeSource);
-			source << matches.prefix() << includeSource;
+			// Handle include directive
+			smatch argMatches;
+			if (regex_match(arg, argMatches, INCLUDE_REGEX)) {
+				// Different capture group for '', "", <>. One group will contain path, other two will be empty string
+				const string includePath = argMatches[1].str() + argMatches[2].str() + argMatches[3].str();
+
+				// Load the include source
+				ShaderSource include = GetShaderSource(includePath);
+				if (!include.m_valid) return shaderSource;
+
+				// Mark the start line of the include
+				include.m_start = shaderSource.m_lines;
+
+				// Add the include to our source
+				shaderSource.m_lines += include.m_lines;
+				shaderSource.m_includes.push_back(include);
+				source << include.m_source;
+			}
+
+			// Handle invalid directive
+			else {
+				Logger::Console()->warn("Unknown #pragma directive: \"{}\" in shader file {}", arg, shaderSource.m_resolvedFilePath);
+				return shaderSource;
+			}
 		}
 
-		// Move the search source ahead
-		searchSource = matches.suffix().str();
+		// Add non-directive lines to our source
+		else {
+			shaderSource.m_lines++;
+			source << line << endl;
+		}
 	}
 
-	// Append the remaining source
-	source << searchSource << endl;
-
-	// Set the return value and return success
-	a_source = source.str();
-	return true;
-}
-
-bool ShaderProgram::PreprocessShaderSource(const string& a_filePath, string& a_source) const {
-	string resolvedFilePath;
-	return PreprocessShaderSource(a_filePath, a_source, resolvedFilePath);
-}
-
-void ShaderProgram::FlattenSource(std::string& a_source) {
-	// Remove comments
-	string searchSource = a_source;
-	smatch matches;
-	stringstream sourceStream;
-	while (regex_search(searchSource, matches, S_NEW_LINE)) {
-		sourceStream << matches.prefix();
-		searchSource = matches.suffix().str();
-	}
-	sourceStream << searchSource << endl;
-	a_source = sourceStream.str();
-	
-	// Remove new lines
-	a_source.erase(std::remove(a_source.begin(), a_source.end(), '\n'), a_source.end());
-	a_source.erase(std::remove(a_source.begin(), a_source.end(), '\r'), a_source.end());
+	// Return valid source
+	shaderSource.m_source = source.str();
+	// Logger::Console()->info("Preprocessed shader source:\n\n{}", shaderSource.m_source);
+	// Logger::File()->info("Preprocessed shader source:\n\n{}", shaderSource.m_source);
+	shaderSource.m_valid = true;
+	return shaderSource;
 }
 
 void ShaderProgram::DeleteShaders() {

@@ -344,7 +344,6 @@ bool ContentManager::ReadFile(const string& a_filePath, string& a_source) {
 		input.close();
 		return true;
 	}
-	
 	return false;
 }
 

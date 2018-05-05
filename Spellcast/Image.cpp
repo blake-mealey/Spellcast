@@ -11,7 +11,7 @@ Image::Image() : m_data(nullptr), m_componentCount(0), m_width(0), m_height(0), 
 Image::~Image() {
 	if (m_data) {
 		if (m_fromStb) stbi_image_free(m_data);
-		else delete m_data;
+		else delete[] m_data;
 	}
 }
 

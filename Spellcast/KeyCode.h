@@ -3,10 +3,16 @@
 #define KEY(K) (KeyCode::KEYS[KeyCode::K])
 #define IS_KEY(v, K) (v == KEY(K))
 
+#define MBUTTON(K) (MouseButton::BUTTONS[MouseButton::K])
+#define IS_MBUTTON(v, K) (v == MBUTTON(K))
+
 #define KEY_LAST 348
 
 typedef int key_index;
 typedef int key_code;
+
+typedef int mouse_index;
+typedef int mouse_code;
 
 struct KeyCode {
 	enum : key_index {
@@ -135,4 +141,15 @@ struct KeyCode {
 	};
 
 	static const key_code KEYS[COUNT];
+};
+
+struct MouseButton {
+	enum : mouse_index {
+		LEFT = 0,
+		RIGHT,
+		MIDDLE,
+		COUNT
+	};
+
+	static const mouse_code BUTTONS[COUNT];
 };

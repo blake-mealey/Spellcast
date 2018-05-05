@@ -20,6 +20,10 @@ bool CubeTerrainShader::Init() {
 
 	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
 	m_modelMatrixLoc = GetUniformLocation("modelMatrix");
+	m_viewMatrixLoc = GetUniformLocation("viewMatrix");
+	
+	m_ambientColorLoc = GetUniformLocation("ambientColor");
+
 	m_albedoMapsLoc = GetUniformLocation("albedoMaps");
 
 	// ------------------------------------------------------------------------------------------
@@ -27,9 +31,8 @@ bool CubeTerrainShader::Init() {
 	// ------------------------------------------------------------------------------------------
 
 	Enable();
-
-	SetModelViewProjectionMatrix(mat4(1.f));
-	SetModelMatrix(mat4(1.f));
+	
+	SetAmbientColor(vec4(0.4f, 0.4f, 0.4f, 1.f));
 	SetAlbedoMapsTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
 
 	Disable();
@@ -43,6 +46,14 @@ void CubeTerrainShader::SetModelViewProjectionMatrix(const mat4& a_value) const 
 
 void CubeTerrainShader::SetModelMatrix(const glm::mat4& a_value) const {
 	LoadUniform(m_modelMatrixLoc, a_value);
+}
+
+void CubeTerrainShader::SetViewMatrix(const mat4& a_value) const {
+	LoadUniform(m_viewMatrixLoc, a_value);
+}
+
+void CubeTerrainShader::SetAmbientColor(const vec4& a_value) const {
+	LoadUniform(m_ambientColorLoc, a_value);
 }
 
 void CubeTerrainShader::SetAlbedoMapsTextureUnit(const GLuint a_value) const {

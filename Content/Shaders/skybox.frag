@@ -1,6 +1,6 @@
 #version 430
 
-#pragma include "includes/hsv.glsl"
+#pragma include "hsv.glsl"
 
 in vec3 fragmentUv;
 

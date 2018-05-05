@@ -246,7 +246,7 @@ void Camera::Render(const Graphics& a_context) {
 
 	// Render terrain
 	for (auto it = World::BeginComponents<CubeTerrain>(); it != World::EndComponents<CubeTerrain>(); ++it) {
-		it->Render(viewProjectionMatrix);
+		it->Render(viewMatrix, viewProjectionMatrix);
 	}
 
 	// Render meshes

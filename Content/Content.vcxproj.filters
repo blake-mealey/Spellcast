@@ -18,7 +18,6 @@
     <None Include="Materials\Boulder.mat.json" />
     <None Include="Shaders\lighting.frag" />
     <None Include="Shaders\lighting.vert" />
-    <None Include="Shaders\includes\hsv.glsl" />
     <None Include="Components\Boulder.comp.json" />
     <None Include="Entities\Boulder.entity.json" />
     <None Include="Entities\Boulder_all.entity.json" />
@@ -40,7 +39,8 @@
     <None Include="Shaders\cubes.vert" />
     <None Include="Shaders\cubes.frag" />
     <None Include="Entities\CubeTerrain.entity.json" />
-    <None Include="Shaders\includes\lighting.glsl" />
+    <None Include="Shaders\Include\hsv.glsl" />
+    <None Include="Shaders\Include\lighting.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entities\PointLight.entity.json">

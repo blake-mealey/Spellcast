@@ -4,6 +4,7 @@
 #include "Listener.h"
 #include "KeyboardEvent.h"
 #include "MouseMovedEvent.h"
+#include "MouseButtonEvent.h"
 
 #include <json/json.hpp>
 
@@ -19,7 +20,8 @@ public:
 
 class FpsController : public Component,
                          public Listener<KeyboardEvent>,
-                         public Listener<MouseMovedEvent> {
+                         public Listener<MouseMovedEvent>,
+						 public Listener<MouseButtonEvent> {
 friend SlotMap<FpsController>;
 public:
 	~FpsController() override = default;
@@ -31,10 +33,11 @@ public:
 
 	void On(const KeyboardEvent& a_event) override;
 	void On(const MouseMovedEvent& a_event) override;
+	void On(const MouseButtonEvent& a_event) override;
 
 private:
 	float m_moveSpeed;
 	float m_cameraSpeed;
 
-	bool m_locked;
+	glm::vec2 m_mouseMoveStart;
 };

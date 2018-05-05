@@ -26,7 +26,7 @@ void FpsControllerDesc::Create(Entity* a_entity) {
 
 
 
-FpsController::FpsController(): m_moveSpeed(0), m_cameraSpeed(0), m_locked(false) {}
+FpsController::FpsController(): m_moveSpeed(0), m_cameraSpeed(0) {}
 
 component_type FpsController::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
@@ -63,26 +63,32 @@ void FpsController::On(const KeyboardEvent& a_event) {
 		direction = camera->GetGlobalUp();
 	} else if (IS_KEY(a_event.m_key, Q)) {
 		direction = -camera->GetGlobalUp();
-	} else if (IS_KEY(a_event.m_key, ESCAPE) && a_event.m_began) {
-		m_locked = !m_locked;
-		return;
 	} else {
 		return;
 	}
-
-	if (m_locked) return;
 
 	Transform& transform = GetEntity()->GetTransform();
 	transform.Translate(m_moveSpeed * (a_event.m_shiftHeld ? 0.25f : 1.f) * direction);
 }
 
 void FpsController::On(const MouseMovedEvent& a_event) {
-	if (!m_enabled || !m_active || m_locked) return;
+	if (!m_enabled || !m_active) return;
+	if (!a_event.m_rightDown) return;
 
 	auto* camera = GetEntity()->GetComponent<Camera>();
 	if (!camera || !camera->IsMode(CameraMode::FPS)) return;
 
-	camera->TranslateAngles(m_cameraSpeed * SimState::Delta().GetSeconds() * a_event.m_fromCenter * -1.f);
+	const vec2 mouseDelta = a_event.m_position - m_mouseMoveStart;
+	camera->TranslateAngles(m_cameraSpeed * SimState::Delta().GetSeconds() * mouseDelta * -1.f);
 
-	Input::Instance().ResetMouse();
+	Input::Instance().SetMousePosition(m_mouseMoveStart);
+}
+
+void FpsController::On(const MouseButtonEvent& a_event) {
+	if (!m_enabled || !m_active) return;
+	if (!a_event.m_right) return;
+
+	if (a_event.m_pressed) {
+		m_mouseMoveStart = a_event.m_position;
+	}
 }

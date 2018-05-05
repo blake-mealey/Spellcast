@@ -26,7 +26,7 @@ public:
 
 	bool Init(const CubeTerrainDesc& a_desc);
 
-	void Render(const glm::mat4& a_viewProjectionMatrix);
+	void Render(const glm::mat4& a_viewMatrix, const glm::mat4& a_viewProjectionMatrix);
 
 private:
 	TerrainMaterial m_material;
