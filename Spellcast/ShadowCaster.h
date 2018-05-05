@@ -15,7 +15,7 @@ public:
 	virtual bool InitShadowMap();
 
 	virtual void RenderShadowMap();
-	virtual void RenderShadows(const glm::mat4& a_viewProjectionMatrix) const;
+	virtual void RenderShadows(const glm::mat4& a_viewProjectionMatrix, float a_power) const;
 
 	virtual void ComputeDepthViewProjectionMatrix() = 0;
 

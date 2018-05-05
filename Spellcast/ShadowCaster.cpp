@@ -3,6 +3,7 @@
 #include "World.h"
 #include "MeshRenderer.h"
 #include "Uniforms.h"
+#include "CubeTerrain.h"
 
 using namespace glm;
 
@@ -65,30 +66,53 @@ void ShadowCaster::RenderShadowMap() {
 
 	ComputeDepthViewProjectionMatrix();
 
+	for (auto it = World::BeginComponents<CubeTerrain>(); it != World::EndComponents<CubeTerrain>(); ++it) {
+		CubeTerrain& renderer = *it;
+		if (!renderer.IsEnabled()) continue;
+
+		const mat4 modelMatrix(1.f);
+		m_shadowMapShader.SetDepthModelViewProjectionMatrix(m_depthViewProjectionMatrix * modelMatrix);
+		renderer.RenderBasic();
+	}
+
 	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {
-		const MeshRenderer& meshRenderer = *it;
-		if (!meshRenderer.IsEnabled() || !meshRenderer.DoesCastShadows()) continue;
+		const MeshRenderer& renderer = *it;
+		if (!renderer.IsEnabled() || !renderer.DoesCastShadows()) continue;
 		
-		const mat4& depthModelMatrix = meshRenderer.GetTransform().GetTransformationMatrix();
-		m_shadowMapShader.SetDepthModelViewProjectionMatrix(m_depthViewProjectionMatrix * depthModelMatrix);
-		meshRenderer.RenderBasic();
+		const mat4& modelMatrix = renderer.GetTransform().GetTransformationMatrix();
+		m_shadowMapShader.SetDepthModelViewProjectionMatrix(m_depthViewProjectionMatrix * modelMatrix);
+		renderer.RenderBasic();
 	}
 }
 
-void ShadowCaster::RenderShadows(const mat4& a_viewProjectionMatrix) const {
+void ShadowCaster::RenderShadows(const mat4& a_viewProjectionMatrix, const float a_power) const {
 	if (!m_castsShadows) return;
 
 	m_shadowShader.Enable();
 	m_shadowShader.SetIntensity(m_shadowIntensity);
+	m_shadowShader.SetPower(a_power);
 
 	m_shadowMap.Bind(SHADOW_TEXTURE_UNIT);
 	const mat4 depthBiasViewProjectionMatrix = BIAS_MATRIX * m_depthViewProjectionMatrix;
-	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {
-		if (!it->IsEnabled() || !it->DoesReceiveShadows()) continue;
-		const mat4 modelMatrix = it->GetTransform().GetTransformationMatrix();
+
+	for (auto it = World::BeginComponents<CubeTerrain>(); it != World::EndComponents<CubeTerrain>(); ++it) {
+		CubeTerrain& renderer = *it;
+		if (!renderer.IsEnabled()) continue;
+
+		const mat4 modelMatrix(1.f);
 		m_shadowShader.SetModelViewProjectionMatrix(a_viewProjectionMatrix * modelMatrix);
 		m_shadowShader.SetDepthBiasModelViewProjectionMatrix(depthBiasViewProjectionMatrix * modelMatrix);
-		it->RenderBasic();
+		renderer.RenderBasic();
+	}
+
+	for (auto it = World::BeginComponents<MeshRenderer>(); it != World::EndComponents<MeshRenderer>(); ++it) {
+		const MeshRenderer& renderer = *it;
+		if (!renderer.IsEnabled() || !renderer.DoesReceiveShadows()) continue;
+		
+		const mat4 modelMatrix = renderer.GetTransform().GetTransformationMatrix();
+		m_shadowShader.SetModelViewProjectionMatrix(a_viewProjectionMatrix * modelMatrix);
+		m_shadowShader.SetDepthBiasModelViewProjectionMatrix(depthBiasViewProjectionMatrix * modelMatrix);
+		renderer.RenderBasic();
 	}
 }
 

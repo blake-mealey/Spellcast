@@ -1,4 +1,5 @@
 #pragma include "hsv.glsl"
+#pragma include "lighting_helpers.glsl"
 
 struct PointLight {
 	vec3 color;
@@ -48,10 +49,6 @@ void lighting_add_light(const Material material, vec3 lightDirection_camera, vec
 void lighting_add_direction_light(DirectionLight light, mat4 viewMatrix, vec3 surfaceNormal_camera, vec3 eyeDirection_camera, const Material material) {
 	vec3 lightDirection_camera = (viewMatrix * vec4(-light.direction_world, 0)).xyz;
 	lighting_add_light(material, lightDirection_camera, surfaceNormal_camera, eyeDirection_camera, vec4(light.color, 1.f), 1.f);
-}
-
-float lighting_get_attenuation(float power, float distance) {
-	return 1.0 / (1.0 * (1.0/power) * (distance*distance));
 }
 
 void lighting_add_spot_light(SpotLight light, mat4 viewMatrix, vec3 surfaceNormal_camera, vec3 eyeDirection_camera, vec3 fragmentPosition_camera, const Material material) {

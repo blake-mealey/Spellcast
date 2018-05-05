@@ -35,7 +35,7 @@ public:
 	bool Init(const SpotLightDesc& a_desc);
 	
 	void RenderShadowMap() override;
-	void RenderShadows(const glm::mat4& a_viewProjectionMatrix) const override;
+	void RenderShadows(const glm::mat4& a_viewProjectionMatrix) const;
 
 	void ComputeDepthViewProjectionMatrix() override;
 

@@ -172,10 +172,19 @@ bool CubeChunk::Update() {
 
 void CubeChunk::Render() {
 	if (m_changed) Update();
-
 	if (!m_elements) return;
 
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, m_elements);
+}
+
+void CubeChunk::RenderBasic() {
+	if (m_changed) Update();
+	if (!m_elements) return;
+
+	glBindVertexArray(m_vao);
+	glDisableVertexAttribArray(1);
+	glDrawArrays(GL_TRIANGLES, 0, m_elements);
+	glEnableVertexAttribArray(1);
 }
 

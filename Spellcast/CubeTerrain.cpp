@@ -65,3 +65,7 @@ void CubeTerrain::Render(const mat4& a_viewMatrix, const mat4& a_viewProjectionM
 	m_shader.SetViewMatrix(a_viewMatrix);
 	m_chunk.Render();
 }
+
+void CubeTerrain::RenderBasic() {
+	m_chunk.RenderBasic();
+}

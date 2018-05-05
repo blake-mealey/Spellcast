@@ -4,7 +4,7 @@
     {
       "Type": "SpotLight",
       "Angle": 30,
-      "ShadowIntensity": 0.4,
+      "ShadowIntensity": 0.75,
       "CastsShadows": true,
       "Direction": [0, -1, 1],
       "Color": "Red",

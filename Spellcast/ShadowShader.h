@@ -11,6 +11,8 @@ public:
 	
 	void SetShadowMapTextureUnit(GLuint a_value) const;
 	void SetIntensity(float a_value) const;
+	
+	void SetPower(float a_value) const;
 
 private:
 	uniform_loc m_modelViewProjectionMatrixLoc = 0;
@@ -18,4 +20,6 @@ private:
 	
 	uniform_loc m_shadowMapLoc = 0;
 	uniform_loc m_intensityLoc = 0;
+	
+	uniform_loc m_powerLoc = 0;
 };

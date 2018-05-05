@@ -26,6 +26,7 @@ public:
 
 	bool Update();
 	void Render();
+	void RenderBasic();
 
 private:
 	cube_t m_chunk[CX][CY][CZ];

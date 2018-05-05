@@ -65,7 +65,7 @@ void SpotLight::RenderShadowMap() {
 
 void SpotLight::RenderShadows(const mat4& a_viewProjectionMatrix) const {
 	if (!m_enabled) return;
-	ShadowCaster::RenderShadows(a_viewProjectionMatrix);
+	ShadowCaster::RenderShadows(a_viewProjectionMatrix, m_power * 2.f);
 }
 
 void SpotLight::ComputeDepthViewProjectionMatrix() {

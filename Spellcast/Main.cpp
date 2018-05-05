@@ -7,6 +7,7 @@
 #include "SimState.h"
 #include "Geometry.h"
 #include "SpotLight.h"
+#include "Camera.h"
 
 using namespace glm;
 using namespace std;
@@ -27,7 +28,6 @@ int main() {
 
 	// Create entities
 	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
-	// ContentManager::GetEntityDesc("Camera.entity.json")->Create();
 	ContentManager::GetEntityDesc("Player.entity.json")->Create()->GetTransform().Translate({});
 	
 	ContentManager::GetEntityDesc("Floor.entity.json")->Create();

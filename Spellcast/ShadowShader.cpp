@@ -20,8 +20,11 @@ bool ShadowShader::Init() {
 
 	m_modelViewProjectionMatrixLoc = GetUniformLocation("modelViewProjectionMatrix");
 	m_depthBiasModelViewProjectionMatrixLoc = GetUniformLocation("depthBiasModelViewProjectionMatrix");
+	
 	m_shadowMapLoc = GetUniformLocation("shadowMap");
 	m_intensityLoc = GetUniformLocation("intensity");
+	
+	m_powerLoc = GetUniformLocation("power");
 
 	// ------------------------------------------------------------------------------------------
 	// Load uniform defaults
@@ -51,4 +54,8 @@ void ShadowShader::SetShadowMapTextureUnit(const GLuint a_value) const {
 
 void ShadowShader::SetIntensity(const float a_value) const {
 	LoadUniform(m_intensityLoc, a_value);
+}
+
+void ShadowShader::SetPower(const float a_value) const {
+	LoadUniform(m_powerLoc, a_value);
 }
