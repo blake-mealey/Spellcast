@@ -9,9 +9,10 @@
 #include "Uniforms.h"
 #include "DirectionLight.h"
 #include "SpotLight.h"
+#include "CubeTerrain.h"
+#include "JsonReader.h"
 
 #include <glm/gtc/matrix_transform.inl>
-#include "CubeTerrain.h"
 
 using namespace glm;
 using namespace nlohmann;
@@ -25,26 +26,26 @@ CameraDesc::CameraDesc(): m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
                           m_viewportUnitScale(vec2(1.f)), m_horizontalAngle(G_PI), m_verticalAngle(0.f),
                           m_mode(CameraMode::FPS) {}
 
-CameraDesc::CameraDesc(json& a_data): CameraDesc() {
-	m_nearClippingPlane = ContentManager::FromJson(a_data, "NearClippingPlane", m_nearClippingPlane);
-	m_farClippingPlane = ContentManager::FromJson(a_data, "FarClippingPlane", m_farClippingPlane);
+CameraDesc::CameraDesc(JsonReader& a_reader): CameraDesc() {
+	m_nearClippingPlane = a_reader.GetValue("NearClippingPlane", m_nearClippingPlane);
+	m_farClippingPlane = a_reader.GetValue("FarClippingPlane", m_farClippingPlane);
 
-	m_upVector = ContentManager::VecFromJson(a_data, "UpVector", m_upVector);
-	m_fieldOfView = radians(ContentManager::FromJson(a_data, "FieldOfView", DEFAULT_FIELD_OF_VIEW));
+	m_upVector = a_reader.GetVector("UpVector", m_upVector);
+	m_fieldOfView = radians(a_reader.GetValue("FieldOfView", DEFAULT_FIELD_OF_VIEW));
 
-	m_localPosition = ContentManager::VecFromJson(a_data, "Position", m_localPosition);
-	m_targetGlobalPosition = ContentManager::VecFromJson(a_data, "Target", m_targetGlobalPosition);
+	m_localPosition = a_reader.GetVector("Position", m_localPosition);
+	m_targetGlobalPosition = a_reader.GetVector("Target", m_targetGlobalPosition);
 
-	m_viewportUnitScale = ContentManager::VecFromJson(a_data, "ViewportUnitScale", m_viewportUnitScale);
-	m_viewportUnitPosition = ContentManager::VecFromJson(a_data, "ViewportUnitPosition", m_viewportUnitPosition);
+	m_viewportUnitScale = a_reader.GetVector("ViewportUnitScale", m_viewportUnitScale);
+	m_viewportUnitPosition = a_reader.GetVector("ViewportUnitPosition", m_viewportUnitPosition);
 
-	m_viewportPixelScale = ContentManager::VecFromJson(a_data, "ViewportPixelScale", m_viewportPixelScale);
-	m_viewportPixelPosition = ContentManager::VecFromJson(a_data, "ViewportPixelPosition", m_viewportPixelPosition);
+	m_viewportPixelScale = a_reader.GetVector("ViewportPixelScale", m_viewportPixelScale);
+	m_viewportPixelPosition = a_reader.GetVector("ViewportPixelPosition", m_viewportPixelPosition);
 
-	m_horizontalAngle = ContentManager::FromJson(a_data, "HorizontalAngle", m_horizontalAngle);
-	m_verticalAngle = ContentManager::FromJson(a_data, "VerticalAngle", m_verticalAngle);
+	m_horizontalAngle = a_reader.GetValue("HorizontalAngle", m_horizontalAngle);
+	m_verticalAngle = a_reader.GetValue("VerticalAngle", m_verticalAngle);
 
-	m_mode = ContentManager::EnumFromJson<CameraMode>(a_data, "Mode", m_mode);
+	m_mode = a_reader.GetEnum<CameraMode>("Mode", m_mode);
 }
 
 void CameraDesc::Create(Entity* a_entity) {

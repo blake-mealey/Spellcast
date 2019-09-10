@@ -9,16 +9,16 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
-class Entity;
-
 #define BLUR_LEVEL_COUNT 4
 
 #define DEFAULT_NEAR_CLIPPING_PLANE 0.1f
 #define DEFAULT_FAR_CLIPPING_PLANE 1000.f
 #define DEFAULT_FIELD_OF_VIEW 60.f
 
+class JsonReader;
 class Graphics;
-
+class InjectedContentManager;
+class Entity;
 class Camera;
 
 struct CameraMode {
@@ -28,7 +28,7 @@ struct CameraMode {
 
 struct CameraDesc : ComponentDesc {
 	CameraDesc();
-	explicit CameraDesc(nlohmann::json& a_data);
+	explicit CameraDesc(JsonReader& a_reader);
 	void Create(Entity* a_entity) override;
 
 	float m_nearClippingPlane;

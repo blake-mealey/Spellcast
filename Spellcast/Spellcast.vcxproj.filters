@@ -183,6 +183,9 @@
     <ClCompile Include="InjectedContentManager.cpp">
       <Filter>Source Files\Content</Filter>
     </ClCompile>
+    <ClCompile Include="JsonReader.cpp">
+      <Filter>Source Files\Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System.h">
@@ -330,6 +333,9 @@
       <Filter>Header Files\Content</Filter>
     </ClInclude>
     <ClInclude Include="InjectedContentManager.h">
+      <Filter>Header Files\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonReader.h">
       <Filter>Header Files\Content</Filter>
     </ClInclude>
   </ItemGroup>

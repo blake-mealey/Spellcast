@@ -4,7 +4,6 @@
 #include "Entity.h"
 
 #include <json/json.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <unordered_map>
 
@@ -40,29 +39,6 @@ public:
 	
 	std::string GetContentPath(const std::string& a_filePath, const std::string& a_dirPath = "");
 	void NoFileWarning(const char* a_fileType, const char* a_filePath);
-
-	template <typename T>
-	int EnumFromJson(nlohmann::json& a_data, const std::string& a_key, int a_default = 0);
-
-	template <typename T>
-	int EnumFromJson(nlohmann::json& a_data, int a_default = 0);
-
-	template <typename T>
-	T FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default = T());
-
-	template <typename T>
-	T FromJson(nlohmann::json& a_data, const T& a_default = T());
-
-	template <typename V>
-	V VecFromJson(nlohmann::json& a_data, const std::string& a_key, const V& a_default = V());
-
-	template <typename V>
-	V VecFromJson(nlohmann::json& a_data, const V& a_default = V());
-
-	template <typename K>
-	glm::vec4 ColorFromJson(nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default = glm::vec4(1.f));
-
-	glm::vec4 ColorFromJson(nlohmann::json& a_data, const glm::vec4& a_default = glm::vec4(1.f));
 
 private:
 

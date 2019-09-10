@@ -165,6 +165,7 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="InjectedContentManager.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="JsonReader.cpp" />
     <ClCompile Include="KeyCode.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="FpsController.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="InjectedContentManager.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="JsonReader.h" />
     <ClInclude Include="KeyboardEvent.h" />
     <ClInclude Include="KeyCode.h" />
     <ClInclude Include="Listener.h" />

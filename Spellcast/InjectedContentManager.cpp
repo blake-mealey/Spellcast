@@ -1,8 +1,6 @@
 #include "InjectedContentManager.h"
 #include "ContentManager.h"
 #include "Mesh.h"
-
-#include <fstream>
 #include "CubeMap.h"
 #include "LightingShader.h"
 #include "CubeTerrain.h"
@@ -14,6 +12,10 @@
 #include "MeshRenderer.h"
 #include "SkyboxRenderer.h"
 #include "Camera.h"
+#include "JsonReader.h"
+
+#include <fstream>
+#include <string>
 
 using namespace std;
 using namespace glm;
@@ -135,7 +137,7 @@ Material* InjectedContentManager::GetMaterial(nlohmann::json& a_data, bool a_ove
     json data;
 	const bool fromFile = a_data.is_string();
 	if (fromFile) {
-		const string filePath = FromJson<string>(a_data);
+		const string filePath = JsonReader(a_data).GetValue<string>();
 		
 		// Check if the data has already been loaded
 		if (!a_overwrite) {
@@ -158,7 +160,7 @@ Material* InjectedContentManager::GetMaterial(nlohmann::json& a_data, bool a_ove
 	}
 
 	// Cache the result and return
-	if (fromFile) m_materials[FromJson<string>(a_data)] = mat;
+	if (fromFile) m_materials[JsonReader(a_data).GetValue<string>()] = mat;
 	return mat;
 }
 
@@ -280,6 +282,7 @@ ComponentDesc* InjectedContentManager::GetComponentDesc(nlohmann::json& a_data, 
 		const component_index index = ComponentType::GetIndex(type.get<string>());
 
 		// Construct the component description from the loaded data
+        JsonReader reader(a_data);
 		switch (index) {
 		case ComponentTypeIndex::MESH_RENDERER:
 			desc = new MeshRendererDesc(a_data);
@@ -288,7 +291,7 @@ ComponentDesc* InjectedContentManager::GetComponentDesc(nlohmann::json& a_data, 
 			desc = new SkyboxRendererDesc(a_data);
 			break;
 		case ComponentTypeIndex::CAMERA:
-			desc = new CameraDesc(a_data);
+			desc = new CameraDesc(reader);
 			break;
 		case ComponentTypeIndex::DIRECTION_LIGHT:
 			desc = new DirectionLightDesc(a_data);
@@ -373,82 +376,4 @@ std::string InjectedContentManager::GetContentPath(const std::string& a_filePath
 
 void InjectedContentManager::NoFileWarning(const char* a_fileType, const char* a_filePath) {
     Logger::Console()->warn("Could not open {} file: {}", a_fileType, a_filePath);
-}
-
-vec4 InjectedContentManager::ColorFromJson(json& a_data, const vec4& a_default) {
-	vec4 color = a_default;
-    if (a_data.is_array()) {
-        if (a_data.size() == 3) {
-			color = vec4(VecFromJson<vec3>(a_data), 255.f) / 255.f;
-        } else if (a_data.size() == 4) {
-			color = VecFromJson<vec4>(a_data) / 255.f;
-        }
-    } else if (a_data.is_string()) {
-        string name = a_data.get<string>();
-        if (name.find("White") != string::npos)                 color = ContentManager::COLOR_WHITE;
-        else if (name.find("LightGrey") != string::npos)        color = ContentManager::COLOR_LIGHT_GREY;
-        else if (name.find("Black") != string::npos)            color = ContentManager::COLOR_BLACK;
-        else if (name.find("LightRed") != string::npos)         color = ContentManager::COLOR_LIGHT_RED;
-        else if (name.find("Red") != string::npos)              color = ContentManager::COLOR_RED;
-        else if (name.find("LightGreen") != string::npos)       color = ContentManager::COLOR_LIGHT_GREEN;
-        else if (name.find("Green") != string::npos)            color = ContentManager::COLOR_GREEN;
-        else if (name.find("DarkBlue") != string::npos)         color = ContentManager::COLOR_DARK_BLUE;
-        else if (name.find("LightBlue") != string::npos)        color = ContentManager::COLOR_LIGHT_BLUE;
-        else if (name.find("Blue") != string::npos)             color = ContentManager::COLOR_BLUE;
-        else if (name.find("Yellow") != string::npos)           color = ContentManager::COLOR_YELLOW;
-        else if (name.find("Cyan") != string::npos)             color = ContentManager::COLOR_CYAN;
-
-        if (name.find("HalfAlpha") != string::npos) color.a = 0.5f;
-        else if (name.find("Alpha") != string::npos) color.a = 0.f;
-    }
-    return color;
-}
-
-template <typename T>
-int InjectedContentManager::EnumFromJson(nlohmann::json& a_data, const std::string& a_key, const int a_default) {
-	return EnumFromJson<T>(a_data[a_key], a_default);
-}
-
-template <typename T>
-int InjectedContentManager::EnumFromJson(nlohmann::json& a_data, const int a_default) {
-	if (a_data.is_string()) {
-		const std::string name = a_data.get<std::string>();
-		for (int i = 0; i < T::COUNT; ++i) if (T::NAMES[i] == name) return i;
-	} else if (a_data.is_number_integer()) {
-		const int value = a_data.get<int>();
-		if (value >= 0 && value < T::COUNT) return value;
-	}	
-	return a_default;
-}
-
-template <typename T>
-T InjectedContentManager::FromJson(nlohmann::json& a_data, const std::string& a_key, const T& a_default) {
-	return FromJson(a_data[a_key], a_default);
-}
-
-template <typename T>
-T InjectedContentManager::FromJson(nlohmann::json& a_data, const T& a_default) {
-	if (a_data.is_null()) return a_default;
-	return a_data.get<T>();
-}
-
-template <typename V>
-V InjectedContentManager::VecFromJson(nlohmann::json& a_data, const std::string& a_key, const V& a_default) {
-	return VecFromJson(a_data[a_key], a_default);
-}
-
-template <typename V>
-V InjectedContentManager::VecFromJson(nlohmann::json& a_data, const V& a_default) {
-	if (!a_data.is_array() || a_data.size() != sizeof(V) / sizeof(float)) return a_default;
-
-	V vector;
-	float* vectorData = glm::value_ptr(vector);
-	for (float f : a_data) vectorData++[0] = f;
-
-	return vector;
-}
-
-template <typename K>
-glm::vec4 InjectedContentManager::ColorFromJson(nlohmann::json& a_data, const K& a_key, const glm::vec4& a_default) {
-	return ColorFromJson(a_data[a_key], a_default);
 }

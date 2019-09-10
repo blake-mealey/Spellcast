@@ -14,6 +14,7 @@
 #include "PointLight.h"
 #include "FpsController.h"
 #include "CubeTerrain.h"
+#include "JsonReader.h"
 
 #include <fstream>
 
@@ -287,6 +288,7 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 		const component_index index = ComponentType::GetIndex(type.get<string>());
 
 		// Construct the component description from the loaded data
+        JsonReader reader(a_data);
 		switch (index) {
 		case ComponentTypeIndex::MESH_RENDERER:
 			desc = new MeshRendererDesc(a_data);
@@ -295,7 +297,7 @@ ComponentDesc* ContentManager::GetComponentDesc(json& a_data, bool a_overwrite) 
 			desc = new SkyboxRendererDesc(a_data);
 			break;
 		case ComponentTypeIndex::CAMERA:
-			desc = new CameraDesc(a_data);
+			desc = new CameraDesc(reader);
 			break;
 		case ComponentTypeIndex::DIRECTION_LIGHT:
 			desc = new DirectionLightDesc(a_data);
