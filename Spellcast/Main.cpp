@@ -1,18 +1,20 @@
 #include "Graphics.h"
 #include "Input.h"
 #include "Simulation.h"
-#include "ContentManager.h"
 
 #include <glm/glm.hpp>
 #include "SimState.h"
 #include "Geometry.h"
 #include "SpotLight.h"
 #include "Camera.h"
+#include "InjectedContentManager.h"
 
 using namespace glm;
 using namespace std;
 
 int main() {
+    InjectedContentManager contentManager;
+
 	// Initialize systems
 	Graphics& graphics = Graphics::Instance();
 	if (!graphics.Init("Spellcast")) exit(-1);
@@ -27,20 +29,20 @@ int main() {
 	vector<System*> systems = { &input, &simulation, &graphics };
 
 	// Create entities
-	ContentManager::GetEntityDesc("Skybox.entity.json")->Create();
-	ContentManager::GetEntityDesc("Player.entity.json")->Create()->GetTransform().Translate({});
+	contentManager.GetEntityDesc("Skybox.entity.json")->Create();
+	contentManager.GetEntityDesc("Player.entity.json")->Create()->GetTransform().Translate({});
 	
-	ContentManager::GetEntityDesc("Floor.entity.json")->Create();
-	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(-Geometry::UP);
-	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(Geometry::UP);
-	ContentManager::GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Scale(0.5f);
+	contentManager.GetEntityDesc("Floor.entity.json")->Create();
+	contentManager.GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(-Geometry::UP);
+	contentManager.GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Translate(Geometry::UP);
+	contentManager.GetEntityDesc("Boulder.entity.json")->Create()->GetTransform().Scale(0.5f);
 
-	ContentManager::GetEntityDesc("Sun.entity.json")->Create();
-	ContentManager::GetEntityDesc("PointLight.entity.json")->Create()->GetTransform().SetPosition(-Geometry::UP * 10.f);
+	contentManager.GetEntityDesc("Sun.entity.json")->Create();
+	contentManager.GetEntityDesc("PointLight.entity.json")->Create()->GetTransform().SetPosition(-Geometry::UP * 10.f);
 	
-	ContentManager::GetEntityDesc("CubeTerrain.entity.json")->Create();
+	contentManager.GetEntityDesc("CubeTerrain.entity.json")->Create();
 
-	EntityDesc* spotLightDesc = ContentManager::GetEntityDesc("SpotLight.entity.json");
+	EntityDesc* spotLightDesc = contentManager.GetEntityDesc("SpotLight.entity.json");
 	constexpr int count = 10;
 	constexpr float distance = 3.f;
 	for (int i = 0; i < count; ++i) {
