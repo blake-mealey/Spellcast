@@ -21,9 +21,12 @@ const std::string CameraMode::NAMES[COUNT] = { "Target", "Sphere", "FPS" };
 
 CameraDesc::CameraDesc(): m_nearClippingPlane(DEFAULT_NEAR_CLIPPING_PLANE),
                           m_farClippingPlane(DEFAULT_FAR_CLIPPING_PLANE),
-                          m_upVector(Geometry::UP), m_fieldOfView(radians(DEFAULT_FIELD_OF_VIEW)),
+                          m_upVector(Geometry::UP),
+                          m_fieldOfView(radians(DEFAULT_FIELD_OF_VIEW)),
                           m_localPosition(-Geometry::FORWARD),
-                          m_viewportUnitScale(vec2(1.f)), m_horizontalAngle(G_PI), m_verticalAngle(0.f),
+                          m_viewportUnitScale(vec2(1.f)),
+                          m_horizontalAngle(G_PI),
+                          m_verticalAngle(0.f),
                           m_mode(CameraMode::FPS) {}
 
 CameraDesc::CameraDesc(JsonReader& a_reader): CameraDesc() {
@@ -64,11 +67,19 @@ Camera::~Camera() {
 	if (m_screenVbo) glDeleteBuffers(1, &m_screenVbo);
 }
 
-Camera::Camera() : m_depthStencilBuffer(0), m_screenBuffer(0), m_glowBuffer(0), m_screenVao(0), m_screenVbo(0),
-                   m_blurTextures{}, m_blurTempTextures{},
+Camera::Camera() : m_depthStencilBuffer(0),
+                   m_screenBuffer(0),
+                   m_glowBuffer(0),
+                   m_screenVao(0),
+                   m_screenVbo(0),
+                   m_blurTextures{},
+                   m_blurTempTextures{},
                    m_nearClippingPlane(0.f),
                    m_farClippingPlane(0.f),
-                   m_fieldOfView(0.f), m_horizontalAngle(0), m_verticalAngle(0), m_mode(0) {};
+                   m_fieldOfView(0.f),
+                   m_horizontalAngle(0),
+                   m_verticalAngle(0),
+                   m_mode(0) {};
 
 component_type Camera::GetType() {
 	return Component::GetType() | (1 << GetTypeIndex());
